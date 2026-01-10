@@ -1,0 +1,183 @@
+.main{
+    height: calc(100vh - 80px);
+    
+}
+
+.requiredError{
+    color: red;
+    margin: 0;
+    font-size: 12px;
+    padding: 0;
+    opacity: 1;
+}
+.ErrorArea{
+    color: transparent;
+    opacity: 0;
+    margin: 0;
+    font-size: 12px;
+    padding: 0;
+}
+
+.game{
+    background-image: url("/public/women.png");
+    background-size: cover;
+    background-repeat:no-repeat;
+    background-position: center;
+    height: 600px;
+}
+
+.women{
+    background-image: url("/public/women.png");
+    background-size: cover;
+    background-repeat:no-repeat;
+    background-position:top center;
+    color: #fff;
+   
+
+}
+
+.speaker{
+     background-color: #000;
+     background-image: url("/public/Frame\ 707.png");
+    background-position: center;
+    background-repeat:no-repeat;
+    width: 100%;
+    color: #fff;
+
+}
+
+.perfume{
+    background-color: #000;
+     background-image: url("/public/Frame\ 706.png");
+   background-position: center;
+    background-repeat:no-repeat;
+    width: 100%;
+    color: #fff;
+    
+}
+
+.loading{
+    border: 5px solid black;
+    height: 40px;
+    width: 40px;
+    border-right: 5px solid #03A9F4;
+    border-left: 5px solid #03A9F4;
+    border-radius: 50%;
+    animation: load 1.5s linear infinite;
+}
+
+@keyframes load {
+  0% { transform: rotate(0deg); 
+   
+     
+       box-shadow:inset 0 0 5px #4EC3F8,
+       0 0 10px #03A9F4;
+}
+70% {
+  
+   transform: rotate(360deg);
+   box-shadow:inset 0 0 10px #4EC3F8,
+    0 0 30px #03A9F4;
+}
+  100% { transform: scale(2);
+    box-shadow:inset 0 0 10px #4EC3F8,
+    0 0 50px #03A9F4;
+
+  }
+}
+
+
+.card {
+  position: relative;
+  display: inline-block;
+}
+.addtoCart {
+  position: absolute;
+ width: 100%;
+  height: 0%;
+  left: 0;
+  bottom: 0;
+  opacity: 1;
+  transition: all 0.4s ease-in-out;
+  overflow: hidden;
+}
+.card:hover .addtoCart {
+  height:40px;
+}
+
+.Dropdown{
+  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(240, 240, 240, 0.7);
+  -webkit-backdrop-filter: blur(20px);
+   backdrop-filter: blur(20px);
+   z-index: 10;
+  
+}
+
+
+.navbar{
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  /* width: 250px; */
+  z-index: 999;
+  background-color: rgba(240, 240, 240, 0.7);
+  box-shadow: -10px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 5px !important;
+  row-gap: 20px;
+  backdrop-filter: blur(20px);
+  animation: sideBar .5s ease-in-out 0s 1 forwards ;
+}
+
+@keyframes sideBar {
+  0%{
+    width: 0px;
+    opacity: 0;
+  }
+  100%{
+    width: 300px;
+    opacity: 1;
+  }
+  
+}
+
+
+.closesideBar{
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  /* width: 250px; */
+  z-index: 999;
+  background-color: rgba(240, 240, 240, 0.7);
+  box-shadow: -10px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 5px !important;
+  row-gap: 20px;
+  backdrop-filter: blur(20px);
+  animation: closeSideBar .5s ease-in-out 0s 1 forwards ;
+}
+
+
+@keyframes closeSideBar {
+  0%{
+    width: 300px;
+    opacity: 1;
+  }
+  100%{
+    width: 0px;
+    opacity: 0;
+  }
+  
+}
+
+
+
+.sideIcons{
+  transition: all .5s;
+}
+
+.sideIcons:hover , .sideIcons:active{
+  transform: scale(1.5);
+  text-shadow: 0 0 3px  #000;
+}
