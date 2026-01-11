@@ -43,12 +43,12 @@ const Myroute = () => {
           <Route path="/Dashboard" element={<Dash/>}/>
           <Route path="/Account" element={<Account/>}></Route>
           <Route path="/Product" element={<Products />}></Route>
-          /////
+          {/* /////
           <Route path="/signup" element={<Signup />}></Route>
           <Route path="/verify_email" element={<Verify_email />}></Route>
           <Route path="/login" element={<Login />}></Route>
           <Route path="/ForgetPassword" element={<ForgetPassword />}></Route>
-          ///////
+          /////// */}
           <Route path="/NotFound" element={<NotFound />}></Route>
           <Route path="*" element={<Navigate to="/" />}></Route>
         </Routes>
