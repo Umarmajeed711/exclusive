@@ -156,15 +156,15 @@ confirmPassword: yup.string().when("newPassword", {
       "border-b-2  bg-gray-200 p-1 outline-none  w-full p-2",
   };
   return (
-    <div className="mx-5 lg:mx-10">
+    <div className="mx-5 md:mx-8 lg:mx-14">
       {/* BreadCrums */}
      
       <Breadcrums currentPage="My Account"/>
 
-      <div className="my-10 flex flex-col  lg:flex-row lg:justify-center gap-10 ">
+      <div className="my-10 grid grid-cols-3 place-content-center gap-10  ">
 
         {/* side Navigation section */}
-        <div className="min-w-80 shadow-lg flex flex-col gap-5  p-10">
+        <div className="col-span-3 lg:col-span-1 min-w-80 shadow-lg flex flex-col gap-5  p-10">
           {/* Calls to Us */}
 
           <div>
@@ -222,7 +222,7 @@ confirmPassword: yup.string().when("newPassword", {
 
         {/* contact Form */}
 
-        <div className=" min-w-80 p-5 md:p-10 h-full shadow-lg">
+        <div className="col-span-3 lg:col-span-2  min-w-80 p-5 md:p-10 h-full shadow-lg">
 
           <div className="h-[40px] w-full flex justify-center items-center mb-2 overflow-hidden">
                       <Alert

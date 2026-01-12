@@ -169,9 +169,10 @@ const Checkout = () => {
 
       <Breadcrums currentPage="Checkout" prevPages={[{name:"cart",url:"/cart"}]} />
 
-      <div className="container mx-auto px-2 sm:px-4  flex justify-center ">
+      <div className=" ">
+        {/* container mx-auto px-2 sm:px-4  flex justify-center */}
         <form onSubmit={billingFormik.handleSubmit}>
-          <div className="grid grid-cols-2 gap-3 lg:px-10 ">
+          <div className="grid grid-cols-2 gap-3  ">
             {/* Billing Details */}
             <div className="col-span-2 sm:col-span-1 p-4 md:p-8">
               <p className=" text-3xl sm:text-4xl md:text-5xl  bli">

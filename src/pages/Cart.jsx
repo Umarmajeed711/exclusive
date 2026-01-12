@@ -18,6 +18,7 @@ const Cart = () => {
   const [total, setTotal] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
   const [toggleCart, setToggleCart] = useState(false);
+  const [cartLoading, setCartLoading] = useState(true);
 
   // const getCartProduct = async () => {
   //   try {
@@ -38,6 +39,7 @@ const Cart = () => {
     setTimeout(() => {
       console.log("Cart product from context", state?.cart);
       setProductCart(state?.cart);
+      setCartLoading(false);
     }, 5000);
   }, [toggleCart]);
 
@@ -101,25 +103,20 @@ const Cart = () => {
   };
 
   return (
-    <div className="mx-5 md:mx-14">
+    <div className="mx-5  md:mx-8 lg:mx-14">
       {/* BreadCrums */}
-      {/* <div className="container px-3 sm:px-4 md:px-8  mt-5 flex gap-2 items-center">
-        <Link
-          to="/"
-          className="text-base  sm:text-xl font-normal text-gray-500"
-        >
-          Home
-        </Link>{" "}
-        <PiGreaterThan />
-        <span className="text-sm  sm:text-base font-normal">Cart</span>
-      </div> */}
+
       <Breadcrums currentPage="Cart" />
       <h1 className="text-xl md:text-4xl blii font-bold mt-3 sm:mt-5">
         YOUR CART
       </h1>
 
       <div>
-        {productCart?.length > 0 ? (
+        {cartLoading ? (
+          <div className="flex justify-center items-center min-h-56 sm:min-h-[350px] h-full">
+            <div className="loading"></div>
+          </div>
+        ) : productCart?.length > 0 ? (
           <>
             <div className="hidden md:block">
               <div className="grid  grid-cols-1 md:grid-cols-10 bg-white shadow-xl p-5 text-center text-base lg:text-xl font-medium">
@@ -324,8 +321,9 @@ const Cart = () => {
             </p>
             <Link
               to={"/home"}
-              className=" bg-theme-primary text-white w-full sm:w-auto px-9 py-3 rounded-full text-base text-center font-normal
-                      hover:shadow-theme-secondary hover:shadow hover:scale-105 transition duration-300 mb-8 md:mb-10"
+              // className=" bg-theme-primary text-white w-full sm:w-auto px-9 py-3 rounded-full text-base text-center font-normal
+              //         hover:shadow-theme-secondary hover:shadow hover:scale-105 transition duration-300 mb-8 md:mb-10"
+                      className=" bg-theme-primary transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
             >
               Shop Now
             </Link>
@@ -368,11 +366,13 @@ const Cart = () => {
               </div>
             </div>
 
-            <div>
+           
+
+            <div className="flex justify-end items-center">
               <button
-                className="w-full  transition-all duration-200 bg-red-500 text-white rounded-full p-2 mt-5 hover:bg-red-600"
-                onClick={handleCheckout}
                 type="submit"
+                onClick={handleCheckout}
+                className=" bg-theme-primary transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
               >
                 Go to Checkout
               </button>

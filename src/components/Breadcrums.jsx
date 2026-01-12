@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Breadcrums = ({ currentPage, prevPages = [] }) => {
   return (
-    <div className="container px-2   mt-5 flex gap-2 items-center">
+    <div className="container    mt-5 flex gap-2 items-center">
       <Link to="/" className="text-base capitalize  sm:text-[18px] font-normal text-gray-500">
         Home
       </Link>{" "}

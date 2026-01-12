@@ -78,7 +78,7 @@ const Contact = () => {
     inputField: "border-b-2  bg-gray-200 p-1 outline-none  w-full p-2",
   };
   return (
-    <div className="mx-5 lg:mx-10">
+    <div className="mx-5 md:mx-8 lg:mx-14">
       {/* BreadCrums */}
       {/* <div className="container px-3 sm:px-4 md:px-8  mt-5 flex gap-2 items-center">
         <Link
@@ -91,10 +91,10 @@ const Contact = () => {
         <span className="text-sm  sm:text-base font-normal"></span>
       </div> */}
 
-      <Breadcrums currentPage="My Account" />
+      <Breadcrums currentPage="Contact" />
 
-      <div className="my-10 flex flex-col  lg:flex-row lg:justify-center gap-10 ">
-        <div className="min-w-80 shadow-lg flex flex-col gap-5  p-10">
+      <div className="my-10 grid grid-cols-3 place-content-center gap-10 ">
+        <div className="col-span-3 lg:col-span-1 min-w-80 shadow-lg flex flex-col gap-5  p-10">
           {/* Calls to Us */}
 
           <div>
@@ -141,7 +141,7 @@ const Contact = () => {
 
         {/* contact Form */}
 
-        <div className=" min-w-80 p-5 md:p-10 h-full shadow-lg">
+        <div className="col-span-3 lg:col-span-2 min-w-80 p-5 md:p-10 h-full shadow-lg">
           <form
             action="https://formsubmit.co/abc@gmail.com"
             method="POST"
