@@ -323,7 +323,7 @@ const Cart = () => {
               to={"/home"}
               // className=" bg-theme-primary text-white w-full sm:w-auto px-9 py-3 rounded-full text-base text-center font-normal
               //         hover:shadow-theme-secondary hover:shadow hover:scale-105 transition duration-300 mb-8 md:mb-10"
-                      className=" bg-theme-primary transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+                      className=" bg-theme-primary transition-all duration-200 rounded flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
             >
               Shop Now
             </Link>

@@ -23,8 +23,7 @@ const AddProduct = () => {
     productQuantity: yup.number().required("Product Quantity is required"),
     productCategory: yup.string().required("Please select the category"),
     productSizes: yup.string().required("Product sizes are required"),
-    productColor: yup.string().required("Product colors are required")
-
+    productColor: yup.string().required("Product colors are required"),
   });
 
   const ProductFormik = useFormik({
@@ -35,36 +34,28 @@ const AddProduct = () => {
       productQuantity: "",
       productDiscount: 0,
       productCategory: "",
-      productSizes:"",
-      productColor:""
+      productSizes: "",
+      productColor: "",
     },
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
-
       console.log(values);
       console.log(selectedFiles);
-       let productSizes  = values.productSizes.split(",")
-       let productColor = values.productColor.split(",")
-       console.log("product Sizes" , productSizes);
-       console.log("product colors: " , productColor);
-       
+      let productSizes = values.productSizes.split(",");
+      let productColor = values.productColor.split(",");
 
-       
-      
-      
       if (!selectedFiles.length) {
         setApiError("Please select at least 1 image ");
-        setError(true) 
+        setError(true);
         return;
       }
 
-      if(selectedFiles.length > 5){
+      if (selectedFiles.length > 5) {
         setApiError("please select only 5 images for one product");
-        return
-
+        return;
       }
-     
+
       const formData = new FormData();
       formData.append("name", values.productName);
       formData.append("description", values.productDescription);
@@ -72,14 +63,11 @@ const AddProduct = () => {
       formData.append("quantity", values.productQuantity);
       formData.append("discount", values.productDiscount);
       formData.append("category_id", values.productCategory);
-      formData.append("sizes",productSizes)
-      formData.append("colors",productColor)
-      Array.from(selectedFiles).forEach(files => {
+      formData.append("sizes", productSizes);
+      formData.append("colors", productColor);
+      Array.from(selectedFiles).forEach((files) => {
         formData.append("images", files);
       });
-
-     
-
 
       // for uplaoding single image
       //  formData.append("images", file); // ✅ Must match your multer field name!
@@ -89,19 +77,18 @@ const AddProduct = () => {
       //   formData.append("images", file);
       // });
 
-     
       try {
-         let response = await api.post(`/products`, formData, {
+        let response = await api.post(`/products`, formData, {
           // headers: { "Content-Type": "multipart/form-data" },
           // withCredentials: true,
-         });
+        });
         // let response = await  api.post(`/products`,
         //     {name:values.productName, description:values.productDescription,price:values.productPrice, quantity :values.productQuantity,
         //         image_url:values.productImage , discount :values.productDiscount,category_id:values.productCategory
 
         //      })
 
-         console.log("response", response);
+        console.log("response", response);
         setloading(false);
         const Toast = Swal.mixin({
           toast: true,
@@ -131,13 +118,10 @@ const AddProduct = () => {
   });
 
   const handleFileChange = (event) => {
-
-    let files = event.target.files
+    let files = event.target.files;
     setSelectedFiles(files);
-    console.log(files)
-
-   
-  }
+    console.log(files);
+  };
 
   const [show, setShow] = useState(false);
 
@@ -147,9 +131,9 @@ const AddProduct = () => {
 
   const closeForm = () => {
     setShow(false);
-    setSelectedFiles(null)
-    setError(false)
-    setApiError("")
+    setSelectedFiles(null);
+    setError(false);
+    setApiError("");
     ProductFormik.resetForm();
   };
 
@@ -170,7 +154,7 @@ const AddProduct = () => {
       let result = await api.get(`/products`);
 
       setProducts(result.data.products);
-      console.log(result.data)
+      console.log(result.data);
     } catch (error) {}
   };
 
@@ -327,7 +311,9 @@ const AddProduct = () => {
                         File selected: {selectedFiles.length}
                       </p>
                     ) : (
-                      <p className={`${error ? 'requiredError' : 'ErrorArea'}`} >No file selected</p>
+                      <p className={`${error ? "requiredError" : "ErrorArea"}`}>
+                        No file selected
+                      </p>
                     )}
                   </div>
                 </div>
@@ -348,7 +334,6 @@ const AddProduct = () => {
                       value={ProductFormik.values.productPrice}
                       onChange={ProductFormik.handleChange}
                       className={Styles.inputField}
-                      
                     />
 
                     {ProductFormik.touched.productPrice &&
@@ -418,9 +403,8 @@ const AddProduct = () => {
                   </div>
                 </div>
 
-                
-          {/* product sizes */}
-          {/* <div >
+                {/* product sizes */}
+                {/* <div >
             <span className="text-xl">Sizes:</span>
 
             <div className="flex flex-wrap justify-center gap-3">
@@ -499,9 +483,7 @@ const AddProduct = () => {
 
           </div> */}
 
-
-
-           {/* product sizes by user input */}
+                {/* product sizes by user input */}
 
                 <div className="flex gap-3 items-center justify-between">
                   <label htmlFor="productSizes">
@@ -518,23 +500,26 @@ const AddProduct = () => {
                       className={Styles.inputField}
                     />
 
-
-                    { ProductFormik.touched.productColor &&  Boolean(ProductFormik.errors.productColor) ?
-
-                    ProductFormik.touched.productSizes &&
-                    Boolean(ProductFormik.errors.productSizes) ? (
-                      <p className="requiredError">
-                        {ProductFormik.touched.productSizes &&
-                          ProductFormik.errors.productSizes}
-                      </p>
+                    {ProductFormik.touched.productColor &&
+                    Boolean(ProductFormik.errors.productColor) ? (
+                      ProductFormik.touched.productSizes &&
+                      Boolean(ProductFormik.errors.productSizes) ? (
+                        <p className="requiredError">
+                          {ProductFormik.touched.productSizes &&
+                            ProductFormik.errors.productSizes}
+                        </p>
+                      ) : (
+                        <p className="ErrorArea">Error Area</p>
+                      )
                     ) : (
-                      <p className="ErrorArea">Error Area</p>
-                    ):
-                    <p className="text-xs"><span className="font-medium"> Note:</span> Sizes should be ( <span className="font-semibold text-sm">,</span> )  seperated.</p>
-                    }
+                      <p className="text-xs">
+                        <span className="font-medium"> Note:</span> Sizes should
+                        be ( <span className="font-semibold text-sm">,</span> )
+                        seperated.
+                      </p>
+                    )}
                   </div>
                 </div>
-
 
                 {/* product color by user input */}
 
@@ -553,33 +538,27 @@ const AddProduct = () => {
                       className={Styles.inputField}
                     />
 
-                    {
-                      ProductFormik.touched.productColor &&  Boolean(ProductFormik.errors.productColor) ?
-
-                      ProductFormik.touched.productColor &&
+                    {ProductFormik.touched.productColor &&
                     Boolean(ProductFormik.errors.productColor) ? (
-                      <p className="requiredError">
-                        {ProductFormik.touched.productColor &&
-                          ProductFormik.errors.productColor}
-                      </p>
+                      ProductFormik.touched.productColor &&
+                      Boolean(ProductFormik.errors.productColor) ? (
+                        <p className="requiredError">
+                          {ProductFormik.touched.productColor &&
+                            ProductFormik.errors.productColor}
+                        </p>
+                      ) : (
+                        <p className="ErrorArea">Error Area</p>
+                      )
                     ) : (
-                      <p className="ErrorArea">Error Area</p>
-                    )
-
-                    :
-                     <p className="text-xs"><span className="font-medium"> Note:</span> Colors should be ( <span className="font-semibold text-sm">,</span> )  seperated.</p>
-                       
-
-                       
-
-                    }
-
-                    
+                      <p className="text-xs">
+                        <span className="font-medium"> Note:</span> Colors
+                        should be ({" "}
+                        <span className="font-semibold text-sm">,</span> )
+                        seperated.
+                      </p>
+                    )}
                   </div>
                 </div>
-
-
-
 
                 {/* product Category */}
                 <div className="flex gap-3  justify-between mt-4">
@@ -638,35 +617,11 @@ const AddProduct = () => {
         </Modal>
       </div>
 
-      {/* <div className="grid gap-10 grid-cols-1 md:grid-cols-3 mx-4 md:mx-10 lg:mx-20">
-        {Products?.map((eachProduct, i) => {
-          return (
-            <div
-              key={i}
-              className="col-span-1 border-2 shadow-inner rounded-xl p-4"
-            >
-              <div className="flex justify-end gap-5">
-                <span>Edit</span>
-                <span>Delete</span>
-              </div>
-
-              <div>
-                <img
-                  src={eachProduct?.image_urls[0] || "/logo 192.png"}
-                  alt=""
-                  className="w-full h-64"
-                />
-              </div>
-              <div>
-                <p>{eachProduct.name}</p>
-                <p>ratings: 4.5 *****</p>
-                <p>Price : {eachProduct.price}$</p>
-              </div>
-            </div>
-          );
-        })}
-      </div> */}
-      <OurProducts products={Products}   title="Our Products" description="Explore Our products"/>
+      <OurProducts
+        products={Products}
+        title="Our Products"
+        description="Explore Our products"
+      />
     </div>
   );
 };

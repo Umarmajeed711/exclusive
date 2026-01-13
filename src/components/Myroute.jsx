@@ -19,13 +19,14 @@ import OrderConfirmation from "../pages/OrderComplete";
 import Account from "../pages/Account";
 import Shop from "../pages/Shop";
 import Dash from "../pages/PrivatePages/Dash";
+import AddProduct from "../pages/PrivatePages/AddProduct";
 
 const Myroute = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
   return (
     <div>
-      {state?.isLogin == false ? (
+      {state?.isLogin == true ? (
         <Routes>
           <Route path="/" index element={<Home />}></Route>
           <Route path="/Category" element={<Category />}></Route>
@@ -43,6 +44,7 @@ const Myroute = () => {
           <Route path="/Dashboard" element={<Dash/>}/>
           <Route path="/Account" element={<Account/>}></Route>
           <Route path="/Product" element={<Products />}></Route>
+          <Route path="/AddProduct" element={<AddProduct />}></Route>
           {/* /////
           <Route path="/signup" element={<Signup />}></Route>
           <Route path="/verify_email" element={<Verify_email />}></Route>

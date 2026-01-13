@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import { Signup } from "./pages/signup";
 import { Login } from "./pages/login";
 import Category from "./components/Category";
-import AddProduct from "./components/AddProduct";
+// import AddProduct from "./components/AddProduct";
 import Products from "./pages/PrivatePages/Products";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";

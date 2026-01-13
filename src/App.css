@@ -3,19 +3,37 @@
     
 }
 
-.requiredError{
-    color: red;
-    margin: 0;
-    font-size: 12px;
-    padding: 0;
-    opacity: 1;
+.inputField {
+  /* background: linear-gradient(to top right, #bae9ff 60%, #03A9F4, #4EC3F8); */
+  /* background: linear-gradient(to right, #979696cc ,#C4C4C41A); */
+  padding: 10px;
+  outline: none;
+  border-radius: 10px;
+  border: 1px solid #03A9F4;
+  width: 100%;
+  box-shadow: 0 0 2px #03A9F4;
+  transition: all 0.3s;
 }
-.ErrorArea{
-    color: transparent;
-    opacity: 0;
-    margin: 0;
-    font-size: 12px;
-    padding: 0;
+
+.inputField:focus {
+  box-shadow: 0 0 10px #4EC3F8;
+}
+
+.requiredError {
+  color: #03A9F4;
+  margin: 0;
+  font-size: 12px;
+  padding: 0;
+}
+.error-wrapper {
+  height: 16px;
+}
+.ErrorArea {
+  color: transparent;
+  visibility: none;
+  margin: 0;
+  font-size: 12px;
+  padding: 0;
 }
 
 .game{
@@ -180,4 +198,67 @@
 .sideIcons:hover , .sideIcons:active{
   transform: scale(1.5);
   text-shadow: 0 0 3px  #000;
+}
+
+
+/* Default: Hide scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px; /* Chrome/Safari/Edge */
+  background: transparent;
+}
+
+/* Keep scrollbar invisible until hover */
+.custom-scrollbar {
+  scrollbar-color: transparent transparent; /* Firefox */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+/* On hover: show thin scrollbar */
+.custom-scrollbar:hover {
+  scrollbar-width: thin;
+  scrollbar-color: #03A9F4 transparent;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar {
+  width: 3px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: #03A9F4;
+  border-radius: 10px;
+}
+
+.custom-scrollbar:focus {
+  scrollbar-width: thin;
+}
+
+.custom-scrollbar:focus::-webkit-scrollbar {
+  width: 3px;
+}
+
+.modal {
+ 
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.button{
+    transition: all .3s;
+    cursor: pointer;
+    border:1px solid #03A9F4;
+}
+
+.button:hover{
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #03A9F4;
+    border-color: transparent;
+    color: #03A9F4;
 }
