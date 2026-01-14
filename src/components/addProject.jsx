@@ -244,24 +244,13 @@ const AddProductForm = ({
 
       console.log(values);
 
-      // const formData = new FormData();
-      // formData.append("title", values.title);
-      // formData.append("description", values.description);
-      // formData.append("live_link", values.live_link);
-      // formData.append("code_link", values.code_link);
-      // formData.append("image", values.image);
-      // formData.append("isTopProject", values.isTopProject);
 
-      // // Check values inside FormData
-      // for (let [key, value] of formData.entries()) {
-      //   console.log(key, value);
-      // }
 
       console.log("Form dAta", formData);
 
       try {
         let response = await api.post(
-          `/products?id=${projectData?._id || ""}`,
+          `/products`,
           formData
           // {
           //   headers: {
