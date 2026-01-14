@@ -156,7 +156,7 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
 
 const AddProductForm = ({
   onclose = () => {},
-  projectData = {},
+  productData = {},
   OnSuccess = () => {},
   OnError = () => {},
   categoryList = [],
@@ -177,14 +177,17 @@ const AddProductForm = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("project Data", projectData);
-    // addProjectFormik.setFieldValue("title", projectData?.title);
-    // addProjectFormik.setFieldValue("description", projectData?.description);
-    // addProjectFormik.setFieldValue("live_link", projectData?.live_link);
-    // addProjectFormik.setFieldValue("code_link", projectData?.code_link);
-    // addProjectFormik.setFieldValue("image", projectData?.image);
-    // addProjectFormik.setFieldValue("isTopProject", projectData?.isTopProject);
-    // setPreview(projectData?.image);
+    console.log("project Data", productData);
+    addProjectFormik.setFieldValue("productName", productData?.name);
+    addProjectFormik.setFieldValue("productDescription", productData?.description);
+    addProjectFormik.setFieldValue("productPrice", productData?.price);
+    addProjectFormik.setFieldValue("productQuantity", productData?.productQuantity);
+    addProjectFormik.setFieldValue("productCategory", productData?.category_name);
+    addProjectFormik.setFieldValue("productSizes", productData?.sizes);
+    addProjectFormik.setFieldValue("productColor", productData?.colors);
+     addProjectFormik.setFieldValue("productDiscount", productData?.discount);
+    
+    setPreview(productData?.image_urls);
   }, []);
 
   const ProductValidation = yup.object({
@@ -357,7 +360,7 @@ const AddProductForm = ({
             className=" px-4   flex flex-col gap-4 items-center overflow-hidden h-full w-full "
           >
             <p className="jetBranis text-xl sm:text-2xl md:text-3xl font-medium sm:font-semibold mt-2   ">
-              {projectData?._id ? "Update" : "Add"} Product
+              {productData?.product_id ? "Update" : "Add"} Product
             </p>
 
             <div className="flex flex-col gap-4 w-full overflow-x-hidden overflow-y-auto  h-full custom-scrollbar p-1">
@@ -717,7 +720,7 @@ const AddProductForm = ({
                       <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                       <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
                     </div>
-                  ) : projectData?._id ? (
+                  ) : productData?.product_id ? (
                     "Update Product"
                   ) : (
                     "Add Product"

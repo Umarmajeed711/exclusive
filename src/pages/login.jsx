@@ -71,7 +71,16 @@ export const Login = () => {
         });
 
         loginFormik.resetForm();
-        dispatch({ type: "USER_LOGIN", payload: response?.data.user });
+        let adminLogin = response?.data.user.email == "umarmajeed711@gmail.com"
+        if(adminLogin){
+          console.log("admin Login",adminLogin);
+          
+
+          dispatch({ type: "ADMIN_LOGIN", payload: response?.data.user });
+        }else{
+           dispatch({ type: "USER_LOGIN", payload: response?.data.user });
+
+        }
 
        
 

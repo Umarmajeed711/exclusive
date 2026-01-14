@@ -1,10 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
 import "../App.css";
 import Title from "./Title";
 import api from "./api";
 import { GlobalContext } from "../context/Context";
+import Modal from "./modal";
+import AddProductForm from "./addProject";
+import Swal from "sweetalert2";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -13,8 +16,16 @@ const isNewArrival = (createdAt) => {
   return diffInDays <= 7;
 };
 
-const OurProducts = ({products,  title, description, loading }) => {
+const OurProducts = ({products,  title, description, loading , categoryList }) => {
   let { state, dispatch } = useContext(GlobalContext);
+   let Admin = state?.isAdmin;
+
+   console.log("Admin" , Admin);
+   
+    const [projectData, setProjectData] = useState({});
+     
+    
+      const [showModal, setShowModal] = useState(false);
 
   // const products = [
   //   {
@@ -63,6 +74,95 @@ const OurProducts = ({products,  title, description, loading }) => {
       console.log(error);
     }
   };
+
+
+
+  //
+   const editProduct = (product) => {
+    setProjectData(product);
+    setShowModal(true);
+  };
+
+  const deleteProduct = async (product) => {
+    const id = product?.product_id;
+
+    // 🔥 Show confirmation alert first
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this product?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    // ✅ If user confirms
+    if (result?.isConfirmed) {
+      try {
+        let response = await api.delete(`/products/id=${id}`);
+        // setToggle(!toggle); // refresh UI
+
+        // Success toast
+        Swal.fire({
+          icon: "success",
+          title: "Product deleted successfully",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      } catch (error) {
+        // Error toast
+        Swal.fire({
+          icon: "error",
+          title: error?.response?.data?.message || "Something went wrong",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      }
+    }
+  };
+
+  const onSuccess = ({ position, icon, message }) => {
+    setProjectData({});
+    setShowModal(false);
+    dynamicToast({ position, icon, message });
+    // getProducts();
+  };
+
+  const OnError = ({ position, icon, message }) => {
+    dynamicToast({ position, icon, message });
+  };
+
+  const dynamicToast = ({
+    position = "bottom-left",
+    icon = "success",
+    message = "",
+  }) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: position,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: icon,
+      title: message,
+    });
+  };
+
 
   return (
     <div className="  w-full">
@@ -120,6 +220,34 @@ const OurProducts = ({products,  title, description, loading }) => {
                       >
                         <AiOutlineEye className="text-lg text-gray-700" />
                       </button>
+                      {
+                        Admin ? 
+                        <>
+                         <button
+                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          editProduct(product)
+                        }}
+                      >
+                        <AiOutlineEye className="text-lg text-gray-700" />
+                      </button>
+                       <button
+                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                         
+                          deleteProduct(product?.product_id)
+                        }}
+                      >
+                        <AiOutlineEye className="text-lg text-gray-700" />
+                      </button>
+                        </>
+                        : null
+                    
+                      }
                     </div>
 
                     {/*check the product discount is available or not*/}
@@ -171,6 +299,26 @@ const OurProducts = ({products,  title, description, loading }) => {
           </div>
         </>
       )}
+      {showModal && (
+              <Modal
+                onClose={() => {
+                  setShowModal(false);
+                  setProjectData({});
+                }}
+                isOpen={showModal}
+              >
+                <AddProductForm
+                  onclose={() => {
+                    setShowModal(false);
+                    setProjectData({});
+                  }}
+                  productData={projectData}
+                  categoryList={categoryList}
+                  OnSuccess={onSuccess}
+                  OnError={OnError}
+                />
+              </Modal>
+            )}
     </div>
   );
 };

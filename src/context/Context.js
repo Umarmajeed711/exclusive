@@ -10,8 +10,8 @@ let data = {
     userData: "",
     cart: [],
     isReloadCart: false,
-    orderDetails: {}
-    // isAdmin:false
+    orderDetails: {},
+    isAdmin:false
 
 }
 
