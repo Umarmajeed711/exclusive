@@ -156,7 +156,7 @@ const AddProduct = () => {
         products={Products}
         title="Our Products"
         description="Explore Our products"
-        categoryList={categoryList}
+        // categoryList={categoryList}
         // editProduct={editProject}
         // deleteProduct={deleteProject}
       />

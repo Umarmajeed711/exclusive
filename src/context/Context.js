@@ -11,7 +11,8 @@ let data = {
     cart: [],
     isReloadCart: false,
     orderDetails: {},
-    isAdmin:false
+    isAdmin:false,
+    categoryList:[]
 
 }
 

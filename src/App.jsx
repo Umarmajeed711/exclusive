@@ -69,7 +69,13 @@ const App = () => {
     try {
       let response = await api.get(`/user-detail`);
 
-      dispatch({ type: "USER_LOGIN", payload: response.data.user });
+      let adminLogin = response.data.user.email == "umarmajeed711@gmail.com";
+      if (adminLogin) {
+        dispatch({ type: "ADMIN_LOGIN", payload: response.data.user });
+        getCategory();
+      } else {
+        dispatch({ type: "USER_LOGIN", payload: response.data.user });
+      }
       console.log(response);
       getCartProduct(response?.data.user.user_id);
     } catch (error) {
@@ -90,6 +96,21 @@ const App = () => {
       console.log(error);
     }
   };
+
+  
+  
+    const getCategory = async () => {
+      try {
+        let result = await api.get(`/categories`);
+        console.log("CAtegory list", result.data.categories);
+        
+  
+        
+        dispatch({ type: "CATEGORY_LIST", payload: result.data.categories });
+      } catch (error) {}
+    };
+
+   
 
   // useEffect(() => {
   //   getCartProduct()

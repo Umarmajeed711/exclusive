@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
 import "../App.css";
@@ -16,7 +16,7 @@ const isNewArrival = (createdAt) => {
   return diffInDays <= 7;
 };
 
-const OurProducts = ({products,  title, description, loading , categoryList }) => {
+const OurProducts = ({products,  title, description, loading }) => {
   let { state, dispatch } = useContext(GlobalContext);
    let Admin = state?.isAdmin;
 
@@ -75,6 +75,7 @@ const OurProducts = ({products,  title, description, loading , categoryList }) =
     }
   };
 
+  
 
 
   //
@@ -313,7 +314,6 @@ const OurProducts = ({products,  title, description, loading , categoryList }) =
                     setProjectData({});
                   }}
                   productData={projectData}
-                  categoryList={categoryList}
                   OnSuccess={onSuccess}
                   OnError={OnError}
                 />

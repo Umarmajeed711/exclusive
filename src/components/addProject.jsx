@@ -108,8 +108,11 @@ const DiscountField = ({ originalPrice = 0, formik, loading }) => {
 const CategorySelect = ({ formik, categoryList, loading }) => {
   const [open, setOpen] = useState(false);
   const selected = categoryList?.find(
-    (c) => c.category_id === formik.values.productCategory
+    (c) => c.category_id == formik.values.productCategory
   );
+
+ 
+  
 
   return (
     <div className="relative">
@@ -158,14 +161,14 @@ const AddProductForm = ({
   onclose = () => {},
   productData = {},
   OnSuccess = () => {},
-  OnError = () => {},
-  categoryList = [],
+  OnError = () => {}
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
 
   const fileInputRef = useRef(null);
 
   const baseUrl = state?.baseUrl;
+  const categoryList = state?.categoryList;
 
   const [loading, setloading] = useState(false);
 
@@ -178,16 +181,20 @@ const AddProductForm = ({
 
   useEffect(() => {
     console.log("project Data", productData);
+    let sizes = productData.sizes.join(",");
+    let colors = productData.colors.join(",");
+
     addProjectFormik.setFieldValue("productName", productData?.name);
     addProjectFormik.setFieldValue("productDescription", productData?.description);
     addProjectFormik.setFieldValue("productPrice", productData?.price);
-    addProjectFormik.setFieldValue("productQuantity", productData?.productQuantity);
-    addProjectFormik.setFieldValue("productCategory", productData?.category_name);
-    addProjectFormik.setFieldValue("productSizes", productData?.sizes);
-    addProjectFormik.setFieldValue("productColor", productData?.colors);
-     addProjectFormik.setFieldValue("productDiscount", productData?.discount);
+    addProjectFormik.setFieldValue("productQuantity", productData?.quantity);
+    addProjectFormik.setFieldValue("productCategory", productData?.category_id);
+    addProjectFormik.setFieldValue("productSizes", sizes);
+    addProjectFormik.setFieldValue("productColor", colors);
+    addProjectFormik.setFieldValue("productDiscount", productData?.discount);
     
     setPreview(productData?.image_urls);
+    setSelectedFiles(productData?.image_urls)
   }, []);
 
   const ProductValidation = yup.object({
@@ -214,10 +221,16 @@ const AddProductForm = ({
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
+
+      console.log("values", values);
+      
       setloading(true);
+      
 
       let productSizes = values.productSizes.split(",");
       let productColor = values.productColor.split(",");
+
+
 
       if (!selectedFiles.length) {
         setApiError("Please select at least 1 image ");
@@ -245,21 +258,18 @@ const AddProductForm = ({
         formData.append("images", files);
       });
 
-      console.log(values);
 
 
 
       console.log("Form dAta", formData);
 
       try {
-        let response = await api.post(
+        let response =   productData.product_id ? await api.put(
+          `/products/${productData?.product_id}`,
+          formData
+        ) :await api.post(
           `/products`,
           formData
-          // {
-          //   headers: {
-          //     "Content-Type": "multipart/form-data",
-          //   },
-          // }
         );
 
         console.log(response);
