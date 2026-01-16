@@ -111,6 +111,9 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
     (c) => c.category_id == formik.values.productCategory
   );
 
+ 
+  
+
   return (
     <div className="relative">
       <span className="text-xl font-bold flex items-center gap-1">
@@ -158,7 +161,7 @@ const AddProductForm = ({
   onclose = () => {},
   productData = {},
   OnSuccess = () => {},
-  OnError = () => {},
+  OnError = () => {}
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
 
@@ -170,10 +173,8 @@ const AddProductForm = ({
   const [loading, setloading] = useState(false);
 
   const [apiError, setApiError] = useState("");
-  const [oldImages, setOldImages] = useState([]); // URLs from DB
-  const [newImages, setNewImages] = useState([]); // File objects
-  const [removedImages, setRemovedImages] = useState([]); // URLs to delete
-
+  const [allPreview, setPreview] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [imgError, setImageError] = useState(false);
 
   const navigate = useNavigate();
@@ -184,18 +185,16 @@ const AddProductForm = ({
     let colors = productData.colors.join(",");
 
     addProjectFormik.setFieldValue("productName", productData?.name);
-    addProjectFormik.setFieldValue(
-      "productDescription",
-      productData?.description
-    );
+    addProjectFormik.setFieldValue("productDescription", productData?.description);
     addProjectFormik.setFieldValue("productPrice", productData?.price);
     addProjectFormik.setFieldValue("productQuantity", productData?.quantity);
     addProjectFormik.setFieldValue("productCategory", productData?.category_id);
     addProjectFormik.setFieldValue("productSizes", sizes);
     addProjectFormik.setFieldValue("productColor", colors);
     addProjectFormik.setFieldValue("productDiscount", productData?.discount);
-
-    setOldImages(productData.image_urls || []);
+    
+    setPreview(productData?.image_urls);
+    setSelectedFiles(productData?.image_urls)
   }, []);
 
   const ProductValidation = yup.object({
@@ -222,26 +221,29 @@ const AddProductForm = ({
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
+
       console.log("values", values);
-      console.log("removedImages", removedImages);
-
+      
       setloading(true);
+      
 
-      let productSizes = values.productSizes;
-      let productColor = values.productColor;
+      let productSizes = values.productSizes.split(",");
+      let productColor = values.productColor.split(",");
 
-      // if (!selectedFiles.length) {
-      //   setApiError("Please select at least 1 image ");
-      //   setImageError(true);
-      //   setloading(false);
-      //   return;
-      // }
 
-      // if (selectedFiles.length > 5) {
-      //   setApiError("please select only 5 images for one product");
-      //   setloading(false);
-      //   return;
-      // }
+
+      if (!selectedFiles.length) {
+        setApiError("Please select at least 1 image ");
+        setImageError(true);
+        setloading(false);
+        return;
+      }
+
+      if (selectedFiles.length > 5) {
+        setApiError("please select only 5 images for one product");
+        setloading(false);
+        return;
+      }
 
       const formData = new FormData();
       formData.append("name", values.productName);
@@ -252,33 +254,23 @@ const AddProductForm = ({
       formData.append("category_id", values.productCategory);
       formData.append("sizes", productSizes);
       formData.append("colors", productColor);
-      // formData.append("removedImages", removedImages);
-      Array.from(newImages).forEach((files) => {
+      Array.from(selectedFiles).forEach((files) => {
         formData.append("images", files);
       });
 
-      // ✅ send removed images
-      removedImages.forEach((img) => {
-        formData.append("removedImages[]", img);
-      });
 
-      // // ✅ send only NEW files
-      // newImages.forEach((file) => {
-      //   formData.append("images", file);
-      // });
 
-      if (!oldImages.length && !newImages.length) {
-        setloading(false)
-        alert("At least one image is required");
-        return;
-      }
 
       console.log("Form dAta", formData);
 
       try {
-        let response = productData.product_id
-          ? await api.put(`/products/${productData?.product_id}`, formData)
-          : await api.post(`/products`, formData);
+        let response =   productData.product_id ? await api.put(
+          `/products/${productData?.product_id}`,
+          formData
+        ) :await api.post(
+          `/products`,
+          formData
+        );
 
         console.log(response);
 
@@ -318,69 +310,38 @@ const AddProductForm = ({
   //   addProjectFormik.setFieldValue("image", file);
   // };
 
-  // const handleFile = (files) => {
-  //   if (!files) return;
+  const handleFile = (files) => {
+    if (!files) return;
 
-  //   console.log("files", files);
+    console.log("files", files);
 
-  //   let array = [];
+    let array = [];
 
-  //   Object.entries(files)?.map((fl, i) => {
-  //     console.log("fl", fl[1].type, i);
+    Object.entries(files)?.map((fl, i) => {
+      console.log("fl", fl[1].type, i);
 
-  //     if (!fl[1]?.type.startsWith("image/")) {
-  //       alert("Only image files allowed!");
-  //       return;
-  //     }
-  //     let newPreview = URL.createObjectURL(fl[1]);
+      if (!fl[1]?.type.startsWith("image/")) {
+        alert("Only image files allowed!");
+        return;
+      }
+      let newPreview = URL.createObjectURL(fl[1]);
 
-  //     array.push(newPreview);
-  //   });
+      array.push(newPreview);
+    });
 
-  //   setPreview(array);
-  //   setSelectedFiles(files);
-  // };
-
-  const handleInput = (e) => {
-    const files = Array.from(e.target.files);
-
-    const totalImages = oldImages.length + newImages.length + files.length;
-
-    if (totalImages > 5) {
-      alert("Maximum 5 images allowed per product");
-      return;
-    }
-
-    setNewImages((prev) => [...prev, ...files]);
+    setPreview(array);
+    setSelectedFiles(files);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-   
-     const files = Array.from(e.dataTransfer.files);
-
-    const totalImages = oldImages.length + newImages.length + files.length;
-
-    if (totalImages > 5) {
-      alert("Maximum 5 images allowed per product");
-      return;
-    }
-
-    setNewImages((prev) => [...prev, ...files]);
+    const files = e.dataTransfer.files;
+    handleFile(files);
   };
 
-  // const handleInput = (e) => {
-  //   const files = e.target.files;
-  //   handleFile(files);
-  // };
-
-  const removeOldImage = (imgUrl) => {
-    setOldImages((prev) => prev.filter((img) => img !== imgUrl));
-    setRemovedImages((prev) => [...prev, imgUrl]);
-  };
-
-  const removeNewImage = (index) => {
-    setNewImages((prev) => prev.filter((_, i) => i !== index));
+  const handleInput = (e) => {
+    const files = e.target.files;
+    handleFile(files);
   };
 
   return (
@@ -478,6 +439,7 @@ const AddProductForm = ({
                   </div>
                 </div>
               </div>
+              
 
               {/* productPrice */}
               <div className="flex gap-3 flex-col justify-center ">
@@ -592,6 +554,7 @@ const AddProductForm = ({
                 </div>
               </div>
 
+              
               <CategorySelect
                 categoryList={categoryList}
                 formik={addProjectFormik}
@@ -636,56 +599,15 @@ const AddProductForm = ({
                 className={`w-full border-2 border-dashed  border-gray-400 rounded-xl p-3 text-center cursor-pointer 
              hover:border-theme-primary transition `}
               >
-                {newImages?.length > 0 || oldImages.length > 0 ? (
-                  // <div className="grid grid-cols-2 gap-2">
-                  //   {allPreview?.map((prev, i) => (
-                  //     <img
-                  //       src={prev}
-                  //       key={i}
-                  //       alt="Preview"
-                  //       className="w-full h-28 col-span-1 object-cover rounded-lg border-2 border-double border-gray-400"
-                  //     />
-                  //   ))}
-                  // </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {/* OLD IMAGES */}
-                    {oldImages.map((img, i) => (
-                      <div key={i} className="relative">
-                        <img
-                          src={img}
-                          className="w-full h-28 col-span-1 object-cover rounded-lg border-2 border-double border-theme-primary"
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) =>  {
-                            e.preventDefault();
-                          e.stopPropagation();
-                            removeOldImage(img)}}
-                          className="z-10 flex justify-center items-center absolute top-0 -pt-2 right-0 text-xl font-bold bg-theme-primary   hover:bg-red-600 hover:scale-105 -m-1 text-white rounded-full w-6 h-6 transition-all duration-300"
-                        >
-                          <span className="">×</span>
-                        </button>
-                      </div>
-                    ))}
-
-                    {/* NEW IMAGES */}
-                    {newImages.map((file, i) => (
-                      <div key={i} className="relative">
-                        <img
-                          src={URL.createObjectURL(file)}
-                          className="w-full h-28 col-span-1 object-cover rounded-lg border-2 border-double border-gray-400"
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                          e.stopPropagation();
-                            removeNewImage(i)}}
-                          className="z-10 flex justify-center items-center absolute top-0 -pt-2 right-0 text-xl font-bold bg-theme-primary   hover:bg-red-600 hover:scale-105 -m-1 text-white rounded-full w-6 h-6 transition-all duration-300"
-                        >
-                          <span>×</span>
-                        </button>
-                      </div>
+                {allPreview?.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    {allPreview?.map((prev, i) => (
+                      <img
+                        src={prev}
+                        key={i}
+                        alt="Preview"
+                        className="w-full h-28 col-span-1 object-cover rounded-lg border-2 border-double border-gray-400"
+                      />
                     ))}
                   </div>
                 ) : (
@@ -705,9 +627,9 @@ const AddProductForm = ({
                   className="hidden"
                 />
               </div>
-              {newImages?.length > 0 || oldImages.length > 0 ? (
+              {selectedFiles?.length > 0 ? (
                 <p className="text-xs text-theme-primary text-center">
-                  File selected: {newImages.length + oldImages.length}
+                  File selected: {selectedFiles.length}
                 </p>
               ) : (
                 <p
@@ -718,6 +640,7 @@ const AddProductForm = ({
                   No file selected
                 </p>
               )}
+              
 
               <div className="flex flex-col justify-between items-center">
                 <button
