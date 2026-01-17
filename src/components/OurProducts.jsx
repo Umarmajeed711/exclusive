@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
+import { BiEditAlt } from "react-icons/bi";
+import { RiDeleteBin5Line } from "react-icons/ri";
 import "../App.css";
 import Title from "./Title";
 import api from "./api";
@@ -16,18 +18,126 @@ const isNewArrival = (createdAt) => {
   return diffInDays <= 7;
 };
 
-const OurProducts = ({products,  title, description, loading }) => {
+const OurProducts = ({products,  title, description, loading, updateProduct,delProduct }) => {
   let { state, dispatch } = useContext(GlobalContext);
    let Admin = state?.isAdmin;
 
-   console.log("Admin" , Admin);
    
     const [projectData, setProjectData] = useState({});
      
     
       const [showModal, setShowModal] = useState(false);
 
-  // const products = [
+ 
+
+  const addToFavorite = async (product_id) => {
+    try {
+      let response = await api.post("/add_to_favorite", {
+        user_id: state?.user.user_id,
+        product_id: product_id,
+      });
+
+      console.log("Add to Wishlist", response);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  
+
+
+  //
+   const editProduct = (product) => {
+    setProjectData(product);
+    setShowModal(true);
+  };
+
+  const deleteProduct = async (id) => {
+
+
+    // 🔥 Show confirmation alert first
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this product?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    // ✅ If user confirms
+    if (result?.isConfirmed) {
+      try {
+        let response = await api.delete(`/product/${id}`);
+        
+
+        // Success toast
+        Swal.fire({
+          icon: "success",
+          title: "Product deleted successfully",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        delProduct(id);
+      } catch (error) {
+        // Error toast
+        Swal.fire({
+          icon: "error",
+          title: error?.response?.message || "Something went wrong",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      }
+    }
+  };
+
+ 
+
+  const onSuccess = ({ position, icon, message,product }) => {
+    updateProduct(product)
+    setProjectData({});
+    setShowModal(false);
+    dynamicToast({ position, icon, message });
+  };
+
+  const OnError = ({ position, icon, message }) => {
+    dynamicToast({ position, icon, message });
+  };
+
+  const dynamicToast = ({
+    position = "bottom-left",
+    icon = "success",
+    message = "",
+  }) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: position,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: icon,
+      title: message,
+    });
+  };
+
+
+
+   // const products = [
   //   {
   //     product_id:"1",
   //     name:"Product1",
@@ -61,108 +171,6 @@ const OurProducts = ({products,  title, description, loading }) => {
   //     image_urls:["./image.png",""]
   //   },
   // ]
-
-  const addToFavorite = async (product_id) => {
-    try {
-      let response = await api.post("/add_to_favorite", {
-        user_id: state?.user.user_id,
-        product_id: product_id,
-      });
-
-      console.log("Add to Wishlist", response);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  
-
-
-  //
-   const editProduct = (product) => {
-    setProjectData(product);
-    setShowModal(true);
-  };
-
-  const deleteProduct = async (product) => {
-    const id = product?.product_id;
-
-    // 🔥 Show confirmation alert first
-    const result = await Swal.fire({
-      title: "Are You Sure?",
-      text: "Do you want to delete this product?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-    });
-
-    // ✅ If user confirms
-    if (result?.isConfirmed) {
-      try {
-        let response = await api.delete(`/products/id=${id}`);
-        // setToggle(!toggle); // refresh UI
-
-        // Success toast
-        Swal.fire({
-          icon: "success",
-          title: "Product deleted successfully",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      } catch (error) {
-        // Error toast
-        Swal.fire({
-          icon: "error",
-          title: error?.response?.data?.message || "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      }
-    }
-  };
-
-  const onSuccess = ({ position, icon, message }) => {
-    setProjectData({});
-    setShowModal(false);
-    dynamicToast({ position, icon, message });
-    // getProducts();
-  };
-
-  const OnError = ({ position, icon, message }) => {
-    dynamicToast({ position, icon, message });
-  };
-
-  const dynamicToast = ({
-    position = "bottom-left",
-    icon = "success",
-    message = "",
-  }) => {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: position,
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
-      icon: icon,
-      title: message,
-    });
-  };
 
 
   return (
@@ -211,7 +219,7 @@ const OurProducts = ({products,  title, description, loading }) => {
                       >
                         <AiOutlineHeart className="text-lg text-gray-700" />
                       </button>
-                      <button
+                      {/* <button
                         className="bg-white p-2 rounded-full shadow hover:bg-gray-200"
                         onClick={(e) => {
                           e.preventDefault();
@@ -220,7 +228,7 @@ const OurProducts = ({products,  title, description, loading }) => {
                         }}
                       >
                         <AiOutlineEye className="text-lg text-gray-700" />
-                      </button>
+                      </button> */}
                       {
                         Admin ? 
                         <>
@@ -232,7 +240,7 @@ const OurProducts = ({products,  title, description, loading }) => {
                           editProduct(product)
                         }}
                       >
-                        <AiOutlineEye className="text-lg text-gray-700" />
+                        <BiEditAlt className="text-lg text-gray-700" />
                       </button>
                        <button
                         className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
@@ -243,7 +251,7 @@ const OurProducts = ({products,  title, description, loading }) => {
                           deleteProduct(product?.product_id)
                         }}
                       >
-                        <AiOutlineEye className="text-lg text-gray-700" />
+                        <RiDeleteBin5Line className="text-lg text-gray-700" />
                       </button>
                         </>
                         : null

@@ -32,8 +32,16 @@ const Home = () => {
     getProducts();
   }, []);
 
+  const handleProductUpdate = (product) => {
+    setProducts((prev) => prev.map((p) => (p.product_id == product.product_id ? product : p)));
+  };
+
+  const handleProductDelete = (id) => {
+    setProducts((prev) => prev.filter((p) => p.product_id !== id));
+  };
+
   return (
-    <div >
+    <div>
       <div className="relative h-80 sm:h-full">
         <img src="./heroPic.jpg" className="h-full w-full" />
 
@@ -59,28 +67,28 @@ const Home = () => {
       </div>
 
       {/* <HeroCarousel/> */}
-<div className="mx-4 my-2 lg:mx-14 lg:my-8 flex flex-col justify-center items-center  h-full" >
+      <div className="mx-4 my-2 lg:mx-14 lg:my-8 flex flex-col justify-center items-center  h-full">
+        <TopOffers />
 
+        <div className="h-full w-full p-4 ">
+          <img src="/Frame 600.png" alt="" className="h-full w-full " />
+        </div>
 
-      <TopOffers />
+        <OurProducts
+          products={Products}
+          title="Our Products"
+          description="Explore Our products"
+          loading={loading}
+          updateProduct={handleProductUpdate}
+          delProduct={handleProductDelete}
+        />
 
-      <div className="h-full w-full p-4 ">
-        <img src="/Frame 600.png" alt="" className="h-full w-full " />
-      </div>
-
-      <OurProducts
-        products={Products}
-        title="Our Products"
-        description="Explore Our products"
-        loading={loading}
-      />
-
-      {Products?.length > 0 ? (
-        <Link to="/" className="px-3 py-2 bg-red-600 text-white rounded">
-          View ALL Products
-        </Link>
-      ) : null}
-      {/* <NewArrivals /> */}
+        {Products?.length > 0 ? (
+          <Link to="/" className="px-3 py-2 bg-red-600 text-white rounded">
+            View ALL Products
+          </Link>
+        ) : null}
+        {/* <NewArrivals /> */}
       </div>
     </div>
   );

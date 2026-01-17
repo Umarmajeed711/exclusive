@@ -97,20 +97,13 @@ const App = () => {
     }
   };
 
-  
-  
-    const getCategory = async () => {
-      try {
-        let result = await api.get(`/categories`);
-        console.log("CAtegory list", result.data.categories);
-        
-  
-        
-        dispatch({ type: "CATEGORY_LIST", payload: result.data.categories });
-      } catch (error) {}
-    };
+  const getCategory = async () => {
+    try {
+      let result = await api.get(`/categories`);
 
-   
+      dispatch({ type: "CATEGORY_LIST", payload: result.data.categories });
+    } catch (error) {}
+  };
 
   // useEffect(() => {
   //   getCartProduct()
