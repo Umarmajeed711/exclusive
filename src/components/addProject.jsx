@@ -186,7 +186,7 @@ const AddProductForm = ({
     addProjectFormik.setFieldValue("productColor", colors);
     addProjectFormik.setFieldValue("productDiscount", productData?.discount);
 
-    setOldImages(productData.image_urls || []);
+    setOldImages(productData?.image_urls || []);
   }, []);
 
 
@@ -226,9 +226,8 @@ useEffect(() => {
 
     onSubmit: async (values) => {
       console.log("values", values);
-      console.log("mianImage",mainImage);
+      console.log("mainImage",mainImage);
       
-      console.log("removedImages", removedImages);
 
       setloading(true);
 
@@ -251,7 +250,7 @@ useEffect(() => {
       });
       if (mainImage) {
         formData.append("mainImageType", mainImage.type);
-        formData.append("mainImageIndex", mainImage.index);
+        formData.append("mainImageIndex", Number(mainImage.index));
       }
 
       // ✅ send removed images
@@ -363,14 +362,7 @@ useEffect(() => {
   };
 
  
-  // const removeOldImage = (img, index) => {
-  //   setOldImages((prev) => prev.filter((_, i) => i !== index));
-
-  //   if (mainImage?.type === "old" && mainImage.index === index) {
-  //     setMainImage({ type: "old", index: 0 });
-  //   }
-  // };
-
+  
   const removeOldImage = (img, index) => {
   setOldImages((prev) => {
     const updated = prev.filter((_, i) => i !== index);
@@ -394,13 +386,7 @@ useEffect(() => {
 
 
 
-  // const removeNewImage = (index) => {
-  //   setNewImages((prev) => prev.filter((_, i) => i !== index));
 
-  //   if (mainImage?.type === "new" && mainImage.index === index) {
-  //     setMainImage({ type: "new", index: 0 } );
-  //   }
-  // };
 
   const removeNewImage = (index) => {
   setNewImages((prev) => {
@@ -409,7 +395,7 @@ useEffect(() => {
     if (mainImage?.type === "new" && mainImage.index === index) {
       if (updated.length > 0) {
         setMainImage({ type: "new", index: 0 });
-      } else if (oldImages.length > 0) {
+      } else if (oldImages?.length > 0) {
         setMainImage({ type: "old", index: 0 });
       } else {
         setMainImage(null);
@@ -767,18 +753,18 @@ useEffect(() => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              setMainImage({ type: "new", index: i });
+                              setMainImage({ type: "new", index: ((oldImages?.length) + i )});
                             }}
                             className={`w-full h-28 object-cover rounded-lg border-2 cursor-pointer
             ${
-              mainImage?.type === "new" && mainImage.index === i
+              mainImage?.type === "new" && mainImage.index === ((oldImages?.length) + i )
                 ? "border-green-500"
                 : "border-gray-400"
             }`}
                           />
 
                           {mainImage?.type === "new" &&
-                            mainImage.index === i && (
+                            mainImage.index === ((oldImages?.length) + i ) && (
                               <span className="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 rounded">
                                 MAIN
                               </span>

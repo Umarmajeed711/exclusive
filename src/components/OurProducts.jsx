@@ -71,6 +71,9 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
     if (result?.isConfirmed) {
       try {
         let response = await api.delete(`/product/${id}`);
+
+        console.log("response", response);
+        
         
 
         // Success toast
@@ -85,10 +88,13 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
         });
         delProduct(id);
       } catch (error) {
+
+        console.log("eror" ,error);
+        
         // Error toast
         Swal.fire({
           icon: "error",
-          title: error?.response?.message || "Something went wrong",
+          title: error?.response?.data?.message || "Something went wrong",
           toast: true,
           position: "bottom-left",
           showConfirmButton: false,
@@ -201,7 +207,7 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
                   {/* Image & hover */}
                   <div className="relative w-full  h-64 aspect-square overflow-hidden rounded  flex justify-center items-center   bg-slate-100  ">
                     <img
-                      src={product?.image_urls[0] || ""}
+                      src={product?.main_image || product?.image_urls[0] || ""}
                       alt={product?.name}
                       className=" h-[50%] object-cover group-hover:scale-105 transition "
                     />

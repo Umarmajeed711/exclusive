@@ -52,62 +52,20 @@ const AddProduct = () => {
     getProducts();
   }, [toggle]);
 
-  const editProject = (project) => {
-    setProjectData(project);
-    setShowModal(true);
+  const handleProductUpdate = (product) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.product_id == product.product_id ? product : p)),
+    );
   };
 
-  const deleteProject = async (project) => {
-    const id = project?._id;
-
-    // 🔥 Show confirmation alert first
-    const result = await Swal.fire({
-      title: "Are You Sure?",
-      text: "Do you want to delete this project?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-    });
-
-    // ✅ If user confirms
-    if (result?.isConfirmed) {
-      try {
-        let response = await api.delete(`/project?id=${id}`);
-        setToggle(!toggle); // refresh UI
-
-        // Success toast
-        Swal.fire({
-          icon: "success",
-          title: "Project deleted successfully",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      } catch (error) {
-        // Error toast
-        Swal.fire({
-          icon: "error",
-          title: error?.response?.data?.message || "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
-      }
-    }
+  const handleProductDelete = (id) => {
+    setProducts((prev) => prev.filter((p) => p.product_id !== id));
   };
 
-  const onSuccess = ({ position, icon, message }) => {
+  const onSuccess = ({ position, icon, message, product }) => {
     setProjectData({});
     setShowModal(false);
     dynamicToast({ position, icon, message });
-    getProducts();
   };
 
   const OnError = ({ position, icon, message }) => {
@@ -137,7 +95,7 @@ const AddProduct = () => {
     });
   };
   return (
-    <div  className="mx-5  md:mx-8 lg:mx-14">
+    <div className="mx-5  md:mx-8 lg:mx-14">
       {/* Form Modal */}
 
       <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
@@ -156,12 +114,11 @@ const AddProduct = () => {
         products={Products}
         title="Our Products"
         description="Explore Our products"
-        // categoryList={categoryList}
-        // editProduct={editProject}
-        // deleteProduct={deleteProject}
+        loading={loading}
+        updateProduct={handleProductUpdate}
+        delProduct={handleProductDelete}
       />
 
-      
       {showModal && (
         <Modal
           onClose={() => {
