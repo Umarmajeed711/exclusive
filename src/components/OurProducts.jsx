@@ -18,17 +18,20 @@ const isNewArrival = (createdAt) => {
   return diffInDays <= 7;
 };
 
-const OurProducts = ({products,  title, description, loading, updateProduct,delProduct }) => {
+const OurProducts = ({
+  products = [],
+  title = "",
+  description = "",
+  loading = false,
+  updateProduct,
+  delProduct,
+}) => {
   let { state, dispatch } = useContext(GlobalContext);
-   let Admin = state?.isAdmin;
+  let Admin = state?.isAdmin;
 
-   
-    const [projectData, setProjectData] = useState({});
-     
-    
-      const [showModal, setShowModal] = useState(false);
+  const [projectData, setProjectData] = useState({});
 
- 
+  const [showModal, setShowModal] = useState(false);
 
   const addToFavorite = async (product_id) => {
     try {
@@ -43,18 +46,13 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
     }
   };
 
-  
-
-
   //
-   const editProduct = (product) => {
+  const editProduct = (product) => {
     setProjectData(product);
     setShowModal(true);
   };
 
   const deleteProduct = async (id) => {
-
-
     // 🔥 Show confirmation alert first
     const result = await Swal.fire({
       title: "Are You Sure?",
@@ -73,8 +71,6 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
         let response = await api.delete(`/product/${id}`);
 
         console.log("response", response);
-        
-        
 
         // Success toast
         Swal.fire({
@@ -88,9 +84,8 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
         });
         delProduct(id);
       } catch (error) {
+        console.log("eror", error);
 
-        console.log("eror" ,error);
-        
         // Error toast
         Swal.fire({
           icon: "error",
@@ -105,10 +100,8 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
     }
   };
 
- 
-
-  const onSuccess = ({ position, icon, message,product }) => {
-    updateProduct(product)
+  const onSuccess = ({ position, icon, message, product }) => {
+    updateProduct(product);
     setProjectData({});
     setShowModal(false);
     dynamicToast({ position, icon, message });
@@ -141,9 +134,7 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
     });
   };
 
-
-
-   // const products = [
+  // const products = [
   //   {
   //     product_id:"1",
   //     name:"Product1",
@@ -178,11 +169,10 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
   //   },
   // ]
 
-
   return (
     <div className="  w-full">
       {/* px-5 my-5 md:px-8 lg:px-14 lg:my-8 */}
-      {loading ? ( 
+      {loading ? (
         <div className="flex justify-center items-center main">
           <div className="loading"></div>
         </div>
@@ -194,7 +184,7 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
         </div>
       ) : (
         <>
-          <Title title={title} description={description} />
+          {title ? <Title title={title} description={description} /> : null}
 
           <div className="grid gap-10 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 ">
             {products?.map((product, i) => (
@@ -235,34 +225,31 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
                       >
                         <AiOutlineEye className="text-lg text-gray-700" />
                       </button> */}
-                      {
-                        Admin ? 
+                      {Admin ? (
                         <>
-                         <button
-                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          editProduct(product)
-                        }}
-                      >
-                        <BiEditAlt className="text-lg text-gray-700" />
-                      </button>
-                       <button
-                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                         
-                          deleteProduct(product?.product_id)
-                        }}
-                      >
-                        <RiDeleteBin5Line className="text-lg text-gray-700" />
-                      </button>
+                          <button
+                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              editProduct(product);
+                            }}
+                          >
+                            <BiEditAlt className="text-lg text-gray-700" />
+                          </button>
+                          <button
+                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+
+                              deleteProduct(product?.product_id);
+                            }}
+                          >
+                            <RiDeleteBin5Line className="text-lg text-gray-700" />
+                          </button>
                         </>
-                        : null
-                    
-                      }
+                      ) : null}
                     </div>
 
                     {/*check the product discount is available or not*/}
@@ -315,24 +302,24 @@ const OurProducts = ({products,  title, description, loading, updateProduct,delP
         </>
       )}
       {showModal && (
-              <Modal
-                onClose={() => {
-                  setShowModal(false);
-                  setProjectData({});
-                }}
-                isOpen={showModal}
-              >
-                <AddProductForm
-                  onclose={() => {
-                    setShowModal(false);
-                    setProjectData({});
-                  }}
-                  productData={projectData}
-                  OnSuccess={onSuccess}
-                  OnError={OnError}
-                />
-              </Modal>
-            )}
+        <Modal
+          onClose={() => {
+            setShowModal(false);
+            setProjectData({});
+          }}
+          isOpen={showModal}
+        >
+          <AddProductForm
+            onclose={() => {
+              setShowModal(false);
+              setProjectData({});
+            }}
+            productData={projectData}
+            OnSuccess={onSuccess}
+            OnError={OnError}
+          />
+        </Modal>
+      )}
     </div>
   );
 };

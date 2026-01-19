@@ -11,6 +11,8 @@ import OurProducts from "../../components/OurProducts";
 import Modal from "../../components/modal";
 import AddProductForm from "../../components/addProject";
 import { GlobalContext } from "../../context/Context";
+import { BiGrid, BiListCheck, BiPlus } from "react-icons/bi";
+import { MdFormatListBulleted,MdOutlineAdd ,MdOutlineFilterAlt} from "react-icons/md";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -21,6 +23,7 @@ const AddProduct = () => {
   const [loading, setloading] = useState(false);
   const [projectData, setProjectData] = useState({});
   const [toggle, setToggle] = useState(false);
+  const [viewType,setViewType] = useState("grid");
 
   const [categoryList, setCategoryList] = useState([]);
 
@@ -110,10 +113,55 @@ const AddProduct = () => {
         </button>
       </div>
 
+      <div>
+        <div className="flex flex-col  gap-5 my-5 sm:my-10">
+          <div className="flex gap-5 items-center">
+            <p className="h-10 w-5 rounded bg-theme-primary"></p>
+            <p className="text-theme-primary text-xl font-medium">
+              All Products
+            </p>
+          </div>
+          {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
+          <div className="flex justify-between items-center h-full">
+            <div className="text-3xl sm:text-4xl font-medium">
+              Explore All products
+            </div>
+            <div className="flex gap-2">
+              <button
+                className="button   text-xl"
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                <MdOutlineAdd/>
+              </button>
+
+
+              <div className="flex gap-[2px] text-xl  font-medium border border-theme-primary bg-theme-background p-[2px] rounded">
+                <button className={`gridButton  ${viewType == "grid" ? "bg-theme-primary text-white" : "" }`} onClick={() => {setViewType("grid")}}>
+                  <BiGrid/>
+                  
+                </button>
+                <button  className={`gridButton  ${viewType == "list" ? "bg-theme-primary text-white" : "" }`} onClick={() => {setViewType("list")}}><MdFormatListBulleted/></button>
+              </div>
+              <button
+                className="button   text-xl"
+                onClick={() => {
+                  setShowModal(true);
+                }}
+              >
+                <MdOutlineFilterAlt/>
+              </button>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+
       <OurProducts
         products={Products}
-        title="Our Products"
-        description="Explore Our products"
+        // title="Our Products"
+        // description="Explore Our products"
         loading={loading}
         updateProduct={handleProductUpdate}
         delProduct={handleProductDelete}
