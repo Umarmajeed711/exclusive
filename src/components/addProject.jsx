@@ -135,7 +135,7 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
         </div>
       )}
       <div className="error-wrapper">
-        {formik.touched.productCategory && formik.errors.productCategory && (
+        {formik.submitCount > 0 && formik.errors.productCategory && (
           <p className="requiredError">{formik.errors.productCategory}</p>
         )}
       </div>
@@ -461,7 +461,7 @@ useEffect(() => {
                   />
 
                   <div className="error-wrapper">
-                    {addProjectFormik.touched.productName &&
+                    {addProjectFormik.submitCount > 0 &&
                       addProjectFormik.errors.productName && (
                         <p className="requiredError">
                           {addProjectFormik.errors.productName}
@@ -494,7 +494,7 @@ useEffect(() => {
                   />
 
                   <div className="error-wrapper">
-                    {addProjectFormik.touched.productQuantity &&
+                    {addProjectFormik.submitCount > 0 &&
                       addProjectFormik.errors.productQuantity && (
                         <p className="requiredError">
                           {addProjectFormik.errors.productQuantity}
@@ -525,7 +525,7 @@ useEffect(() => {
                   />
 
                   <div className="error-wrapper">
-                    {addProjectFormik.touched.productPrice &&
+                    {addProjectFormik.submitCount > 0 &&
                       addProjectFormik.errors.productPrice && (
                         <p className="requiredError">
                           {addProjectFormik.errors.productPrice}
@@ -563,7 +563,7 @@ useEffect(() => {
                   />
 
                   <div className="error-wrapper">
-                    {addProjectFormik.touched.productSizes &&
+                    {addProjectFormik.submitCount > 0 &&
                     addProjectFormik.errors.productSizes ? (
                       <p className="requiredError">
                         {addProjectFormik.errors.productSizes}
@@ -600,7 +600,7 @@ useEffect(() => {
                   />
 
                   <div className="error-wrapper">
-                    {addProjectFormik.touched.productColor &&
+                    {addProjectFormik.submitCount > 0 &&
                     addProjectFormik.errors.productColor ? (
                       <p className="requiredError">
                         {addProjectFormik.errors.productColor}
@@ -644,7 +644,7 @@ useEffect(() => {
                     placeholder="Write product Description..."
                   />
                   <div className="error-wrapper">
-                    {addProjectFormik.touched.productDescription &&
+                    {addProjectFormik.submitCount > 0 &&
                       addProjectFormik.errors.productDescription && (
                         <p className="requiredError">
                           {addProjectFormik.errors.productDescription}

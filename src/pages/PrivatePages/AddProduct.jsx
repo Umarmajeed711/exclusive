@@ -13,6 +13,7 @@ import AddProductForm from "../../components/addProject";
 import { GlobalContext } from "../../context/Context";
 import { BiGrid, BiListCheck, BiPlus } from "react-icons/bi";
 import { MdFormatListBulleted,MdOutlineAdd ,MdOutlineFilterAlt} from "react-icons/md";
+import ProductListView from "../../components/ProductList";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -55,11 +56,30 @@ const AddProduct = () => {
     getProducts();
   }, [toggle]);
 
+  // const handleProductUpdate = (product) => {
+  //   setProducts((prev) =>
+  //     prev.map((p) => (p.product_id == product.product_id ? product : p)),
+  //   );
+  // };
+
   const handleProductUpdate = (product) => {
-    setProducts((prev) =>
-      prev.map((p) => (p.product_id == product.product_id ? product : p)),
+  setProducts((prev) => {
+    const exists = prev?.some(
+      (p) => p?.product_id == product?.product_id
     );
-  };
+
+    if (exists) {
+      // UPDATE
+      return prev?.map((p) =>
+        p.product_id === product.product_id ? product : p
+      );
+    }
+
+    // ADD
+    return  [product, ...prev];
+  });
+};
+
 
   const handleProductDelete = (id) => {
     setProducts((prev) => prev.filter((p) => p.product_id !== id));
@@ -158,7 +178,8 @@ const AddProduct = () => {
         </div>
       </div>
 
-      <OurProducts
+      {viewType === "grid" ? (
+ <OurProducts
         products={Products}
         // title="Our Products"
         // description="Explore Our products"
@@ -166,6 +187,15 @@ const AddProduct = () => {
         updateProduct={handleProductUpdate}
         delProduct={handleProductDelete}
       />
+) : (
+  <ProductListView
+    products={Products}
+    onEdit={handleProductUpdate}
+    onDelete={handleProductDelete}
+  />
+)}
+
+      
 
       {showModal && (
         <Modal
