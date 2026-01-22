@@ -12,7 +12,11 @@ import Modal from "../../components/modal";
 import AddProductForm from "../../components/addProject";
 import { GlobalContext } from "../../context/Context";
 import { BiGrid, BiListCheck, BiPlus } from "react-icons/bi";
-import { MdFormatListBulleted,MdOutlineAdd ,MdOutlineFilterAlt} from "react-icons/md";
+import {
+  MdFormatListBulleted,
+  MdOutlineAdd,
+  MdOutlineFilterAlt,
+} from "react-icons/md";
 import ProductListView from "../../components/ProductList";
 
 const AddProduct = () => {
@@ -24,7 +28,7 @@ const AddProduct = () => {
   const [loading, setloading] = useState(false);
   const [projectData, setProjectData] = useState({});
   const [toggle, setToggle] = useState(false);
-  const [viewType,setViewType] = useState("grid");
+  const [viewType, setViewType] = useState("grid");
 
   const [categoryList, setCategoryList] = useState([]);
 
@@ -63,23 +67,20 @@ const AddProduct = () => {
   // };
 
   const handleProductUpdate = (product) => {
-  setProducts((prev) => {
-    const exists = prev?.some(
-      (p) => p?.product_id == product?.product_id
-    );
+    setProducts((prev) => {
+      const exists = prev?.some((p) => p?.product_id == product?.product_id);
 
-    if (exists) {
-      // UPDATE
-      return prev?.map((p) =>
-        p.product_id === product.product_id ? product : p
-      );
-    }
+      if (exists) {
+        // UPDATE
+        return prev?.map((p) =>
+          p.product_id === product.product_id ? product : p,
+        );
+      }
 
-    // ADD
-    return  [product, ...prev];
-  });
-};
-
+      // ADD
+      return [product, ...prev];
+    });
+  };
 
   const handleProductDelete = (id) => {
     setProducts((prev) => prev.filter((p) => p.product_id !== id));
@@ -153,16 +154,26 @@ const AddProduct = () => {
                   setShowModal(true);
                 }}
               >
-                <MdOutlineAdd/>
+                <MdOutlineAdd />
               </button>
 
-
               <div className="flex gap-[2px] text-xl  font-medium border border-theme-primary bg-theme-background p-[2px] rounded">
-                <button className={`gridButton  ${viewType == "grid" ? "bg-theme-primary text-white" : "" }`} onClick={() => {setViewType("grid")}}>
-                  <BiGrid/>
-                  
+                <button
+                  className={`gridButton  ${viewType == "grid" ? "bg-theme-primary text-white" : ""}`}
+                  onClick={() => {
+                    setViewType("grid");
+                  }}
+                >
+                  <BiGrid />
                 </button>
-                <button  className={`gridButton  ${viewType == "list" ? "bg-theme-primary text-white" : "" }`} onClick={() => {setViewType("list")}}><MdFormatListBulleted/></button>
+                <button
+                  className={`gridButton  ${viewType == "list" ? "bg-theme-primary text-white" : ""}`}
+                  onClick={() => {
+                    setViewType("list");
+                  }}
+                >
+                  <MdFormatListBulleted />
+                </button>
               </div>
               <button
                 className="button   text-xl"
@@ -170,32 +181,27 @@ const AddProduct = () => {
                   setShowModal(true);
                 }}
               >
-                <MdOutlineFilterAlt/>
+                <MdOutlineFilterAlt />
               </button>
-              
             </div>
           </div>
         </div>
       </div>
 
       {viewType === "grid" ? (
- <OurProducts
-        products={Products}
-        // title="Our Products"
-        // description="Explore Our products"
-        loading={loading}
-        updateProduct={handleProductUpdate}
-        delProduct={handleProductDelete}
-      />
-) : (
-  <ProductListView
-    products={Products}
-    onEdit={handleProductUpdate}
-    onDelete={handleProductDelete}
-  />
-)}
-
-      
+        <OurProducts
+          products={Products}
+          loading={loading}
+          updateProduct={handleProductUpdate}
+          delProduct={handleProductDelete}
+        />
+      ) : (
+        <ProductListView
+          products={Products}
+          updateProduct={handleProductUpdate}
+          delProduct={handleProductDelete}
+        />
+      )}
 
       {showModal && (
         <Modal
@@ -210,8 +216,7 @@ const AddProduct = () => {
               setShowModal(false);
               setProjectData({});
             }}
-            projectData={projectData}
-            categoryList={categoryList}
+            productData={projectData}
             OnSuccess={onSuccess}
             OnError={OnError}
           />

@@ -1,4 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import Modal from "./modal";
+import AddProductForm from "./addProject";
+import api from "./api";
+import { GlobalContext } from "../context/Context";
 
 /* ==============================
    DEFAULT COLUMN CONFIG
@@ -19,10 +24,16 @@ const STORAGE_KEY = "product_table_columns";
 /* ==============================
    MAIN COMPONENT
 ================================ */
-const ProductListView = ({ products = [], onEdit, onDelete }) => {
+const ProductListView = ({ products = [],updateProduct, delProduct}) => {
+  let { state, dispatch } = useContext(GlobalContext);
+  let Admin = state?.isAdmin;
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
   const [open, setOpen] = useState(false);
   const [dragIndex, setDragIndex] = useState(null);
+
+  const [projectData, setProjectData] = useState({});
+
+  const [showModal, setShowModal] = useState(false);
 
   /* ==============================
      LOAD FROM LOCALSTORAGE
@@ -44,9 +55,7 @@ const ProductListView = ({ products = [], onEdit, onDelete }) => {
   ================================ */
   const toggleColumn = (key) => {
     setColumns((prev) =>
-      prev.map((c) =>
-        c.key === key ? { ...c, visible: !c.visible } : c
-      )
+      prev.map((c) => (c.key === key ? { ...c, visible: !c.visible } : c)),
     );
   };
 
@@ -82,18 +91,14 @@ const ProductListView = ({ products = [], onEdit, onDelete }) => {
     <div className="flex items-center gap-3 min-w-[240px]">
       <img
         src={
-          product.main_image ||
-          product.image_urls?.[0] ||
-          "/placeholder.png"
+          product.main_image || product.image_urls?.[0] || "/placeholder.png"
         }
         alt={product.name}
         className="w-10 h-10 rounded object-cover border"
       />
       <div>
         <p className="font-medium">{product.name}</p>
-        <p className="text-xs text-gray-500">
-          ID: {product.product_id}
-        </p>
+        <p className="text-xs text-gray-500">ID: {product.product_id}</p>
       </div>
     </div>
   );
@@ -136,13 +141,13 @@ const ProductListView = ({ products = [], onEdit, onDelete }) => {
         return (
           <div className="flex gap-2 justify-center min-w-[120px]">
             <button
-              onClick={() => onEdit?.(product)}
+              onClick={() => editProduct(product)}
               className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
             >
               Edit
             </button>
             <button
-              onClick={() => onDelete?.(product.product_id)}
+              onClick={() => deleteProduct(product?.product_id)}
               className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded"
             >
               Delete
@@ -155,118 +160,225 @@ const ProductListView = ({ products = [], onEdit, onDelete }) => {
     }
   };
 
-  /* ==============================
-     RENDER
-  ================================ */
+  const editProduct = (product) => {    
+    setProjectData(product);
+    setShowModal(true);
+  };
+
+  const deleteProduct = async (id) => {
+    // 🔥 Show confirmation alert first
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this product?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    // ✅ If user confirms
+    if (result?.isConfirmed) {
+      try {
+        let response = await api.delete(`/product/${id}`);
+
+        console.log("response", response);
+
+        // Success toast
+        Swal.fire({
+          icon: "success",
+          title: "Product deleted successfully",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        delProduct(id);
+      } catch (error) {
+        console.log("eror", error);
+
+        // Error toast
+        Swal.fire({
+          icon: "error",
+          title: error?.response?.data?.message || "Something went wrong",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+      }
+    }
+  };
+
+  const onSuccess = ({ position, icon, message, product }) => {
+    updateProduct(product);
+    setProjectData({});
+    setShowModal(false);
+    dynamicToast({ position, icon, message });
+  };
+
+  const OnError = ({ position, icon, message }) => {
+    dynamicToast({ position, icon, message });
+  };
+
+  const dynamicToast = ({
+    position = "bottom-left",
+    icon = "success",
+    message = "",
+  }) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: position,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: icon,
+      title: message,
+    });
+  };
+
+  // Render
   return (
-    <div className="bg-white rounded-xl shadow p-4">
-      {/* HEADER */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Products</h2>
+    <>
+      <div className="bg-white rounded-xl shadow p-4">
+        {/* HEADER */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Products</h2>
 
-        {/* COLUMN OPTIONS (PRODUCT NOT INCLUDED) */}
-        <div className="relative">
-          <button
-            onClick={() => setOpen(!open)}
-            className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
-          >
-            Columns ⚙
-          </button>
+          {/* COLUMN OPTIONS (PRODUCT NOT INCLUDED) */}
+          <div className="relative">
+            <button
+              onClick={() => setOpen(!open)}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+            >
+              Columns ⚙
+            </button>
 
-          {open && (
-            <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-20">
-              <p className="text-xs text-gray-500 mb-2">
-                Drag to reorder columns
-              </p>
+            {open && (
+              <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-20">
+                <p className="text-xs text-gray-500 mb-2">
+                  Drag to reorder columns
+                </p>
 
-              {columns.map((col, index) => (
-                <div
-                  key={col.key}
-                  draggable
-                  onDragStart={() => onDragStart(index)}
-                  onDragOver={onDragOver}
-                  onDrop={() => onDrop(index)}
-                  className="flex items-center justify-between gap-2 py-1 px-2 rounded cursor-move hover:bg-gray-100"
+                {columns.map((col, index) => (
+                  <div
+                    key={col.key}
+                    draggable
+                    onDragStart={() => onDragStart(index)}
+                    onDragOver={onDragOver}
+                    onDrop={() => onDrop(index)}
+                    className="flex items-center justify-between gap-2 py-1 px-2 rounded cursor-move hover:bg-gray-100"
+                  >
+                    <label className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        checked={col.visible}
+                        onChange={() => toggleColumn(col.key)}
+                      />
+                      {col.label}
+                    </label>
+                    <span className="text-gray-400">⋮⋮</span>
+                  </div>
+                ))}
+
+                <button
+                  onClick={resetColumns}
+                  className="mt-3 w-full text-sm text-red-600 hover:underline"
                 >
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={col.visible}
-                      onChange={() => toggleColumn(col.key)}
-                    />
-                    {col.label}
-                  </label>
-                  <span className="text-gray-400">⋮⋮</span>
-                </div>
-              ))}
+                  Reset to Default
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
 
-              <button
-                onClick={resetColumns}
-                className="mt-3 w-full text-sm text-red-600 hover:underline"
-              >
-                Reset to Default
-              </button>
-            </div>
-          )}
+        {/* TABLE */}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead className="bg-gray-100 text-sm">
+              <tr>
+                {/* FIXED PRODUCT COLUMN */}
+                <th className="p-3 text-left sticky left-0 z-20 bg-gray-100">
+                  Product
+                </th>
+
+                {columns
+                  .filter((c) => c.visible)
+                  .map((col) => (
+                    <th key={col.key} className="p-3 text-left">
+                      {col.label}
+                    </th>
+                  ))}
+              </tr>
+            </thead>
+
+            <tbody>
+              {products.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={columns.length + 1}
+                    className="p-6 text-center text-gray-500"
+                  >
+                    No products found
+                  </td>
+                </tr>
+              ) : (
+                products?.map((product) => (
+                  <tr
+                    key={product.product_id}
+                    className="border-b hover:bg-gray-50"
+                  >
+                    {/* FIXED PRODUCT CELL */}
+                    <td className="p-3 sticky left-0 z-10 bg-white">
+                      {renderProductCell(product)}
+                    </td>
+
+                    {columns.map(
+                      (col) =>
+                        col.visible && (
+                          <td key={col.key} className="p-3">
+                            {renderCell(col.key, product)}
+                          </td>
+                        ),
+                    )}
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {/* TABLE */}
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead className="bg-gray-100 text-sm">
-            <tr>
-              {/* FIXED PRODUCT COLUMN */}
-              <th className="p-3 text-left sticky left-0 z-20 bg-gray-100">
-                Product
-              </th>
-
-              {columns
-                .filter((c) => c.visible)
-                .map((col) => (
-                  <th key={col.key} className="p-3 text-left">
-                    {col.label}
-                  </th>
-                ))}
-            </tr>
-          </thead>
-
-          <tbody>
-            {products.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length + 1}
-                  className="p-6 text-center text-gray-500"
-                >
-                  No products found
-                </td>
-              </tr>
-            ) : (
-              products.map((product) => (
-                <tr
-                  key={product.product_id}
-                  className="border-b hover:bg-gray-50"
-                >
-                  {/* FIXED PRODUCT CELL */}
-                  <td className="p-3 sticky left-0 z-10 bg-white">
-                    {renderProductCell(product)}
-                  </td>
-
-                  {columns.map(
-                    (col) =>
-                      col.visible && (
-                        <td key={col.key} className="p-3">
-                          {renderCell(col.key, product)}
-                        </td>
-                      )
-                  )}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+      {showModal && (
+        <Modal
+          onClose={() => {
+            setShowModal(false);
+            setProjectData({});
+          }}
+          isOpen={showModal}
+        >
+          <AddProductForm
+            onclose={() => {
+              setShowModal(false);
+              setProjectData({});
+            }}
+            productData={projectData}
+            OnSuccess={onSuccess}
+            OnError={OnError}
+          />
+        </Modal>
+      )}
+    </>
   );
 };
 
