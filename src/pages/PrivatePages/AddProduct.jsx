@@ -18,6 +18,8 @@ import {
   MdOutlineFilterAlt,
 } from "react-icons/md";
 import ProductListView from "../../components/ProductList";
+import SmartFilter from "../../components/SmartFilters";
+import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -28,6 +30,7 @@ const AddProduct = () => {
   const [loading, setloading] = useState(false);
   const [projectData, setProjectData] = useState({});
   const [toggle, setToggle] = useState(false);
+  const [showFilter,setShowFilter] = useState(false);
   const [viewType, setViewType] = useState("grid");
 
   const [categoryList, setCategoryList] = useState([]);
@@ -118,10 +121,93 @@ const AddProduct = () => {
       title: message,
     });
   };
+
+  const productFilters = [
+    {
+      key: "name",
+      label: "Product Name",
+      operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.TEXT,
+    },
+    {
+      key: "price",
+      label: "Price",
+      operators: [
+        FILTER_OPERATORS.BETWEEN,
+        FILTER_OPERATORS.GTE,
+        FILTER_OPERATORS.LTE,
+        FILTER_OPERATORS.IS,
+      ],
+      inputType: INPUT_TYPES.NUMBER,
+    },
+    {
+      key: "category_name",
+      label: "Category",
+      operators: [FILTER_OPERATORS.IS, FILTER_OPERATORS.IN],
+      inputType: INPUT_TYPES.SELECT,
+      options: [
+        { label: "Headphones", value: "headphones" },
+        { label: "Mobile", value: "mobile" },
+        { label: "Laptop", value: "laptop" },
+        // add more categories here...
+      ],
+    },
+    {
+      key: "colors",
+      label: "Color",
+      operators: [FILTER_OPERATORS.IN, FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.SELECT,
+      options: [
+        { label: "Black", value: "Black" },
+        { label: "Yellow", value: "Yellow" },
+        { label: "White", value: "White" },
+        { label: "Red", value: "Red" },
+        // add more colors here...
+      ],
+    },
+    {
+      key: "discount",
+      label: "Discount (%)",
+      operators: [
+        FILTER_OPERATORS.BETWEEN,
+        FILTER_OPERATORS.GTE,
+        FILTER_OPERATORS.LTE,
+        FILTER_OPERATORS.IS,
+      ],
+      inputType: INPUT_TYPES.NUMBER,
+    },
+    {
+      key: "is_available",
+      label: "Availability",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.SELECT,
+      options: [
+        { label: "Available", value: true },
+        { label: "Not Available", value: false },
+      ],
+    },
+    {
+      key: "created_at",
+      label: "Created Date",
+      operators: [FILTER_OPERATORS.BETWEEN],
+      inputType: INPUT_TYPES.DATE_RANGE,
+    },
+    {
+      key: "quantity",
+      label: "Quantity",
+      operators: [
+        FILTER_OPERATORS.BETWEEN,
+        FILTER_OPERATORS.GTE,
+        FILTER_OPERATORS.LTE,
+        FILTER_OPERATORS.IS,
+      ],
+      inputType: INPUT_TYPES.NUMBER,
+    },
+  ];
+
   return (
     <div className="mx-5  md:mx-8 lg:mx-14">
       {/* Form Modal */}
-
       <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
         Add your new project now...
         <button
@@ -133,7 +219,6 @@ const AddProduct = () => {
           +
         </button>
       </div>
-
       <div>
         <div className="flex flex-col  gap-5 my-5 sm:my-10">
           <div className="flex gap-5 items-center">
@@ -178,7 +263,7 @@ const AddProduct = () => {
               <button
                 className="button   text-xl"
                 onClick={() => {
-                  setShowModal(true);
+                  setShowFilter(true);
                 }}
               >
                 <MdOutlineFilterAlt />
@@ -187,7 +272,6 @@ const AddProduct = () => {
           </div>
         </div>
       </div>
-
       {viewType === "grid" ? (
         <OurProducts
           products={Products}
@@ -202,7 +286,6 @@ const AddProduct = () => {
           delProduct={handleProductDelete}
         />
       )}
-
       {showModal && (
         <Modal
           onClose={() => {
@@ -222,6 +305,16 @@ const AddProduct = () => {
           />
         </Modal>
       )}
+      {showFilter && (
+        <SmartFilter
+          filters={productFilters}
+          enablePagination={true}
+          enableSorting={false}
+          onChange={(query) => {
+            // yahan API call hogi (later)
+          }}
+        />
+      )}{" "}
     </div>
   );
 };

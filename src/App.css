@@ -282,3 +282,36 @@
     border-color: transparent;
     color: #fff;
 }
+
+
+
+.filterSelect {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.betweenInputs {
+  display: flex;
+  gap: 10px;
+}
+
+.modalHeader h3 {
+  margin-bottom: 10px;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 15px;
+}
+
+.btn {
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.btnCancel {
+  background: #eee;
+}
