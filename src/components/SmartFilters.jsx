@@ -1,90 +1,200 @@
 import { useState } from "react";
-import FilterModal from "./FilterModal";
-// import { FilterModal } from "./filters/filterModal";
+import Modal from "./modal";
 
-export default function SmartFilter({
-  filters = [],
-  enablePagination = false,
-  enableSorting = false,
-  onChange,
-}) {
+const SmartFilter = ({ filters = [], onChange }) => {
+  const [showModal, setShowModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState([]);
 
-  const addFilter = (filter) => {
-    // ❌ ignore empty values
-    if (
-      filter.value === "" ||
-      filter.value === null ||
-      filter.value === undefined ||
-      (Array.isArray(filter.value) && filter.value.every(v => !v))
-    ) {
-      return;
+  // modal state
+  const [field, setField] = useState(null);
+  const [operator, setOperator] = useState("");
+  const [value, setValue] = useState("");
+
+  /* ================= RESET ================= */
+
+  const resetModal = () => {
+    setField(null);
+    setOperator("");
+    setValue("");
+  };
+
+  /* ================= VALIDATION ================= */
+
+  const isValidValue = () => {
+    if (operator === "between") {
+      return Array.isArray(value) && value[0] !== "" && value[1] !== "";
     }
+    return value !== "" && value !== null && value !== undefined;
+  };
+
+  /* ================= APPLY ================= */
+
+  const applyFilter = () => {
+    if (!field || !operator || !isValidValue()) return;
+
+    const newFilter = {
+      key: field.key,
+      operator,
+      value,
+    };
 
     setActiveFilters((prev) => {
-      const index = prev.findIndex(
-        f => f.key === filter.key && f.operator === filter.operator
+      const existsIndex = prev.findIndex(
+        (f) => f.key === newFilter.key && f.operator === newFilter.operator
       );
 
-      if (index !== -1) {
-        const copy = [...prev];
-        copy[index] = filter;
-        return copy;
+      let updated;
+      if (existsIndex !== -1) {
+        updated = [...prev];
+        updated[existsIndex] = newFilter;
+      } else {
+        updated = [...prev, newFilter];
       }
 
-      return [...prev, filter];
+      onChange?.(updated);
+      return updated;
     });
+
+    resetModal();
+    setShowModal(false);
   };
+
+  /* ================= REMOVE ================= */
 
   const removeFilter = (key, operator) => {
-    setActiveFilters((prev) =>
-      prev.filter(
-        f => !(f.key === key && f.operator === operator)
-      )
-    );
-  };
-
-  const clearAll = () => setActiveFilters([]);
-
-  // 🔔 notify page (later API call)
-  const notifyChange = (filters) => {
-    onChange?.({
-      filters,
-      pagination: enablePagination ? {} : null,
-      sorting: enableSorting ? {} : null,
+    setActiveFilters((prev) => {
+      const updated = prev.filter(
+        (f) => !(f.key === key && f.operator === operator)
+      );
+      onChange?.(updated);
+      return updated;
     });
   };
 
+  /* ================= UI ================= */
+
   return (
-    <div>
-      <h3>Filters</h3>
+    <div className="smartFilter">
 
-      {/* Active filters */}
-      <div>
-        {activeFilters.map((f) => (
-          <span key={`${f.key}-${f.operator}`}>
-            {f.key} {f.operator} {JSON.stringify(f.value)}
-            <button onClick={() => {
-              removeFilter(f.key, f.operator);
-              notifyChange(activeFilters);
-            }}>
-              ✕
-            </button>
-          </span>
-        ))}
-      </div>
+      {/* BUTTON */}
+      <button onClick={() => setShowModal(true)}>🔍 Filters</button>
 
-      <FilterModal
-        filters={filters}
-        onApply={(filter) => {
-          addFilter(filter);
-          notifyChange([...activeFilters, filter]);
-        }}
-      />
-
+      {/* ACTIVE FILTERS */}
       {activeFilters.length > 0 && (
-        <button onClick={clearAll}>Clear All</button>
+        <div className="activeFilters">
+          {activeFilters.map((f) => (
+            <span key={`${f.key}-${f.operator}`} className="filterChip">
+              {f.key} {f.operator} {JSON.stringify(f.value)}
+              <button onClick={() => removeFilter(f.key, f.operator)}>
+                ✕
+              </button>
+            </span>
+          ))}
+        </div>
       )}
+
+      {/* MODAL */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <h3>Add Filter</h3>
+
+        {/* FIELD */}
+        <select
+          value={field?.key || ""}
+          onChange={(e) => {
+            const selected = filters.find(
+              (f) => f.key === e.target.value
+            );
+            setField(selected);
+            setOperator("");
+            setValue("");
+          }}
+        >
+          <option value="">Select field</option>
+          {filters.map((f) => (
+            <option key={f.key} value={f.key}>
+              {f.label}
+            </option>
+          ))}
+        </select>
+
+        {/* OPERATOR */}
+        {field && (
+          <select
+            value={operator}
+            onChange={(e) => {
+              setOperator(e.target.value);
+              setValue("");
+            }}
+          >
+            <option value="">Select operator</option>
+            {field.operators.map((op) => (
+              <option key={op} value={op}>
+                {op}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {/* VALUE */}
+        {field && operator && (
+          <>
+            {operator === "between" ? (
+              <div className="between">
+                <input
+                  type={field.inputType}
+                  placeholder="From"
+                  value={value?.[0] || ""}
+                  onChange={(e) =>
+                    setValue([e.target.value, value?.[1] || ""])
+                  }
+                />
+                <input
+                  type={field.inputType}
+                  placeholder="To"
+                  value={value?.[1] || ""}
+                  onChange={(e) =>
+                    setValue([value?.[0] || "", e.target.value])
+                  }
+                />
+              </div>
+            ) : field.inputType === "select" ? (
+              <select
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              >
+                <option value="">Select</option>
+                {field.options.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={field.inputType}
+                placeholder="Enter value"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+              />
+            )}
+          </>
+        )}
+
+        {/* ACTIONS */}
+        <div className="actions">
+          <button onClick={applyFilter}>Apply</button>
+          <button
+            onClick={() => {
+              resetModal();
+              setShowModal(false);
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      </Modal>
     </div>
   );
-}
+};
+
+export default SmartFilter;

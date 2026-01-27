@@ -30,7 +30,7 @@ const AddProduct = () => {
   const [loading, setloading] = useState(false);
   const [projectData, setProjectData] = useState({});
   const [toggle, setToggle] = useState(false);
-  const [showFilter,setShowFilter] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
   const [viewType, setViewType] = useState("grid");
 
   const [categoryList, setCategoryList] = useState([]);
@@ -268,6 +268,10 @@ const AddProduct = () => {
               >
                 <MdOutlineFilterAlt />
               </button>
+              <SmartFilter
+                filters={productFilters}
+                // onChange={handleFilterChange}
+              />
             </div>
           </div>
         </div>
@@ -305,16 +309,26 @@ const AddProduct = () => {
           />
         </Modal>
       )}
-      {showFilter && (
-        <SmartFilter
-          filters={productFilters}
-          enablePagination={true}
-          enableSorting={false}
-          onChange={(query) => {
-            // yahan API call hogi (later)
+      {/* {showFilter && (
+        <Modal
+          onClose={() => {
+            setShowFilter(false);
           }}
-        />
-      )}{" "}
+          isOpen={showFilter}
+        >
+          <SmartFilter
+            filters={productFilters}
+            enablePagination={true}
+            enableSorting={false}
+            onChange={(query) => {
+              // yahan API call hogi (later)
+            }}
+            onClose={() => {
+              setShowFilter(false);
+            }}
+          />
+        </Modal>
+      )} */}
     </div>
   );
 };

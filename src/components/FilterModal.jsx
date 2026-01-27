@@ -43,7 +43,7 @@ const FilterModal = ({ filters, onApply, isOpen, onClose }) => {
   };
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen}>
+    <Modal onClose={onClose} isOpen={true}>
       <div className="modalHeader">
         <h3>Filters</h3>
       </div>
