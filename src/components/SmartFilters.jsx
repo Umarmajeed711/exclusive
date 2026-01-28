@@ -5,87 +5,143 @@ const SmartFilter = ({ filters = [], onChange }) => {
   const [showModal, setShowModal] = useState(false);
   const [activeFilters, setActiveFilters] = useState([]);
 
-  // modal state
-  const [field, setField] = useState(null);
-  const [operator, setOperator] = useState("");
-  const [value, setValue] = useState("");
+  /* ================= HELPERS ================= */
 
-  /* ================= RESET ================= */
+  const isActive = (key) =>
+    activeFilters.some((f) => f.key === key);
 
-  const resetModal = () => {
-    setField(null);
-    setOperator("");
-    setValue("");
+  const inactiveFilters = filters.filter(
+    (f) => !isActive(f.key)
+  );
+
+  /* ================= ADD FILTER ================= */
+
+  const addFilter = (filter) => {
+    setActiveFilters((prev) => [
+      ...prev,
+      {
+        key: filter.key,
+        label: filter.label,
+        operator: filter.operators[0],
+        value: filter.operators[0] === "between" ? ["", ""] : "",
+        meta: filter,
+      },
+    ]);
   };
 
-  /* ================= VALIDATION ================= */
+  /* ================= UPDATE ================= */
 
-  const isValidValue = () => {
-    if (operator === "between") {
-      return Array.isArray(value) && value[0] !== "" && value[1] !== "";
-    }
-    return value !== "" && value !== null && value !== undefined;
-  };
-
-  /* ================= APPLY ================= */
-
-  const applyFilter = () => {
-    if (!field || !operator || !isValidValue()) return;
-
-    const newFilter = {
-      key: field.key,
-      operator,
-      value,
-    };
-
-    setActiveFilters((prev) => {
-      const existsIndex = prev.findIndex(
-        (f) => f.key === newFilter.key && f.operator === newFilter.operator
-      );
-
-      let updated;
-      if (existsIndex !== -1) {
-        updated = [...prev];
-        updated[existsIndex] = newFilter;
-      } else {
-        updated = [...prev, newFilter];
-      }
-
-      onChange?.(updated);
-      return updated;
-    });
-
-    resetModal();
-    setShowModal(false);
+  const updateFilter = (key, changes) => {
+    const updated = activeFilters.map((f) =>
+      f.key === key ? { ...f, ...changes } : f
+    );
+    setActiveFilters(updated);
+    onChange?.(updated.map(({ meta, ...rest }) => rest));
   };
 
   /* ================= REMOVE ================= */
 
-  const removeFilter = (key, operator) => {
-    setActiveFilters((prev) => {
-      const updated = prev.filter(
-        (f) => !(f.key === key && f.operator === operator)
+  const removeFilter = (key) => {
+    const updated = activeFilters.filter((f) => f.key !== key);
+    setActiveFilters(updated);
+    onChange?.(updated.map(({ meta, ...rest }) => rest));
+  };
+
+  const clearFilters = () => {
+    setActiveFilters([]);
+    onChange?.([]);
+  };
+
+  /* ================= VALUE INPUT ================= */
+
+  const renderValue = (filter) => {
+    const { meta, operator, value } = filter;
+
+    if (operator === "between") {
+      return (
+        <div className="flex gap-2">
+          <input
+            type="number"
+            placeholder="From"
+            value={value[0]}
+            onChange={(e) =>
+              updateFilter(filter.key, {
+                value: [e.target.value, value[1]],
+              })
+            }
+            className="w-full rounded-md border px-3 py-1.5 text-sm"
+          />
+          <input
+            type="number"
+            placeholder="To"
+            value={value[1]}
+            onChange={(e) =>
+              updateFilter(filter.key, {
+                value: [value[0], e.target.value],
+              })
+            }
+            className="w-full rounded-md border px-3 py-1.5 text-sm"
+          />
+        </div>
       );
-      onChange?.(updated);
-      return updated;
-    });
+    }
+
+    if (meta.inputType === "select") {
+      return (
+        <select
+          value={value}
+          onChange={(e) =>
+            updateFilter(filter.key, { value: e.target.value })
+          }
+          className="w-full rounded-md border px-3 py-1.5 text-sm"
+        >
+          <option value="">Select</option>
+          {meta.options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      );
+    }
+
+    return (
+      <input
+        type={meta.inputType === "number" ? "number" : "text"}
+        value={value}
+        placeholder="Enter value"
+        onChange={(e) =>
+          updateFilter(filter.key, { value: e.target.value })
+        }
+        className="w-full rounded-md border px-3 py-1.5 text-sm"
+      />
+    );
   };
 
   /* ================= UI ================= */
 
   return (
-    <div className="smartFilter">
+    <div>
+      <button
+        onClick={() => setShowModal(true)}
+        className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-100"
+      >
+        🔍 Filters
+      </button>
 
-      {/* BUTTON */}
-      <button onClick={() => setShowModal(true)}>🔍 Filters</button>
-
-      {/* ACTIVE FILTERS */}
+      {/* ACTIVE TAGS */}
       {activeFilters.length > 0 && (
-        <div className="activeFilters">
+        <div className="mt-3 flex flex-wrap gap-2">
           {activeFilters.map((f) => (
-            <span key={`${f.key}-${f.operator}`} className="filterChip">
-              {f.key} {f.operator} {JSON.stringify(f.value)}
-              <button onClick={() => removeFilter(f.key, f.operator)}>
+            <span
+              key={f.key}
+              className="flex items-center gap-2 rounded-full bg-gray-200 px-3 py-1 text-xs"
+            >
+              {f.label}
+              <button
+                onClick={() => removeFilter(f.key)}
+                className="text-gray-600 hover:text-black"
+              >
                 ✕
               </button>
             </span>
@@ -93,104 +149,96 @@ const SmartFilter = ({ filters = [], onChange }) => {
         </div>
       )}
 
-      {/* MODAL */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-        <h3>Add Filter</h3>
+        <div className="w-full max-w-2xl rounded-lg bg-white p-5">
 
-        {/* FIELD */}
-        <select
-          value={field?.key || ""}
-          onChange={(e) => {
-            const selected = filters.find(
-              (f) => f.key === e.target.value
-            );
-            setField(selected);
-            setOperator("");
-            setValue("");
-          }}
-        >
-          <option value="">Select field</option>
-          {filters.map((f) => (
-            <option key={f.key} value={f.key}>
-              {f.label}
-            </option>
-          ))}
-        </select>
+          <h3 className="mb-4 text-lg font-semibold">
+            Filters
+          </h3>
 
-        {/* OPERATOR */}
-        {field && (
-          <select
-            value={operator}
-            onChange={(e) => {
-              setOperator(e.target.value);
-              setValue("");
-            }}
-          >
-            <option value="">Select operator</option>
-            {field.operators.map((op) => (
-              <option key={op} value={op}>
-                {op}
-              </option>
-            ))}
-          </select>
-        )}
-
-        {/* VALUE */}
-        {field && operator && (
-          <>
-            {operator === "between" ? (
-              <div className="between">
-                <input
-                  type={field.inputType}
-                  placeholder="From"
-                  value={value?.[0] || ""}
-                  onChange={(e) =>
-                    setValue([e.target.value, value?.[1] || ""])
-                  }
-                />
-                <input
-                  type={field.inputType}
-                  placeholder="To"
-                  value={value?.[1] || ""}
-                  onChange={(e) =>
-                    setValue([value?.[0] || "", e.target.value])
-                  }
-                />
-              </div>
-            ) : field.inputType === "select" ? (
-              <select
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
+          {/* ACTIVE FILTER ROWS */}
+          <div className="space-y-3">
+            {activeFilters.map((f) => (
+              <div
+                key={f.key}
+                className="flex items-center justify-between gap-3 rounded-md border bg-gray-50 p-3"
               >
-                <option value="">Select</option>
-                {field.options.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <input
-                type={field.inputType}
-                placeholder="Enter value"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-              />
-            )}
-          </>
-        )}
+                <div className="flex w-full flex-col gap-2">
+                  <strong className="text-sm">
+                    {f.label}
+                  </strong>
 
-        {/* ACTIONS */}
-        <div className="actions">
-          <button onClick={applyFilter}>Apply</button>
-          <button
-            onClick={() => {
-              resetModal();
-              setShowModal(false);
-            }}
-          >
-            Cancel
-          </button>
+                  <select
+                    value={f.operator}
+                    onChange={(e) =>
+                      updateFilter(f.key, {
+                        operator: e.target.value,
+                        value:
+                          e.target.value === "between"
+                            ? ["", ""]
+                            : "",
+                      })
+                    }
+                    className="rounded-md border px-3 py-1.5 text-sm"
+                  >
+                    {f.meta.operators.map((op) => (
+                      <option key={op} value={op}>
+                        {op}
+                      </option>
+                    ))}
+                  </select>
+
+                  {renderValue(f)}
+                </div>
+
+                <button
+                  onClick={() => removeFilter(f.key)}
+                  className="text-gray-400 hover:text-red-500"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* INACTIVE FILTER TAGS */}
+          {inactiveFilters.length > 0 && (
+            <>
+              <h4 className="mt-6 mb-2 text-sm font-medium text-gray-700">
+                Add Filters
+              </h4>
+
+              <div className="flex flex-wrap gap-2">
+                {inactiveFilters.map((f) => (
+                  <span
+                    key={f.key}
+                    onClick={() => addFilter(f)}
+                    className="cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300"
+                  >
+                    + {f.label}
+                  </span>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* FOOTER */}
+          {activeFilters.length > 0 && (
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={clearFilters}
+                className="rounded-md border px-4 py-1.5 text-sm hover:bg-gray-100"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-gray-800"
+              >
+                Apply Filters
+              </button>
+            </div>
+          )}
         </div>
       </Modal>
     </div>
