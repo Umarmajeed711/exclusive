@@ -145,12 +145,14 @@ const SmartFilter = ({ filters = [], onChange }) => {
       <Modal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        className="!min-h-48 h-full"
+        // className="!min-h-48 h-full"
       >
-        <div className="w-full max-w-2xl rounded-lg bg-white p-5 h-full overflow-hidden">
+        <div className="w-full max-w-2xl rounded-lg bg-white p-4 h-full flex flex-col  justify-between">
           <h3 className="mb-4 text-lg font-semibold">Filters</h3>
 
-          <div className="space-y-3 w-full h-full overflow-auto">
+          <div className="w-full h-full overflow-auto flex flex-col items-center justify-between">
+
+            <div className="w-full h-full overflow-hidden overflow-y-auto custom-scrollbar">
             {/* ACTIVE FILTER ROWS */}
             <div className="space-y-3 ">
               {activeFilters.map((f) => (
@@ -193,8 +195,8 @@ const SmartFilter = ({ filters = [], onChange }) => {
 
             {/* INACTIVE FILTER TAGS */}
             {inactiveFilters.length > 0 && (
-              <>
-                <h4 className="mt-6 mb-2 text-sm font-medium text-gray-700">
+              <div className="py-2">
+                <h4 className="mt-4 mb-2 text-sm font-medium text-gray-700">
                   Add Filters
                 </h4>
 
@@ -209,12 +211,17 @@ const SmartFilter = ({ filters = [], onChange }) => {
                     </span>
                   ))}
                 </div>
-              </>
+              </div>
             )}
 
-            {/* FOOTER */}
+            </div>
+
+
+           
+          </div>
+           {/* FOOTER */}
             {activeFilters.length > 0 && (
-              <div className="mt-6 flex justify-end gap-3">
+              <div className="mt-4 flex justify-end gap-3">
                 <button
                   onClick={clearFilters}
                   className="rounded-md border px-4 py-1.5 text-sm hover:bg-gray-100"
@@ -229,7 +236,6 @@ const SmartFilter = ({ filters = [], onChange }) => {
                 </button>
               </div>
             )}
-          </div>
         </div>
       </Modal>
     </div>
