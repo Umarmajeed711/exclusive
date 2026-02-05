@@ -134,8 +134,6 @@ const AddProduct = () => {
       label: "Price",
       operators: [
         FILTER_OPERATORS.BETWEEN,
-        FILTER_OPERATORS.GTE,
-        FILTER_OPERATORS.LTE,
         FILTER_OPERATORS.IS,
       ],
       inputType: INPUT_TYPES.NUMBER,
@@ -143,26 +141,24 @@ const AddProduct = () => {
     {
       key: "category_name",
       label: "Category",
-      operators: [FILTER_OPERATORS.IS, FILTER_OPERATORS.IN],
+      operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
       options: [
         { label: "Headphones", value: "headphones" },
         { label: "Mobile", value: "mobile" },
-        { label: "Laptop", value: "laptop" },
-        // add more categories here...
+        { label: "Laptop", value: "laptop" }
       ],
     },
     {
       key: "colors",
       label: "Color",
-      operators: [FILTER_OPERATORS.IN, FILTER_OPERATORS.IS],
+      operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
       options: [
         { label: "Black", value: "Black" },
         { label: "Yellow", value: "Yellow" },
         { label: "White", value: "White" },
         { label: "Red", value: "Red" },
-        // add more colors here...
       ],
     },
     {
@@ -170,8 +166,6 @@ const AddProduct = () => {
       label: "Discount (%)",
       operators: [
         FILTER_OPERATORS.BETWEEN,
-        FILTER_OPERATORS.GTE,
-        FILTER_OPERATORS.LTE,
         FILTER_OPERATORS.IS,
       ],
       inputType: INPUT_TYPES.NUMBER,
@@ -190,15 +184,13 @@ const AddProduct = () => {
       key: "created_at",
       label: "Created Date",
       operators: [FILTER_OPERATORS.BETWEEN],
-      inputType: INPUT_TYPES.DATE_RANGE,
+      inputType: INPUT_TYPES.DATE,
     },
     {
       key: "quantity",
       label: "Quantity",
       operators: [
         FILTER_OPERATORS.BETWEEN,
-        FILTER_OPERATORS.GTE,
-        FILTER_OPERATORS.LTE,
         FILTER_OPERATORS.IS,
       ],
       inputType: INPUT_TYPES.NUMBER,

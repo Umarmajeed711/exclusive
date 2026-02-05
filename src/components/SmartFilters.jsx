@@ -51,14 +51,81 @@ const SmartFilter = ({ filters = [], onChange }) => {
 
   /* ================= VALUE INPUT ================= */
 
+  // const renderValue = (filter) => {
+  //   const { meta, operator, value } = filter;
+
+  //   if (operator === "between") {
+  //     return (
+  //       <div className="flex gap-2">
+  //         <input
+  //           type="number"
+  //           placeholder="From"
+  //           value={value[0]}
+  //           onChange={(e) =>
+  //             updateFilter(filter.key, {
+  //               value: [e.target.value, value[1]],
+  //             })
+  //           }
+  //           className="w-full rounded-md border px-3 py-1.5 text-sm"
+  //         />
+  //         <input
+  //           type="number"
+  //           placeholder="To"
+  //           value={value[1]}
+  //           onChange={(e) =>
+  //             updateFilter(filter.key, {
+  //               value: [value[0], e.target.value],
+  //             })
+  //           }
+  //           className="w-full rounded-md border px-3 py-1.5 text-sm"
+  //         />
+  //       </div>
+  //     );
+  //   }
+
+  //   if (meta.inputType === "select") {
+  //     return (
+  //       <select
+  //         value={value}
+  //         onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
+  //         className="w-full rounded-md border px-3 py-1.5 text-sm"
+  //       >
+  //         {meta.options.map((o) => (
+  //           <option key={o.value} value={o.value}>
+  //             {o.label}
+  //           </option>
+  //         ))}
+  //       </select>
+  //     );
+  //   }
+
+  //   return (
+  //     <input
+  //       type={meta.inputType === "number" ? "number" : "text"}
+  //       value={value}
+  //       placeholder="Enter value"
+  //       onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
+  //       className="w-full rounded-md border px-3 py-1.5 text-sm"
+  //     />
+  //   );
+  // };
+
   const renderValue = (filter) => {
     const { meta, operator, value } = filter;
 
+    /* ===== BETWEEN ===== */
     if (operator === "between") {
+      const inputType =
+        meta.inputType === "date"
+          ? "date"
+          : meta.inputType === "number"
+            ? "number"
+            : "text";
+
       return (
         <div className="flex gap-2">
           <input
-            type="number"
+            type={inputType}
             placeholder="From"
             value={value[0]}
             onChange={(e) =>
@@ -69,7 +136,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
             className="w-full rounded-md border px-3 py-1.5 text-sm"
           />
           <input
-            type="number"
+            type={inputType}
             placeholder="To"
             value={value[1]}
             onChange={(e) =>
@@ -83,6 +150,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
       );
     }
 
+    /* ===== SELECT ===== */
     if (meta.inputType === "select") {
       return (
         <select
@@ -90,7 +158,6 @@ const SmartFilter = ({ filters = [], onChange }) => {
           onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
           className="w-full rounded-md border px-3 py-1.5 text-sm"
         >
-          <option value="">Select</option>
           {meta.options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
@@ -100,6 +167,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
       );
     }
 
+    /* ===== DEFAULT ===== */
     return (
       <input
         type={meta.inputType === "number" ? "number" : "text"}
@@ -123,7 +191,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
       </button>
 
       {/* ACTIVE TAGS */}
-      {activeFilters.length > 0 && (
+      {/* {activeFilters.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {activeFilters.map((f) => (
             <span
@@ -140,7 +208,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
             </span>
           ))}
         </div>
-      )}
+      )} */}
 
       <Modal
         isOpen={showModal}
@@ -151,91 +219,86 @@ const SmartFilter = ({ filters = [], onChange }) => {
           <h3 className="mb-4 text-lg font-semibold">Filters</h3>
 
           <div className="w-full h-full overflow-auto flex flex-col items-center justify-between">
-
             <div className="w-full h-full overflow-hidden overflow-y-auto custom-scrollbar">
-            {/* ACTIVE FILTER ROWS */}
-            <div className="space-y-3 ">
-              {activeFilters.map((f) => (
-                <div
-                  key={f.key}
-                  className="flex items-center justify-between gap-3 rounded-md border bg-gray-50 p-3"
-                >
-                  <div className="flex w-full flex-col gap-2">
-                    <strong className="text-sm">{f.label}</strong>
-
-                    <select
-                      value={f.operator}
-                      onChange={(e) =>
-                        updateFilter(f.key, {
-                          operator: e.target.value,
-                          value: e.target.value === "between" ? ["", ""] : "",
-                        })
-                      }
-                      className="rounded-md border px-3 py-1.5 text-sm"
-                    >
-                      {f.meta.operators.map((op) => (
-                        <option key={op} value={op}>
-                          {op}
-                        </option>
-                      ))}
-                    </select>
-
-                    {renderValue(f)}
-                  </div>
-
-                  <button
-                    onClick={() => removeFilter(f.key)}
-                    className="text-gray-400 hover:text-red-500"
+              {/* ACTIVE FILTER ROWS */}
+              <div className="space-y-3 ">
+                {activeFilters.map((f) => (
+                  <div
+                    key={f.key}
+                    className="flex items-center justify-between gap-3 rounded-md border bg-gray-50 p-3"
                   >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
+                    <div className="flex w-full flex-col gap-2">
+                      <strong className="text-sm">{f.label}</strong>
 
-            {/* INACTIVE FILTER TAGS */}
-            {inactiveFilters.length > 0 && (
-              <div className="py-2">
-                <h4 className="mt-4 mb-2 text-sm font-medium text-gray-700">
-                  Add Filters
-                </h4>
+                      <select
+                        value={f.operator}
+                        onChange={(e) =>
+                          updateFilter(f.key, {
+                            operator: e.target.value,
+                            value: e.target.value === "between" ? ["", ""] : "",
+                          })
+                        }
+                        className="rounded-md border px-3 py-1.5 text-sm"
+                      >
+                        {f.meta.operators.map((op) => (
+                          <option key={op} value={op}>
+                            {op}
+                          </option>
+                        ))}
+                      </select>
 
-                <div className="flex flex-wrap gap-2">
-                  {inactiveFilters.map((f) => (
-                    <span
-                      key={f.key}
-                      onClick={() => addFilter(f)}
-                      className="cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300"
+                      {renderValue(f)}
+                    </div>
+
+                    <button
+                      onClick={() => removeFilter(f.key)}
+                      className="text-gray-400 hover:text-red-500"
                     >
-                      + {f.label}
-                    </span>
-                  ))}
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* INACTIVE FILTER TAGS */}
+              {inactiveFilters.length > 0 && (
+                <div className="py-2">
+                  <h4 className="mt-4 mb-2 text-sm font-medium text-gray-700">
+                    Add Filters
+                  </h4>
+
+                  <div className="flex flex-wrap gap-2">
+                    {inactiveFilters.map((f) => (
+                      <span
+                        key={f.key}
+                        onClick={() => addFilter(f)}
+                        className="cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300"
+                      >
+                        + {f.label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-
+              )}
             </div>
-
-
-           
           </div>
-           {/* FOOTER */}
-            {activeFilters.length > 0 && (
-              <div className="mt-4 flex justify-end gap-3">
-                <button
-                  onClick={clearFilters}
-                  className="rounded-md border px-4 py-1.5 text-sm hover:bg-gray-100"
-                >
-                  Clear
-                </button>
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-gray-800"
-                >
-                  Apply Filters
-                </button>
-              </div>
-            )}
+          {/* FOOTER */}
+          {activeFilters.length > 0 && (
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={clearFilters}
+                className="rounded-md border px-4 py-1.5 text-sm hover:bg-gray-100"
+              >
+                Clear
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-gray-800"
+              >
+                Apply Filters
+              </button>
+            </div>
+          )}
         </div>
       </Modal>
     </div>
