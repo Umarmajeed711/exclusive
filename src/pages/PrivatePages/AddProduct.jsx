@@ -20,6 +20,7 @@ import {
 import ProductListView from "../../components/ProductList";
 import SmartFilter from "../../components/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
+import {ActiveFilters} from "../../components/ActiveFilters";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -45,14 +46,32 @@ const AddProduct = () => {
 
   const [Products, setProducts] = useState([]);
 
-  const getProducts = async () => {
-    setloading(true);
-    try {
-      let result = await api.get(`/products`);
+  // const getProducts = async () => {
+  //   setloading(true);
+  //   try {
+  //     let result = await api.get(`/products`);
 
-      setProducts(result.data.products);
-      console.log(result.data);
+  //     setProducts(result.data.products);
+  //     console.log(result.data);
+  //   } catch (error) {
+  //   } finally {
+  //     setloading(false);
+  //   }
+  // };
+
+  const getProducts = async (filters = {}) => {
+    setloading(true);
+
+    try {
+      const result = await api.get("/products", {
+        params: {
+          filters: JSON.stringify(filters),
+        },
+      });
+
+      setProducts(result?.data?.products);
     } catch (error) {
+      console.error(error);
     } finally {
       setloading(false);
     }
@@ -132,10 +151,7 @@ const AddProduct = () => {
     {
       key: "price",
       label: "Price",
-      operators: [
-        FILTER_OPERATORS.BETWEEN,
-        FILTER_OPERATORS.IS,
-      ],
+      operators: [FILTER_OPERATORS.BETWEEN, FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.NUMBER,
     },
     {
@@ -146,7 +162,7 @@ const AddProduct = () => {
       options: [
         { label: "Headphones", value: "headphones" },
         { label: "Mobile", value: "mobile" },
-        { label: "Laptop", value: "laptop" }
+        { label: "Laptop", value: "laptop" },
       ],
     },
     {
@@ -164,10 +180,7 @@ const AddProduct = () => {
     {
       key: "discount",
       label: "Discount (%)",
-      operators: [
-        FILTER_OPERATORS.BETWEEN,
-        FILTER_OPERATORS.IS,
-      ],
+      operators: [FILTER_OPERATORS.BETWEEN, FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.NUMBER,
     },
     {
@@ -189,18 +202,33 @@ const AddProduct = () => {
     {
       key: "quantity",
       label: "Quantity",
-      operators: [
-        FILTER_OPERATORS.BETWEEN,
-        FILTER_OPERATORS.IS,
-      ],
+      operators: [FILTER_OPERATORS.BETWEEN, FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.NUMBER,
     },
   ];
 
+  const [filters, setFilters] = useState([]);
+
+  const handleFilterApply = (query,activeFilters) => {
+    setFilters(activeFilters);
+    getProducts(query);
+  };
+
+  const removeFilter = (index) => {
+    const updated = filters?.filter((_, i) => i !== index);
+    setFilters(updated);
+    getProducts(updated);
+  };
+
+  const clearAllFilters = () => {
+    setFilters([]);
+    getProducts([]);
+  };
+
   return (
     <div className="mx-5  md:mx-8 lg:mx-14">
       {/* Form Modal */}
-      <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
+      {/* <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
         Add your new project now...
         <button
           className="button px-2  text-xl"
@@ -210,14 +238,21 @@ const AddProduct = () => {
         >
           +
         </button>
-      </div>
+      </div> */}
       <div>
         <div className="flex flex-col  gap-5 my-5 sm:my-10">
-          <div className="flex gap-5 items-center">
-            <p className="h-10 w-5 rounded bg-theme-primary"></p>
-            <p className="text-theme-primary text-xl font-medium">
-              All Products
-            </p>
+          <div className="flex justify-between h-full items-center">
+            <div className="flex gap-5 items-center">
+              <p className="h-10 w-5 rounded bg-theme-primary"></p>
+              <p className="text-theme-primary text-xl font-medium">
+                All Products
+              </p>
+            </div>
+            <ActiveFilters
+              filters={filters}
+              onRemove={removeFilter}
+              onClear={clearAllFilters}
+            />
           </div>
           {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
           <div className="flex justify-between items-center h-full">
@@ -252,17 +287,17 @@ const AddProduct = () => {
                   <MdFormatListBulleted />
                 </button>
               </div>
-              <button
+              {/* <button
                 className="button   text-xl"
                 onClick={() => {
                   setShowFilter(true);
                 }}
               >
                 <MdOutlineFilterAlt />
-              </button>
+              </button> */}
               <SmartFilter
                 filters={productFilters}
-                // onChange={handleFilterChange}
+                onChange={handleFilterApply}
               />
             </div>
           </div>

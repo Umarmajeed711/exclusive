@@ -26,7 +26,7 @@ const Myroute = () => {
 
   return (
     <div>
-      {state?.isLogin == false ? (
+      {state?.isLogin == true ? (
         <Routes>
           <Route path="/" index element={<Home />}></Route>
           <Route path="/Category" element={<Category />}></Route>

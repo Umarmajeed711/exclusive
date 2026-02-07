@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Modal from "./modal";
+import { buildFilterQuery } from "./types";
+import { MdOutlineFilterAlt } from "react-icons/md";
 
 const SmartFilter = ({ filters = [], onChange }) => {
   const [showModal, setShowModal] = useState(false);
@@ -7,20 +9,40 @@ const SmartFilter = ({ filters = [], onChange }) => {
 
   /* ================= HELPERS ================= */
 
-  const isActive = (key) => activeFilters.some((f) => f.key === key);
+  const isActive = (key) => activeFilters?.some((f) => f.key === key);
 
-  const inactiveFilters = filters.filter((f) => !isActive(f.key));
+  const inactiveFilters = filters?.filter((f) => !isActive(f.key));
 
   /* ================= ADD FILTER ================= */
 
+  // const addFilter = (filter) => {
+  //   setActiveFilters((prev) => [
+  //     ...prev,
+  //     {
+  //       key: filter.key,
+  //       label: filter.label,
+  //       operator: filter.operators[0],
+  //       value: filter.operators[0] === "between" ? ["", ""] : "",
+  //       meta: filter,
+  //     },
+  //   ]);
+  // };
+
   const addFilter = (filter) => {
+    const defaultValue =
+      filter.inputType === "select"
+        ? ""
+        : filter.operators[0] === "between"
+          ? ["", ""]
+          : "";
+
     setActiveFilters((prev) => [
       ...prev,
       {
         key: filter.key,
         label: filter.label,
         operator: filter.operators[0],
-        value: filter.operators[0] === "between" ? ["", ""] : "",
+        value: defaultValue,
         meta: filter,
       },
     ]);
@@ -29,11 +51,11 @@ const SmartFilter = ({ filters = [], onChange }) => {
   /* ================= UPDATE ================= */
 
   const updateFilter = (key, changes) => {
-    const updated = activeFilters.map((f) =>
+    const updated = activeFilters?.map((f) =>
       f.key === key ? { ...f, ...changes } : f,
     );
     setActiveFilters(updated);
-    onChange?.(updated.map(({ meta, ...rest }) => rest));
+    // onChange?.(updated.map(({ meta, ...rest }) => rest));
   };
 
   /* ================= REMOVE ================= */
@@ -41,13 +63,20 @@ const SmartFilter = ({ filters = [], onChange }) => {
   const removeFilter = (key) => {
     const updated = activeFilters.filter((f) => f.key !== key);
     setActiveFilters(updated);
-    onChange?.(updated.map(({ meta, ...rest }) => rest));
+    // onChange?.(updated.map(({ meta, ...rest }) => rest));
   };
 
   const clearFilters = () => {
     setActiveFilters([]);
     onChange?.([]);
+    setTimeout(() => {
+      setShowModal(false);
+    }, 200);
   };
+
+  const hasInvalidFilters = activeFilters.some((f) =>
+    f.operator === "between" ? !f.value[0] || !f.value[1] : !f.value,
+  );
 
   /* ================= VALUE INPUT ================= */
 
@@ -111,7 +140,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
   // };
 
   const renderValue = (filter) => {
-    const { meta, operator, value } = filter;
+    const { meta, operator, value, lable } = filter;
 
     /* ===== BETWEEN ===== */
     if (operator === "between") {
@@ -158,7 +187,10 @@ const SmartFilter = ({ filters = [], onChange }) => {
           onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
           className="w-full rounded-md border px-3 py-1.5 text-sm"
         >
-          {meta.options.map((o) => (
+          <option value="" disabled>
+            Select {filter.label}
+          </option>
+          {meta?.options?.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
             </option>
@@ -173,21 +205,37 @@ const SmartFilter = ({ filters = [], onChange }) => {
         type={meta.inputType === "number" ? "number" : "text"}
         value={value}
         placeholder="Enter value"
-        onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
+        onChange={(e) => updateFilter(filter?.key, { value: e.target.value })}
         className="w-full rounded-md border px-3 py-1.5 text-sm"
       />
     );
+  };
+
+  const applyFilters = () => {
+    const query = buildFilterQuery(activeFilters);
+
+    onChange?.(query,activeFilters);
+    setShowModal(false);
   };
 
   /* ================= UI ================= */
 
   return (
     <div>
-      <button
+      {/* <button
         onClick={() => setShowModal(true)}
         className="rounded-md border px-3 py-1.5 text-sm hover:bg-gray-100"
       >
         🔍 Filters
+      </button> */}
+
+      <button
+        className="button   text-xl h-full"
+        onClick={() => {
+          setShowModal(true);
+        }}
+      >
+        <MdOutlineFilterAlt />
       </button>
 
       {/* ACTIVE TAGS */}
@@ -261,14 +309,14 @@ const SmartFilter = ({ filters = [], onChange }) => {
               </div>
 
               {/* INACTIVE FILTER TAGS */}
-              {inactiveFilters.length > 0 && (
+              {inactiveFilters?.length > 0 && (
                 <div className="py-2">
                   <h4 className="mt-4 mb-2 text-sm font-medium text-gray-700">
                     Add Filters
                   </h4>
 
                   <div className="flex flex-wrap gap-2">
-                    {inactiveFilters.map((f) => (
+                    {inactiveFilters?.map((f) => (
                       <span
                         key={f.key}
                         onClick={() => addFilter(f)}
@@ -283,7 +331,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
             </div>
           </div>
           {/* FOOTER */}
-          {activeFilters.length > 0 && (
+          {activeFilters?.length > 0 && (
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={clearFilters}
@@ -292,8 +340,9 @@ const SmartFilter = ({ filters = [], onChange }) => {
                 Clear
               </button>
               <button
-                onClick={() => setShowModal(false)}
-                className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-gray-800"
+                onClick={applyFilters}
+                disabled={hasInvalidFilters}
+                className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
               >
                 Apply Filters
               </button>
