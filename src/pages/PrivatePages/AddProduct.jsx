@@ -298,6 +298,7 @@ const AddProduct = () => {
               <SmartFilter
                 filters={productFilters}
                 onChange={handleFilterApply}
+                value={filters}  
               />
             </div>
           </div>

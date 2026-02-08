@@ -1,9 +1,9 @@
-export const ActiveFilters = ({ filters, onRemove, onClear }) => {
-  if (!filters.length) return null;
+export const ActiveFilters = ({ filters = [], onRemove = () => {}, onClear = () => {} }) => {
+  if (!filters?.length) return null;
 
   return (
     <div className="flex flex-wrap gap-2 mb-4">
-      {filters.map((f, index) => (
+      {filters?.map((f, index) => (
         <div
           key={index}
           className="flex items-center gap-2 bg-gray-200 px-3 py-1 rounded-full text-sm"

@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "./modal";
 import { buildFilterQuery } from "./types";
 import { MdOutlineFilterAlt } from "react-icons/md";
 
-const SmartFilter = ({ filters = [], onChange }) => {
+const SmartFilter = ({ filters = [], onChange ,value = []}) => {
   const [showModal, setShowModal] = useState(false);
-  const [activeFilters, setActiveFilters] = useState([]);
+   const [activeFilters, setActiveFilters] = useState(value);
+
+  useEffect(() => {
+    setActiveFilters(value);
+  }, [value]);
 
   /* ================= HELPERS ================= */
 
@@ -74,7 +78,7 @@ const SmartFilter = ({ filters = [], onChange }) => {
     }, 200);
   };
 
-  const hasInvalidFilters = activeFilters.some((f) =>
+  const hasInvalidFilters = activeFilters?.some((f) =>
     f.operator === "between" ? !f.value[0] || !f.value[1] : !f.value,
   );
 
