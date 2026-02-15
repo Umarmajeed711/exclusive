@@ -3,16 +3,20 @@ import Modal from "./modal";
 import { buildFilterQuery } from "./types";
 import { MdOutlineFilterAlt } from "react-icons/md";
 
-const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , onClose = () => {}}) => {
+const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal}) => {
 
-
+  console.log("showFilterModal",showFilterModal);
+  
+  const [showModal, setShowModal] = useState(showFilterModal);
    const [activeFilters, setActiveFilters] = useState(value || []);
 
    
    useEffect(() => {
      setActiveFilters(value);
    }, [value]);
-
+    useEffect(() => {
+     setShowModal(showFilterModal);
+   }, [showFilterModal]);
   /* ================= HELPERS ================= */
 
   const isActive = (key) => activeFilters?.some((f) => f.key === key);
@@ -20,19 +24,6 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
   const inactiveFilters = filters?.filter((f) => !isActive(f.key));
 
   /* ================= ADD FILTER ================= */
-
-  // const addFilter = (filter) => {
-  //   setActiveFilters((prev) => [
-  //     ...prev,
-  //     {
-  //       key: filter.key,
-  //       label: filter.label,
-  //       operator: filter.operators[0],
-  //       value: filter.operators[0] === "between" ? ["", ""] : "",
-  //       meta: filter,
-  //     },
-  //   ]);
-  // };
 
   const addFilter = (filter) => {
     const defaultValue =
@@ -61,7 +52,6 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
       f.key === key ? { ...f, ...changes } : f,
     );
     setActiveFilters(updated);
-    // onChange?.(updated.map(({ meta, ...rest }) => rest));
   };
 
   /* ================= REMOVE ================= */
@@ -75,7 +65,9 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
   const clearFilters = () => {
     setActiveFilters([]);
     onChange?.([],[]);
-    onClose?.()
+    setTimeout(() => {
+      setShowModal(false);
+    }, 200);
   };
 
   const hasInvalidFilters = activeFilters?.some((f) =>
@@ -84,64 +76,6 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
 
   /* ================= VALUE INPUT ================= */
 
-  // const renderValue = (filter) => {
-  //   const { meta, operator, value } = filter;
-
-  //   if (operator === "between") {
-  //     return (
-  //       <div className="flex gap-2">
-  //         <input
-  //           type="number"
-  //           placeholder="From"
-  //           value={value[0]}
-  //           onChange={(e) =>
-  //             updateFilter(filter.key, {
-  //               value: [e.target.value, value[1]],
-  //             })
-  //           }
-  //           className="w-full rounded-md border px-3 py-1.5 text-sm"
-  //         />
-  //         <input
-  //           type="number"
-  //           placeholder="To"
-  //           value={value[1]}
-  //           onChange={(e) =>
-  //             updateFilter(filter.key, {
-  //               value: [value[0], e.target.value],
-  //             })
-  //           }
-  //           className="w-full rounded-md border px-3 py-1.5 text-sm"
-  //         />
-  //       </div>
-  //     );
-  //   }
-
-  //   if (meta.inputType === "select") {
-  //     return (
-  //       <select
-  //         value={value}
-  //         onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
-  //         className="w-full rounded-md border px-3 py-1.5 text-sm"
-  //       >
-  //         {meta.options.map((o) => (
-  //           <option key={o.value} value={o.value}>
-  //             {o.label}
-  //           </option>
-  //         ))}
-  //       </select>
-  //     );
-  //   }
-
-  //   return (
-  //     <input
-  //       type={meta.inputType === "number" ? "number" : "text"}
-  //       value={value}
-  //       placeholder="Enter value"
-  //       onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
-  //       className="w-full rounded-md border px-3 py-1.5 text-sm"
-  //     />
-  //   );
-  // };
 
   const renderValue = (filter) => {
     const { meta, operator, value, lable } = filter;
@@ -219,7 +153,7 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
     const query = buildFilterQuery(activeFilters);
 
     onChange?.(query,activeFilters);
-    onClose?.()
+    setShowModal(false);
   };
 
   /* ================= UI ================= */
@@ -233,12 +167,31 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
         🔍 Filters
       </button> */}
 
-
       
 
+      {/* ACTIVE TAGS */}
+      {/* {activeFilters.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {activeFilters.map((f) => (
+            <span
+              key={f.key}
+              className="flex items-center gap-2 rounded-full bg-gray-200 px-3 py-1 text-xs"
+            >
+              {f.label}
+              <button
+                onClick={() => removeFilter(f.key)}
+                className="text-gray-600 hover:text-black"
+              >
+                ✕
+              </button>
+            </span>
+          ))}
+        </div>
+      )} */}
+
       <Modal
-        isOpen={showFilterModal}
-        onClose={() => onClose?.()}
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
         // className="!min-h-48 h-full"
       >
         <div className="w-full max-w-2xl rounded-lg bg-white p-4 h-full flex flex-col  justify-between">

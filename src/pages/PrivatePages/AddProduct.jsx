@@ -252,6 +252,7 @@ const AddProduct = () => {
               filters={filters}
               onRemove={removeFilter}
               onClear={clearAllFilters}
+              showFilterModal={() => {setShowFilter(true)}}
             />
           </div>
           {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
@@ -287,19 +288,16 @@ const AddProduct = () => {
                   <MdFormatListBulleted />
                 </button>
               </div>
-              {/* <button
-                className="button   text-xl"
-                onClick={() => {
-                  setShowFilter(true);
-                }}
-              >
-                <MdOutlineFilterAlt />
-              </button> */}
-              <SmartFilter
-                filters={productFilters}
-                onChange={handleFilterApply}
-                value={filters}  
-              />
+             
+              <button
+        className="button   text-xl !h-full"
+        onClick={() => {
+          setShowFilter(!showFilter);
+        }}
+      >
+        <MdOutlineFilterAlt />
+      </button>
+              
             </div>
           </div>
         </div>
@@ -357,6 +355,16 @@ const AddProduct = () => {
           />
         </Modal>
       )} */}
+      {
+        showModal && (
+           <SmartFilter
+                filters={productFilters}
+                onChange={handleFilterApply}
+                value={filters}  
+                onClose={() => {setShowModal(false)}}
+              />
+        )
+      }
     </div>
   );
 };

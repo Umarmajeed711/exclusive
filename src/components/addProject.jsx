@@ -425,7 +425,7 @@ useEffect(() => {
       {/*Add Project Form */}
 
       <div
-        className="border rounded-lg  w-full   overflow-hidden h-full pl-2 bg-gray-200"
+        className="border rounded-lg  w-full   overflow-hidden h-full pl-[2px] bg-gray-200"
         style={{ boxShadow: "0 0 10px #03A9F4  " }}
       >
         <div className="flex justify-center items-center flex-col h-full ">
