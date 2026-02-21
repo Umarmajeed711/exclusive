@@ -20,7 +20,8 @@ import {
 import ProductListView from "../../components/ProductList";
 import SmartFilter from "../../components/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
-import {ActiveFilters} from "../../components/ActiveFilters";
+import { ActiveFilters } from "../../components/ActiveFilters";
+import Pagination from "../../components/Pagination";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -45,6 +46,11 @@ const AddProduct = () => {
   };
 
   const [Products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [limit, setLimit] = useState(2);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   // const getProducts = async () => {
   //   setloading(true);
@@ -59,17 +65,43 @@ const AddProduct = () => {
   //   }
   // };
 
-  const getProducts = async (filters = {}) => {
+  // const getProducts = async (filters = {}) => {
+  //   setloading(true);
+
+  //   try {
+  //     const result = await api.get("/products", {
+  //       params: {
+  //         filters: JSON.stringify(filters),
+  //       },
+  //     });
+
+  //     setProducts(result?.data?.products);
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setloading(false);
+  //   }
+  // };
+
+  const getProducts = async ({ filters = {}, page = 1, limit = 10 } = {}) => {
     setloading(true);
 
     try {
       const result = await api.get("/products", {
         params: {
+          page,
+          limit,
           filters: JSON.stringify(filters),
         },
       });
 
       setProducts(result?.data?.products);
+      setCurrentPage(result?.data?.currentPage);
+      setTotalPages(result?.data?.totalPages);
+      setTotalProducts(result?.data?.totalProducts);
+
+      console.log("total PRoducts", result?.data?.totalProducts);
+      
     } catch (error) {
       console.error(error);
     } finally {
@@ -79,14 +111,8 @@ const AddProduct = () => {
 
   useEffect(() => {
     getCategory();
-    getProducts();
+    // getProducts();
   }, [toggle]);
-
-  // const handleProductUpdate = (product) => {
-  //   setProducts((prev) =>
-  //     prev.map((p) => (p.product_id == product.product_id ? product : p)),
-  //   );
-  // };
 
   const handleProductUpdate = (product) => {
     setProducts((prev) => {
@@ -209,20 +235,40 @@ const AddProduct = () => {
 
   const [filters, setFilters] = useState([]);
 
-  const handleFilterApply = (query,activeFilters) => {
+  useEffect(() => {
+    getProducts({ filters, page: currentPage, limit });
+  }, [currentPage]);
+
+  const handleFilterApply = (query, activeFilters) => {
     setFilters(activeFilters);
-    getProducts(query);
+    setCurrentPage(1);
+    // getProducts(query);
+    getProducts({ filters: query, page: 1, limit });
   };
 
   const removeFilter = (index) => {
     const updated = filters?.filter((_, i) => i !== index);
     setFilters(updated);
-    getProducts(updated);
+    // getProducts(updated);
+    getProducts({ filters: updated, page: 1, limit });
   };
 
   const clearAllFilters = () => {
     setFilters([]);
-    getProducts([]);
+    // getProducts([]);
+    getProducts({ filters: [], page: 1, limit });
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+
+    getProducts({
+      filters,
+      page,
+      limit,
+    });
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -241,24 +287,56 @@ const AddProduct = () => {
       </div> */}
       <div>
         <div className="flex flex-col  gap-5 my-5 sm:my-10">
-          <div className="flex justify-between h-full items-center">
+          <div className="flex flex-col gap-2 md:flex-row justify-between h-full md:items-center">
             <div className="flex gap-5 items-center">
               <p className="h-10 w-5 rounded bg-theme-primary"></p>
               <p className="text-theme-primary text-xl font-medium">
-                All Products
+                Explore All products
               </p>
             </div>
             <ActiveFilters
               filters={filters}
               onRemove={removeFilter}
               onClear={clearAllFilters}
-              showFilterModal={() => {setShowFilter(true)}}
+              showFilterModal={() => {
+                setShowFilter(true);
+              }}
             />
           </div>
           {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
           <div className="flex justify-between items-center h-full">
-            <div className="text-3xl sm:text-4xl font-medium">
+            {/* <div className="text-xl sm:text-4xl font-medium">
               Explore All products
+            </div> */}
+            <div className="flex items-center gap-2">
+              {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
+
+              <select
+                value={limit == totalProducts ? "All Products" : limit}
+                onChange={(e) => {
+                  const newLimit = e.target.value == "all" ? Number(totalProducts): Number(e.target.value);
+                  setLimit(newLimit);
+                  setCurrentPage(1);
+
+                  console.log("new limit", newLimit);
+                  
+
+                  getProducts({
+                    filters,
+                    page: 1,
+                    limit: newLimit,
+                  });
+                }}
+                disabled={loading}
+                className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
+               focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
+               hover:border-gray-400 transition"
+              >
+                <option value={10}>10 Products</option>
+                <option value={20}>20 Products</option>
+                <option value={50}>50 Products</option>
+                <option value="all">All Products</option>
+              </select>
             </div>
             <div className="flex gap-2">
               <button
@@ -288,16 +366,18 @@ const AddProduct = () => {
                   <MdFormatListBulleted />
                 </button>
               </div>
-             
-              <button
-        className="button   text-xl !h-full"
-        onClick={() => {
-          setShowFilter(!showFilter);
-        }}
-      >
-        <MdOutlineFilterAlt />
-      </button>
-              
+
+              <div className="flex justify-center cursor-pointer">
+                <button
+                  className="button   text-xl "
+                  onClick={() => {
+                    setShowFilter(!showFilter);
+                    console.log("show filter", showFilter);
+                  }}
+                >
+                  <MdOutlineFilterAlt />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -316,6 +396,15 @@ const AddProduct = () => {
           delProduct={handleProductDelete}
         />
       )}
+
+      <p className="text-sm text-gray-600">
+        Showing page {currentPage} of {totalPages} ({Products?.length} products)
+      </p>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
       {showModal && (
         <Modal
           onClose={() => {
@@ -335,36 +424,18 @@ const AddProduct = () => {
           />
         </Modal>
       )}
-      {/* {showFilter && (
-        <Modal
+
+      {showFilter && (
+        <SmartFilter
+          showFilterModal={showFilter}
+          filters={productFilters}
+          onChange={handleFilterApply}
+          value={filters}
           onClose={() => {
             setShowFilter(false);
           }}
-          isOpen={showFilter}
-        >
-          <SmartFilter
-            filters={productFilters}
-            enablePagination={true}
-            enableSorting={false}
-            onChange={(query) => {
-              // yahan API call hogi (later)
-            }}
-            onClose={() => {
-              setShowFilter(false);
-            }}
-          />
-        </Modal>
-      )} */}
-      {
-        showModal && (
-           <SmartFilter
-                filters={productFilters}
-                onChange={handleFilterApply}
-                value={filters}  
-                onClose={() => {setShowModal(false)}}
-              />
-        )
-      }
+        />
+      )}
     </div>
   );
 };
