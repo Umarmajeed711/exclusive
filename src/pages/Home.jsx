@@ -9,6 +9,7 @@ import OurProducts from "../components/OurProducts";
 import Title from "../components/Title";
 import TopOffers from "../components/TopOffers";
 import HeroCarousel from "../components/HeroCarousal";
+import HeroSection from "../components/heroSection";
 
 const Home = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -42,7 +43,7 @@ const Home = () => {
 
   return (
     <div>
-      <div className="relative h-80 sm:h-full">
+      {/* <div className="relative h-80 sm:h-full">
         <img src="./heroPic.jpg" className="h-full w-full" />
 
         <div className="absolute bottom-[50%]  top-[25%] w-[50%] left-0  p-5 md:p-10 text-white">
@@ -64,7 +65,8 @@ const Home = () => {
             </button>
           </Link>
         </div>
-      </div>
+      </div> */}
+      <HeroSection />
 
       {/* <HeroCarousel/> */}
       <div className="mx-4 my-2 lg:mx-14 lg:my-8 flex flex-col justify-center items-center  h-full">
@@ -75,7 +77,7 @@ const Home = () => {
         </div>
 
         <OurProducts
-          products={Products}
+          products={Products.slice(0,8)}
           title="Our Products"
           description="Explore Our products"
           loading={loading}
@@ -84,9 +86,14 @@ const Home = () => {
         />
 
         {Products?.length > 0 ? (
-          <Link to="/" className="px-3 py-2 bg-red-600 text-white rounded">
-            View ALL Products
-          </Link>
+          // <Link to="/" className="px-3 py-2 bg-red-600 text-white rounded">
+          //   View ALL Products
+          // </Link>
+          <Link to="/shop" className="text-decoration-none mt-3">
+              <button className="bg-[#03A9F4] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0288d1] transition">
+                Explore More
+              </button>
+            </Link>
         ) : null}
         {/* <NewArrivals /> */}
       </div>

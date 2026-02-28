@@ -1,9 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "./modal";
 import AddProductForm from "./addProject";
 import api from "./api";
 import { GlobalContext } from "../context/Context";
+import useClickOutside from "./OutsideClick";
 
 /* ==============================
    DEFAULT COLUMN CONFIG
@@ -24,7 +25,12 @@ const STORAGE_KEY = "product_table_columns";
 /* ==============================
    MAIN COMPONENT
 ================================ */
-const ProductListView = ({ products = [],updateProduct, delProduct}) => {
+const ProductListView = ({
+  products = [],
+  updateProduct,
+  delProduct,
+  loading = true,
+}) => {
   let { state, dispatch } = useContext(GlobalContext);
   let Admin = state?.isAdmin;
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
@@ -160,7 +166,7 @@ const ProductListView = ({ products = [],updateProduct, delProduct}) => {
     }
   };
 
-  const editProduct = (product) => {    
+  const editProduct = (product) => {
     setProjectData(product);
     setShowModal(true);
   };
@@ -247,116 +253,125 @@ const ProductListView = ({ products = [],updateProduct, delProduct}) => {
     });
   };
 
+    const menuRef = useRef(null);
+
+  useClickOutside(menuRef, () => setOpen(false));
+
+
+
   // Render
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
-        {/* HEADER */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Products</h2>
-
-          {/* COLUMN OPTIONS (PRODUCT NOT INCLUDED) */}
-          <div className="relative">
-            <button
-              onClick={() => setOpen(!open)}
-              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
-            >
-              Columns ⚙
-            </button>
-
-            {open && (
-              <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-20">
-                <p className="text-xs text-gray-500 mb-2">
-                  Drag to reorder columns
-                </p>
-
-                {columns.map((col, index) => (
-                  <div
-                    key={col.key}
-                    draggable
-                    onDragStart={() => onDragStart(index)}
-                    onDragOver={onDragOver}
-                    onDrop={() => onDrop(index)}
-                    className="flex items-center justify-between gap-2 py-1 px-2 rounded cursor-move hover:bg-gray-100"
-                  >
-                    <label className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        checked={col.visible}
-                        onChange={() => toggleColumn(col.key)}
-                      />
-                      {col.label}
-                    </label>
-                    <span className="text-gray-400">⋮⋮</span>
-                  </div>
-                ))}
-
-                <button
-                  onClick={resetColumns}
-                  className="mt-3 w-full text-sm text-red-600 hover:underline"
-                >
-                  Reset to Default
-                </button>
-              </div>
-            )}
+        {loading ? (
+          <div className="flex justify-center items-center main">
+            <div className="loading"></div>
           </div>
-        </div>
+        ) : products.length === 0 ? (
+          <div className="flex justify-center items-center h-[50vh]">
+            <div className="text-md sm:text-xl font-medium  drop-shadow">
+              No products found
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* HEADER */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Products</h2>
 
-        {/* TABLE */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead className="bg-gray-100 text-sm">
-              <tr>
-                {/* FIXED PRODUCT COLUMN */}
-                <th className="p-3 text-left sticky left-0 z-20 bg-gray-100">
-                  Product
-                </th>
+              {/* COLUMN OPTIONS (PRODUCT NOT INCLUDED) */}
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setOpen(!open)}
+                  className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                >
+                  Columns ⚙
+                </button>
 
-                {columns
-                  .filter((c) => c.visible)
-                  .map((col) => (
-                    <th key={col.key} className="p-3 text-left">
-                      {col.label}
+                {open && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
+                    <p className="text-xs text-gray-500 mb-2">
+                      Drag to reorder columns
+                    </p>
+
+                    {columns.map((col, index) => (
+                      <div
+                        key={col.key}
+                        draggable
+                        onDragStart={() => onDragStart(index)}
+                        onDragOver={onDragOver}
+                        onDrop={() => onDrop(index)}
+                        className="flex items-center justify-between gap-2 py-1 px-2 rounded cursor-move hover:bg-gray-100"
+                      >
+                        <label className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={col.visible}
+                            onChange={() => toggleColumn(col.key)}
+                          />
+                          {col.label}
+                        </label>
+                        <span className="text-gray-400">⋮⋮</span>
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={resetColumns}
+                      className="mt-3 w-full text-sm text-red-600 hover:underline"
+                    >
+                      Reset to Default
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* TABLE */}
+            <div className="overflow-x-auto w-full h-full max-h-[500px]">
+              <table className="w-full border-collapse">
+                <thead className="bg-gray-100 text-sm">
+                  <tr>
+                    {/* FIXED PRODUCT COLUMN */}
+                    <th className="p-3 text-left sticky left-0 z-30 bg-gray-100 top-0 w-full">
+                      Product
                     </th>
-                  ))}
-              </tr>
-            </thead>
 
-            <tbody>
-              {products.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={columns.length + 1}
-                    className="p-6 text-center text-gray-500"
-                  >
-                    No products found
-                  </td>
-                </tr>
-              ) : (
-                products?.map((product) => (
-                  <tr
-                    key={product.product_id}
-                    className="border-b hover:bg-gray-50"
-                  >
-                    {/* FIXED PRODUCT CELL */}
-                    <td className="p-3 sticky left-0 z-10 bg-white">
-                      {renderProductCell(product)}
-                    </td>
-
-                    {columns.map(
-                      (col) =>
-                        col.visible && (
-                          <td key={col.key} className="p-3">
-                            {renderCell(col.key, product)}
-                          </td>
-                        ),
-                    )}
+                    {columns
+                      .filter((c) => c.visible)
+                      .map((col) => (
+                        <th key={col.key} className="p-3 text-left z-20 sticky top-0 bg-gray-100">
+                          {col.label}
+                        </th>
+                      ))}
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                </thead>
+
+                <tbody>
+                  {products?.map((product) => (
+                    <tr
+                      key={product.product_id}
+                      className="border-b hover:bg-gray-50"
+                    >
+                      {/* FIXED PRODUCT CELL */}
+                      <td className="p-3 sticky left-0 z-10 bg-white">
+                        {renderProductCell(product)}
+                      </td>
+
+                      {columns.map(
+                        (col) =>
+                          col.visible && (
+                            <td key={col.key} className="p-3">
+                              {renderCell(col.key, product)}
+                            </td>
+                          ),
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
 
       {showModal && (

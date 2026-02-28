@@ -46,10 +46,11 @@ const AddProduct = () => {
   };
 
   const [Products, setProducts] = useState([]);
+  const [productsByPage, setProductsByPage] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(12);
   const [totalProducts, setTotalProducts] = useState(0);
 
   // const getProducts = async () => {
@@ -83,7 +84,7 @@ const AddProduct = () => {
   //   }
   // };
 
-  const getProducts = async ({ filters = {}, page = 1, limit = 10 } = {}) => {
+  const getProducts = async ({ filters = {}, page = 1, limit = 12 } = {}) => {
     setloading(true);
 
     try {
@@ -99,9 +100,12 @@ const AddProduct = () => {
       setCurrentPage(result?.data?.currentPage);
       setTotalPages(result?.data?.totalPages);
       setTotalProducts(result?.data?.totalProducts);
+      setProductsByPage((prev) => ({
+        ...prev,
+        [page]: result?.data.products,
+      }));
 
       console.log("total PRoducts", result?.data?.totalProducts);
-      
     } catch (error) {
       console.error(error);
     } finally {
@@ -111,7 +115,7 @@ const AddProduct = () => {
 
   useEffect(() => {
     getCategory();
-    // getProducts();
+    getProducts();
   }, [toggle]);
 
   const handleProductUpdate = (product) => {
@@ -234,15 +238,23 @@ const AddProduct = () => {
   ];
 
   const [filters, setFilters] = useState([]);
+  const [filterquery, setFilterQuery] = useState([]);
 
-  useEffect(() => {
-    getProducts({ filters, page: currentPage, limit });
-  }, [currentPage]);
+  // useEffect(() => {
+  //   console.log("Current FIlters", filterquery);
+
+  //   getProducts({ filters:filterquery, page: currentPage, limit });
+  // }, [currentPage]);
 
   const handleFilterApply = (query, activeFilters) => {
     setFilters(activeFilters);
+    setProductsByPage({});
     setCurrentPage(1);
+    setFilterQuery(query);
     // getProducts(query);
+
+    console.log("Filters", filters);
+    console.log("query", query);
     getProducts({ filters: query, page: 1, limit });
   };
 
@@ -261,9 +273,14 @@ const AddProduct = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
+    if (productsByPage[page]) {
+      setCurrentPage(page);
+      setProducts(productsByPage[page] || []);
+      return;
+    }
 
     getProducts({
-      filters,
+      filters: filterquery,
       page,
       limit,
     });
@@ -311,32 +328,38 @@ const AddProduct = () => {
             <div className="flex items-center gap-2">
               {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
 
-              <select
-                value={limit == totalProducts ? "All Products" : limit}
-                onChange={(e) => {
-                  const newLimit = e.target.value == "all" ? Number(totalProducts): Number(e.target.value);
-                  setLimit(newLimit);
-                  setCurrentPage(1);
+              {totalProducts > 100 ? (
+                <select
+                  defaultValue={limit == totalProducts ? "All Products" : limit}
+                  onChange={(e) => {
+                    const newLimit =
+                      e.target.value == "all"
+                        ? Number(totalProducts)
+                        : Number(e.target.value);
+                    setLimit(newLimit);
+                    setCurrentPage(1);
 
-                  console.log("new limit", newLimit);
-                  
-
-                  getProducts({
-                    filters,
-                    page: 1,
-                    limit: newLimit,
-                  });
-                }}
-                disabled={loading}
-                className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
+                    getProducts({
+                      filters: filterquery,
+                      page: 1,
+                      limit: newLimit,
+                    });
+                  }}
+                  disabled={loading}
+                  className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
                focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
                hover:border-gray-400 transition"
-              >
-                <option value={10}>10 Products</option>
-                <option value={20}>20 Products</option>
-                <option value={50}>50 Products</option>
-                <option value="all">All Products</option>
-              </select>
+                >
+                  <option value={100}>100 Products</option>
+                  <option value={200}>200 Products</option>
+                  <option value={500}>500 Products</option>
+                  <option value="all">All Products</option>
+                </select>
+              ) : (
+                <div className="text-xl sm:text-4xl font-medium">
+                  Explore All products
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <button
@@ -392,17 +415,29 @@ const AddProduct = () => {
       ) : (
         <ProductListView
           products={Products}
+          loading={loading}
           updateProduct={handleProductUpdate}
           delProduct={handleProductDelete}
         />
       )}
 
-      <p className="text-sm text-gray-600">
+      {/* <p className="text-sm text-gray-600">
         Showing page {currentPage} of {totalPages} ({Products?.length} products)
-      </p>
-      <Pagination
+      </p> */}
+      {/* <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
+        onPageChange={handlePageChange}
+        isLoading={loading}
+        Products={Products?.length}
+        
+      /> */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={Math.ceil(totalProducts / limit)}
+        totalProducts={totalProducts}
+        pageSize={limit}
+        isLoading={loading}
         onPageChange={handlePageChange}
       />
       {showModal && (
