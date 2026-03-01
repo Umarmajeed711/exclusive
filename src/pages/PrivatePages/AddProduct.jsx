@@ -356,7 +356,7 @@ const AddProduct = () => {
                   <option value="all">All Products</option>
                 </select>
               ) : (
-                <div className="text-xl sm:text-4xl font-medium">
+                <div className="text-xl sm:text-4xl font-medium py-1">
                   Explore All products
                 </div>
               )}
@@ -392,7 +392,7 @@ const AddProduct = () => {
 
               <div className="flex justify-center cursor-pointer">
                 <button
-                  className="button   text-xl "
+                 className={`button   text-xl ${filters?.length > 0 ? "active" : ""}`}
                   onClick={() => {
                     setShowFilter(!showFilter);
                     console.log("show filter", showFilter);

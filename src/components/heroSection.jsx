@@ -14,13 +14,13 @@ const HeroSection = () => {
   return (
     <section className="relative bg-gray-50 overflow-hidden">
       {/* Background shapes / gradients */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 -z-10 pointer-events-none">
         <div className="absolute top-0 left-1/2 w-[600px] h-[600px] -translate-x-1/2 rounded-full bg-gradient-to-r from-[#03A9F4] to-purple-500 opacity-20 blur-3xl animate-blob"></div>
         <div className="absolute bottom-0 right-1/3 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-pink-400 to-yellow-300 opacity-20 blur-2xl animate-blob animation-delay-2000"></div>
       </div>
 
       {/* Hero content */}
-      <div className="relative z-10 max-w-[1440px] mx-auto px-6 lg:px-8 py-24 flex flex-col-reverse lg:flex-row items-center gap-12">
+      <div className="relative z-10 max-w-[1440px] mx-auto  px-6 lg:px-8 py-6 sm:py-24 flex flex-col-reverse lg:flex-row items-center gap-12">
         {/* Left Text Content */}
         <div className="lg:w-1/2 space-y-6">
           <h1

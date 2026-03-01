@@ -186,7 +186,7 @@ const OurProducts = ({
         <>
           {title ? <Title title={title} description={description} /> : null}
 
-          <div className="grid gap-10 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 ">
+          <div className="grid gap-10 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 my-5 md:my-8">
             {products?.map((product, i) => (
               <Link
                 key={i}

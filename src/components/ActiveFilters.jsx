@@ -48,7 +48,7 @@ export const ActiveFilters = ({
         </button>
       </div> */}
 
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-gray-200 bg-white p-[6px] shadow-sm">
         {/* Label */}
         <span className="text-sm font-semibold text-gray-700">Search by:</span>
 
@@ -77,7 +77,7 @@ export const ActiveFilters = ({
                 e.stopPropagation();
                 onRemove(index);
               }}
-              className="ml-1 flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition hover:bg-red-100 hover:text-red-600"
+              className="ml-1 flex h-4 w-4 items-center justify-center rounded-full text-gray-400 transition  hover:bg-red-100 hover:text-red-600 hover:scale-105"
               aria-label="Remove filter"
             >
               ✕

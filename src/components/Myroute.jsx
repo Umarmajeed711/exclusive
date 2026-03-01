@@ -30,11 +30,11 @@ const Myroute = () => {
         <Routes>
           <Route path="/" index element={<Home />}></Route>
           <Route path="/Category" element={<Category />}></Route>
-          <Route path="/Contact" element={<Contact />}></Route>
+          {/* <Route path="/Contact" element={<Contact />}></Route> */}
           <Route path="/Cart" element={<Cart />}></Route>
           <Route path="/Category" element={<Category />}></Route>
           <Route path="/ProductDetail/:id" element={<ProductDetail />}></Route>
-          <Route path="/Product" element={<Products />}></Route>
+          {/* <Route path="/Product" element={<Products />}></Route> */}
           <Route path="/Contact" element={<Contact />}></Route>
           <Route path="/Checkout" element={<Checkout />}></Route>
           <Route path="/Whishlist" element={<Whishlist/>}></Route>

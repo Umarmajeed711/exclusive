@@ -72,9 +72,10 @@ const Home = () => {
       <div className="mx-4 my-2 lg:mx-14 lg:my-8 flex flex-col justify-center items-center  h-full">
         <TopOffers />
 
-        <div className="h-full w-full p-4 ">
+        {/* <div className="h-full w-full p-4 ">
           <img src="/Frame 600.png" alt="" className="h-full w-full " />
-        </div>
+        </div> */}
+        <HeroCarousel/>
 
         <OurProducts
           products={Products.slice(0,8)}
