@@ -79,6 +79,7 @@ const Home = () => {
 
         <OurProducts
           products={Products.slice(0,8)}
+          skeletonProducts={8}
           title="Our Products"
           description="Explore Our products"
           loading={loading}

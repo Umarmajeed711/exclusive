@@ -28,6 +28,7 @@ const TopOffers = () => {
   return (
     <OurProducts
       products={DiscountProducts}
+      skeletonProducts={4}
       title="Top Offers"
       description="Top Discounted Products"
       loading={loading}

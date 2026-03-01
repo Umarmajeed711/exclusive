@@ -375,6 +375,7 @@ const Shop = () => {
         </div>
       </div>
       <OurProducts
+        skeletonProducts={12}
         products={Products}
         loading={loading}
         updateProduct={handleProductUpdate}

@@ -10,6 +10,7 @@ import { GlobalContext } from "../context/Context";
 import Modal from "./modal";
 import AddProductForm from "./addProject";
 import Swal from "sweetalert2";
+import ProductCardSkeleton from "./productCardSkeleton";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -25,6 +26,7 @@ const OurProducts = ({
   loading = false,
   updateProduct,
   delProduct,
+  skeletonProducts= 4
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
   let Admin = state?.isAdmin;
@@ -173,9 +175,19 @@ const OurProducts = ({
     <div className="  w-full">
       {/* px-5 my-5 md:px-8 lg:px-14 lg:my-8 */}
       {loading ? (
-        <div className="flex justify-center items-center main">
-          <div className="loading"></div>
+        // <div className="flex justify-center items-center main">
+        //   <div className="loading"></div>
+        // </div>
+        <div className="grid gap-10 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 my-5 md:my-8">
+          {
+
+          Array.from({ length: skeletonProducts }).map((_, i) => (
+       <ProductCardSkeleton key={i} />
+     ))
+          }
+          
         </div>
+  
       ) : products?.length === 0 ? (
         <div className="flex justify-center items-center h-[50vh]">
           <div className="text-md sm:text-xl font-medium  drop-shadow">
@@ -195,17 +207,20 @@ const OurProducts = ({
               >
                 <div className="relative border-none  overflow-hidden  group hover:-translate-y-4 hover:shadow-2xl transition duration-500">
                   {/* Image & hover */}
-                  <div className="relative w-full  h-64 aspect-square overflow-hidden rounded  flex justify-center items-center   bg-slate-100  ">
+                  <div className="relative w-full  h-64 aspect-square overflow-hidden   flex justify-center items-center   bg-slate-100  ">
                     <img
                       src={product?.main_image || product?.image_urls[0] || ""}
                       alt={product?.name}
-                      className=" h-[50%] object-cover group-hover:scale-105 transition "
+                      className=" h-[50%]  object-cover group-hover:scale-105 transition "
+                      // className="h-full w-full object-contain group-hover:scale-105 transition"
                     />
+
+                    {/* <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition" /> */}
 
                     {/* Favorite & Quick View */}
                     <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
                       <button
-                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200"
+                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -213,7 +228,7 @@ const OurProducts = ({
                           addToFavorite(product?.product_id);
                         }}
                       >
-                        <AiOutlineHeart className="text-lg text-gray-700" />
+                        <AiOutlineHeart className="text-lg text-gray-700 " />
                       </button>
                       {/* <button
                         className="bg-white p-2 rounded-full shadow hover:bg-gray-200"
@@ -228,7 +243,7 @@ const OurProducts = ({
                       {Admin ? (
                         <>
                           <button
-                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
+                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary "
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -238,7 +253,7 @@ const OurProducts = ({
                             <BiEditAlt className="text-lg text-gray-700" />
                           </button>
                           <button
-                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30"
+                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -279,7 +294,7 @@ const OurProducts = ({
                         e.stopPropagation();
                         alert(`Add ${product?.name} to cart`);
                       }}
-                      className="absolute bottom-0 w-full text-center bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition"
+                      className="absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition"
                     >
                       Add to Cart
                     </button>
@@ -289,10 +304,29 @@ const OurProducts = ({
                   <div className="p-2 flex flex-col gap-1">
                     <p className="font-semibold">{product?.name}</p>
                     <div className="flex gap-2 items-center">
-                      <p className="text-theme-primary font-medium">
+                      {/* <p className="text-theme-primary font-medium">
                         ${product?.price}
+                      </p> */}
+                      {/* <p className="text-gray-500 text-sm">⭐️ 4.5</p> */}
+                      {product?.discount ? (
+                        <>
+                          <p className="text-theme-primary font-medium">
+                            $
+                            {product?.price -
+                              (product?.price * product?.discount) / 100}
+                          </p>
+                          <p className="line-through text-sm text-gray-400">
+                            ${product?.price}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-theme-primary font-medium">
+                          ${product?.price}
+                        </p>
+                      )}
+                      <p className="text-gray-500 text-sm">
+                        ⭐ {product?.rating || "4.5"}
                       </p>
-                      <p className="text-gray-500 text-sm">⭐️ 4.5</p>
                     </div>
                   </div>
                 </div>

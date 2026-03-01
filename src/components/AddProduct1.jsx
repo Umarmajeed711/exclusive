@@ -621,6 +621,7 @@ const AddProduct = () => {
         products={Products}
         title="Our Products"
         description="Explore Our products"
+        skeletonProducts={12}
       />
     </div>
   );

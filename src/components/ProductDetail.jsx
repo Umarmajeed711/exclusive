@@ -606,6 +606,7 @@ const ProductDetail = () => {
               products={RelatedProduct}
               title="Related Products"
               description="Explore Our products"
+              skeletonProducts={4}
             />
           </div>
         </div>

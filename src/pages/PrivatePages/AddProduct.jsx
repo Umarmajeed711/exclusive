@@ -408,6 +408,7 @@ const AddProduct = () => {
       {viewType === "grid" ? (
         <OurProducts
           products={Products}
+          skeletonProducts={12}
           loading={loading}
           updateProduct={handleProductUpdate}
           delProduct={handleProductDelete}
