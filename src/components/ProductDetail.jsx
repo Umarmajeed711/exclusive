@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { GlobalContext } from "../context/Context";
 import api from "./api";
 import Swal from "sweetalert2";
@@ -12,13 +12,16 @@ import moment from "moment/moment";
 import { IoMdClose } from "react-icons/io";
 import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
 import Breadcrums from "./Breadcrums";
-import { ProductDetailSkeleton } from "./productCardSkeleton";
+import {
+  HorizontalReviewSkeleton,
+  ProductDetailSkeleton,
+} from "./productCardSkeleton";
 
 const ProductDetail = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
   const [Product, setProduct] = useState("");
-   const [productLoading, setProductLoading] = useState(false);
+  const [productLoading, setProductLoading] = useState(false);
   const [RelatedProduct, setRelatedProduct] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [feedback, setFeedback] = useState("");
@@ -26,30 +29,29 @@ const ProductDetail = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [resetRating, setResetRating] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [cartloading, setcartLoading] = useState(false);
 
   //  useEffect for get product detail
 
   const { id } = useParams();
 
-   const getProductDetail = async () => {
-      setProductLoading(true)
-      try {
-        let result = await api.get(`/product-details/${id}`);
-        console.log(result.data.products);
-        setProduct(result?.data.products);
-        relatedProducts(result?.data.products);
-        getAverageRating(result?.data.products);
-      } catch (error) {
-        console.log(error);
-      }
-      finally{
-        setProductLoading(false);
-      }
-    };
+  const getProductDetail = async () => {
+    setProductLoading(true);
+    try {
+      let result = await api.get(`/product-details/${id}`);
+      console.log(result.data.products);
+      setProduct(result?.data.products);
+      relatedProducts(result?.data.products);
+      getAverageRating(result?.data.products);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setProductLoading(false);
+    }
+  };
 
   useEffect(() => {
     // function for get data.
-   
 
     getProductDetail();
   }, [id, resetRating]);
@@ -71,7 +73,7 @@ const ProductDetail = () => {
   const [counter, setCounter] = useState(1);
 
   const handleIncreaseCounter = () => {
-    setCounter(counter + 1);
+    if (counter < Product?.quantity) setCounter(counter + 1);
   };
 
   const handleDecreaseCounter = () => {
@@ -146,7 +148,10 @@ const ProductDetail = () => {
     }
   };
 
+  const [ratingLoading, setRatingLoading] = useState(true);
+
   const getAverageRating = async (Product) => {
+    setRatingLoading(true);
     try {
       let response = await api.get(
         `/reviews?product_id=${Product?.product_id}`,
@@ -161,6 +166,8 @@ const ProductDetail = () => {
       setRatings(response?.data?.reviews);
     } catch (error) {
       console.log(error);
+    } finally {
+      setRatingLoading(false);
     }
   };
 
@@ -195,7 +202,7 @@ const ProductDetail = () => {
 
   // function for add to cart
   const addtoCart = async () => {
-    setLoading(true);
+    setcartLoading(true);
     try {
       let addTOCart = await api.post("/add-cart", {
         productId: Product.product_id,
@@ -230,7 +237,7 @@ const ProductDetail = () => {
     } catch (e) {
       console.error("Error adding document: ", e);
     } finally {
-      setLoading(false);
+      setcartLoading(false);
     }
   };
   // rate a product--------------------
@@ -239,6 +246,19 @@ const ProductDetail = () => {
 
   const [selectedImage, setSelectedImage] = React.useState(null);
 
+  const scrollContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -300, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
+    }
+  };
   return (
     <div className="container mx-auto py-2 sm:py-4 px-4 md:px-8 lg:px-14  w-full">
       {/* Breadcrums */}
@@ -280,7 +300,7 @@ const ProductDetail = () => {
               ))}
             </div> */}
 
-              <div className="col-span-1 space-y-2 flex items-center flex-col h-full">
+              <div className="col-span-4 sm:col-span-1 space-y-2 flex items-center flex-col h-full">
                 {Product?.image_urls
                   ? Product.image_urls.map((image, i) => (
                       <div
@@ -321,7 +341,7 @@ const ProductDetail = () => {
               </div>
             </div> */}
 
-              <div className="col-span-3">
+              <div className="col-span-4 sm:col-span-3">
                 <div className="border rounded-3xl overflow-hidden h-full w-full max-h-[452px] flex justify-center items-center bg-gray-50">
                   {Product?.image_urls ? (
                     <img
@@ -339,14 +359,14 @@ const ProductDetail = () => {
             {/* Product? Details Section */}
             <div className="space-y-3 h-full">
               {/* Product? Name */}
-              <h1 className="text-4xl font-bold h11">
+              <h1 className="text-2xl sm:text-4xl font-bold h11">
                 {Product?.name || (
                   <span className="inline-block w-64 h-8 bg-gray-200 rounded animate-pulse" />
                 )}
               </h1>
 
               {/* Rating */}
-              <div className="flex items-center space-x-4">
+              <div className="flex sm:items-center sm:space-x-4 flex-col sm:flex-row">
                 <div className="flex text-yellow-500">
                   <ReactStars
                     count={5}
@@ -363,7 +383,7 @@ const ProductDetail = () => {
                   ({ratings?.length} Reviews) |{" "}
                   {Product.quantity ? (
                     <span className="text-xl text-green-300">
-                      In Stock {Product.quantity}
+                      In Stock {Product?.quantity}
                     </span>
                   ) : (
                     <span className="text-xl text-red-500">Sold Out</span>
@@ -455,10 +475,10 @@ const ProductDetail = () => {
                     {Product?.sizes?.map((size, index) => (
                       <button
                         key={index}
-                        className={`p-2 rounded border font-medium tracking-tight col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-2 h-10 max-h-12 flex justify-center items-center cursor-pointer hover:bg-theme-primary hover:text-white hover:border-theme-primary transition-all duration-200 ${
+                        className={`p-2 rounded border font-medium tracking-tight col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 h-10 max-h-12 flex justify-center items-center cursor-pointer hover:bg-theme-primary hover:text-white hover:border-theme-primary hover:font-semibold transition-all duration-200 ${
                           selectedSize == size
                             ? "bg-theme-primary text-white border-theme-primary font-semibold text-xl shadow  shadow-theme-secondary"
-                            : "bg-white-100 text-black border-gray-600"
+                            : "bg-white-100 text-black"
                         }`}
                         onClick={() => handleSizeSelect(size)}
                       >
@@ -473,7 +493,7 @@ const ProductDetail = () => {
               <hr />
               <div className="flex space-x-4">
                 {/* counter */}
-                <div className="grid grid-cols-3 place-content-center place-items-center border border-gray-600 rounded bg-White">
+                <div className="grid grid-cols-3 place-content-center place-items-center border rounded bg-White">
                   <button
                     disabled={counter <= 1}
                     className="px-4 py-2 text-3xl w-full h-full  border-r-gray-600 hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary disabled:opacity-50 disabled:cursor-not-allowed
@@ -484,7 +504,9 @@ const ProductDetail = () => {
                   </button>
                   <span className="px-4 text-2xl w-full">{counter}</span>
                   <button
-                    className="px-4 py-2 text-3xl w-full h-full border-l-gray-600 hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary transition-all duration-300"
+                    disabled={counter >= Product?.quantity}
+                    className="px-4 py-2 text-3xl w-full h-full border-l-gray-600 hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary disabled:opacity-50 disabled:cursor-not-allowed
+             transition-all duration-300"
                     onClick={handleIncreaseCounter}
                   >
                     +
@@ -493,10 +515,10 @@ const ProductDetail = () => {
                 <button
                   className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded px-6 hover:shadow-xl  text-base sm:text-xl  "
                   onClick={addtoCart}
-                  disabled={loading}
+                  disabled={cartloading}
                   type="submit"
                 >
-                  {loading ? (
+                  {cartloading ? (
                     <div className="flex items-center justify-center px-1 py-2 gap-2">
                       <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
                       <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
@@ -518,113 +540,238 @@ const ProductDetail = () => {
 
       <hr />
 
-      {averageRating > 0 ? (
-        <div className="flex justify-center items-center mt-5">
-          <div className="flex flex-col gap-3 items-center  bg-themeColor p-10 shadow-lg ">
-            <p className="text-xl sm:text-2xl font-bold text-gray-500">
-              OverAll Ratings
+      {/* average Rating */}
+      {/* {averageRating > 0 && (
+        <div className="flex justify-center mt-5">
+          <div className="flex flex-col gap-3 items-center bg-white dark:bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg transition-all duration-300">
+            <p className="text-lg sm:text-2xl font-bold text-gray-600">
+              Overall Ratings
             </p>
-            <p className="text-5xl font-extrabold">
-              {averageRating.toFixed(1)}
+
+            <p className="text-4xl sm:text-5xl font-extrabold text-gray-800">
+              {averageRating?.toFixed(1)}
             </p>
 
             <ReactStars
               count={5}
               value={Number(averageRating)}
               edit={false}
-              size={48}
+              size={24} // mobile-friendly
+              className="sm:text-3xl"
               color2={"#ffd700"}
-              className="text-3xl"
             />
 
-            <p className="text-base sm:text-xl font-medium text-gray-500">
-              based on {ratings?.length} reviews
+            <p className="text-sm sm:text-base font-medium text-gray-500">
+              based on {ratings?.length} review{ratings?.length > 1 ? "s" : ""}
             </p>
           </div>
         </div>
-      ) : null}
+      )} */}
 
       {/* Display product? reviews */}
-      <div className=" container mx-auto px-4 lg:px-10  mt-5">
-        <p className="text-xl sm:text-2xl font-bold">
-          All Reviews (
-          <span className="text-base text-gray-500">{ratings.length}</span>
-          ){" "}
-        </p>
-
+      <div className=" container  mt-5">
         {ratings?.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-5 mt-5">
-            {(ratings?.length > 6 ? ratings.slice(-6) : ratings).map(
-              (rating, index) => {
-                return (
-                  <div key={index} className="border rounded-2xl p-3">
-                    <div className="flex justify-between">
-                      <ReactStars
-                        count={5}
-                        value={Number(rating.rating)}
-                        edit={false}
-                        size={24}
-                        color2={"#ffd700"}
-                      />
+          <div className="flex justify-between items-center mb-8">
+            <p className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-gray-900">
+              OUR HAPPY CUSTOMERS
+              {/* (
+            <span className="text-base text-gray-500">{ratings.length}</span>
+            ){" "} */}
+            </p>
 
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold">...</span>
-
-                        {state?.user?.user_id == rating.user_id ? (
-                          <div>
-                            <IoMdClose
-                              className="hover:text-red-500 shadow-lg "
-                              onClick={() => {
-                                Swal.fire({
-                                  title: "Do you want delete this Feedback?",
-                                  icon: "warning",
-                                  showCancelButton: true,
-                                  confirmButtonText: "Delete",
-                                }).then((result) => {
-                                  if (result.isConfirmed) {
-                                    deleteReview(
-                                      rating.user_id,
-                                      rating.review_id,
-                                    );
-                                  }
-                                });
-                              }}
-                            />
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 items-center">
-                      <p className="text-base sm:text-xl font-bold">
-                        {rating?.name}
-                      </p>
-                      {/* <span>
-                      <IoCheckmarkDoneCircleSharp className="text-green-500 text-base sm:text-xl " />
-                    </span> */}
-                    </div>
-
-                    <p className="text-sm sm:text-base font-normal text-gray-500">
-                      "{rating.feedback}"
-                    </p>
-
-                    <p className="text-sm sm:text-base font-medium">
-                      Posted On{" "}
-                      {moment(rating.created_at).format("MMM Do YY")}{" "}
-                    </p>
-                  </div>
-                );
-              },
-            )}
+            <div className="flex space-x-2">
+              <button
+                className="h-8 w-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100"
+                onClick={scrollLeft}
+                aria-label="Previous testimonials"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+              <button
+                className="h-8 w-8 flex items-center justify-center border border-gray-300 rounded-full hover:bg-gray-100"
+                onClick={scrollRight}
+                aria-label="Next testimonials"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
           </div>
+        ) : null}
+
+        {ratingLoading ? (
+          <HorizontalReviewSkeleton />
         ) : (
-          <p className="bg-gray-200 text-center">No reviews yet.</p>
+          <>
+            {ratings?.length > 0 ? (
+              <>
+                {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-5 mt-5">
+                {(ratings?.length > 6 ? ratings.slice(-6) : ratings).map(
+                  (rating, index) => {
+                    return (
+                      <div key={index} className="border rounded-2xl p-3">
+                        <div className="flex justify-between">
+                          <ReactStars
+                            count={5}
+                            value={Number(rating.rating)}
+                            edit={false}
+                            size={24}
+                            color2={"#ffd700"}
+                          />
+          
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold">...</span>
+          
+                            {state?.user?.user_id == rating.user_id ? (
+                              <div>
+                                <IoMdClose
+                                  className="hover:text-red-500 shadow-lg "
+                                  onClick={() => {
+                                    Swal.fire({
+                                      title: "Do you want delete this Feedback?",
+                                      icon: "warning",
+                                      showCancelButton: true,
+                                      confirmButtonText: "Delete",
+                                    }).then((result) => {
+                                      if (result.isConfirmed) {
+                                        deleteReview(
+                                          rating.user_id,
+                                          rating.review_id,
+                                        );
+                                      }
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+          
+                        <div className="flex gap-2 items-center">
+                          <p className="text-base sm:text-xl font-bold">
+                            {rating?.name}
+                          </p>
+                         
+                        </div>
+          
+                        <p className="text-sm sm:text-base font-normal text-gray-500">
+                          "{rating.feedback}"
+                        </p>
+          
+                        <p className="text-sm sm:text-base font-medium">
+                          Posted On{" "}
+                          {moment(rating.created_at).format("MMM Do YY")}{" "}
+                        </p>
+                      </div>
+                    );
+                  },
+                )}
+              </div> */}
+
+                {/* Scrollable testimonial cards container */}
+                <div
+                  ref={scrollContainerRef}
+                  className="flex overflow-x-auto pb-6 gap-4 scrollbar-hide snap-x"
+                  style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                >
+                  {(ratings?.length > 6 ? ratings?.slice(-6) : ratings)?.map(
+                    (rating, index) => (
+                      <div
+                        key={index}
+                        className="flex-shrink-0 snap-start w-full md:w-96 bg-white p-3 rounded-xl border border-gray-100 shadow-sm"
+                      >
+                        <div className="flex justify-between">
+                          <ReactStars
+                            count={5}
+                            value={Number(rating.rating)}
+                            edit={false}
+                            size={24}
+                            color2={"#ffd700"}
+                          />
+
+                          <div className="flex items-center gap-2">
+                            {state?.user?.user_id == rating.user_id ? (
+                              <div>
+                                <IoMdClose
+                                  className="hover:text-red-500 shadow-lg cursor-pointer "
+                                  onClick={() => {
+                                    Swal.fire({
+                                      title:
+                                        "Do you want delete this Feedback?",
+                                      icon: "warning",
+                                      showCancelButton: true,
+                                      confirmButtonText: "Delete",
+                                    }).then((result) => {
+                                      if (result.isConfirmed) {
+                                        deleteReview(
+                                          rating.user_id,
+                                          rating.review_id,
+                                        );
+                                      }
+                                    });
+                                  }}
+                                />
+                              </div>
+                            ) : null}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="font-bold text-gray-900">
+                            {rating?.name}
+                          </span>
+                          {/* {testimonial.verified && ( */}
+                          <span className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs">
+                            ✓
+                          </span>
+                          {/* )} */}
+                        </div>
+
+                        <p className="text-gray-600 text-sm">
+                          "{rating.feedback}"
+                        </p>
+                        {/* <p className="text-xs font-medium">
+                          Posted On{" "}
+                          {moment(rating.created_at).format("MMM Do YY")}{" "}
+                        </p> */}
+                      </div>
+                    ),
+                  )}
+                </div>
+              </>
+            ) : (
+              <p className="bg-gray-200 text-center">No reviews yet.</p>
+            )}
+          </>
         )}
       </div>
 
       {/* Submit a new review */}
 
-      <div className=" container mx-auto px-8  mt-5 flex justify-center flex-col items-center ">
+      {/* <div className=" container mx-auto px-8  mt-5 flex justify-center flex-col items-center ">
         <p className="text-xl sm:text-2xl font-bold">Rate a product</p>
         <form
           onSubmit={handleSubmitReview}
@@ -658,11 +805,61 @@ const ProductDetail = () => {
             {loading ? "Submitting..." : "Submit Review"}
           </button>
         </form>
+      </div> */}
+
+      <div className="container mx-auto px-6 mt-10 flex flex-col items-center">
+        <p className="text-xl sm:text-2xl font-bold mb-4">Rate this product</p>
+
+        <form
+          onSubmit={handleSubmitReview}
+          className="w-full max-w-sm sm:max-w-md border rounded-3xl p-6 shadow-md flex flex-col gap-4 bg-white"
+        >
+          {/* Rating */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-600">
+              Your rating
+            </label>
+            <ReactStars
+              count={5}
+              value={userRating}
+              onChange={handleRatingChange}
+              size={28}
+              color2={"#ffd700"}
+            />
+          </div>
+
+          {/* Feedback */}
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-600">
+              Your review
+            </label>
+            <textarea
+              value={feedback}
+              onChange={handleFeedbackChange}
+              required
+              rows={4}
+              placeholder="Share your experience with this product…"
+              className="border rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-theme-primary"
+            />
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-theme-primary text-white py-2 rounded-xl font-medium
+                 hover:shadow-lg hover:opacity-90 transition-all duration-300
+                 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Submitting..." : "Submit Review"}
+          </button>
+        </form>
       </div>
 
       {/* map all related product?s */}
       {RelatedProduct?.length > 0 ? (
-        <div className="md:container  md:mx-auto  sm:px-4 md:px-8 lg:px-10 mt-10">
+        <div className="md:container  mt-10">
+           {/* md:mx-auto  sm:px-4 md:px-8 lg:px-10 */}
           <div>
             <OurProducts
               products={RelatedProduct}

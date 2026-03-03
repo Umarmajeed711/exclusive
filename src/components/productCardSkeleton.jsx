@@ -99,7 +99,7 @@ export const ProductDetailSkeleton = () => {
           <div className="space-y-2">
             <div className="w-24 h-5 bg-gray-200 rounded" />
             <div className="grid grid-cols-6 sm:grid-cols-10 gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 4 }).map((_, i) => (
                 <div
                   key={i}
                   className="h-10 col-span-2 bg-gray-200 rounded"
@@ -120,4 +120,41 @@ export const ProductDetailSkeleton = () => {
     </div>
   );
 };
+
+export const HorizontalReviewSkeleton = () => {
+  return (
+    <div
+      className="flex overflow-x-auto pb-6 gap-4 scrollbar-hide snap-x animate-pulse"
+      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+    >
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div
+          key={index}
+          className="flex-shrink-0 snap-start w-full md:w-96 bg-white p-3 rounded-xl border border-gray-100 shadow-sm"
+        >
+          {/* Top row */}
+          <div className="flex justify-between items-center mb-3">
+            <div className="w-28 h-4 bg-gray-200 rounded" />
+            <div className="w-4 h-4 bg-gray-200 rounded-full" />
+          </div>
+
+          {/* Name + badge */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-24 h-4 bg-gray-200 rounded" />
+            <div className="w-5 h-5 bg-gray-200 rounded-full" />
+          </div>
+
+          {/* Feedback lines */}
+          <div className="space-y-2">
+            <div className="w-full h-3 bg-gray-200 rounded" />
+            <div className="w-5/6 h-3 bg-gray-200 rounded" />
+            <div className="w-4/6 h-3 bg-gray-200 rounded" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+;
 
