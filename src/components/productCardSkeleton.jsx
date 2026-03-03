@@ -34,3 +34,90 @@ export default function ProductCardSkeleton() {
     </div>
   );
 }
+
+export const ProductDetailSkeleton = () => {
+  return (
+    <div className="container my-5 animate-pulse">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Images Section */}
+        <div className="grid grid-cols-4 gap-4">
+          {/* Thumbnails */}
+          <div className="col-span-1 space-y-2 flex flex-col items-center">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-[110px] h-[110px] bg-gray-200 rounded-3xl"
+              />
+            ))}
+          </div>
+
+          {/* Main Image */}
+          <div className="col-span-3">
+            <div className="w-full h-[452px] bg-gray-200 rounded-3xl" />
+          </div>
+        </div>
+
+        {/* Details Section */}
+        <div className="space-y-4">
+          {/* Title */}
+          <div className="w-2/3 h-8 bg-gray-200 rounded" />
+
+          {/* Rating */}
+          <div className="w-1/2 h-5 bg-gray-200 rounded" />
+
+          {/* Price */}
+          <div className="flex space-x-3">
+            <div className="w-24 h-6 bg-gray-200 rounded" />
+            <div className="w-16 h-6 bg-gray-200 rounded" />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <div className="w-full h-4 bg-gray-200 rounded" />
+            <div className="w-5/6 h-4 bg-gray-200 rounded" />
+            <div className="w-4/6 h-4 bg-gray-200 rounded" />
+          </div>
+
+          <hr />
+
+          {/* Colors */}
+          <div className="space-y-2">
+            <div className="w-24 h-5 bg-gray-200 rounded" />
+            <div className="flex space-x-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-[30px] h-[30px] rounded-full bg-gray-200"
+                />
+              ))}
+            </div>
+          </div>
+
+          <hr />
+
+          {/* Sizes */}
+          <div className="space-y-2">
+            <div className="w-24 h-5 bg-gray-200 rounded" />
+            <div className="grid grid-cols-6 sm:grid-cols-10 gap-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-10 col-span-2 bg-gray-200 rounded"
+                />
+              ))}
+            </div>
+          </div>
+
+          <hr />
+
+          {/* Quantity + Button */}
+          <div className="flex space-x-4">
+            <div className="w-[140px] h-12 bg-gray-200 rounded" />
+            <div className="flex-grow h-12 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+

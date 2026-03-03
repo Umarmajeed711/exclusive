@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../context/Context";
 import api from "./api";
 import Swal from "sweetalert2";
@@ -11,11 +11,14 @@ import ReactStars from "react-stars";
 import moment from "moment/moment";
 import { IoMdClose } from "react-icons/io";
 import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
+import Breadcrums from "./Breadcrums";
+import { ProductDetailSkeleton } from "./productCardSkeleton";
 
 const ProductDetail = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
   const [Product, setProduct] = useState("");
+   const [productLoading, setProductLoading] = useState(false);
   const [RelatedProduct, setRelatedProduct] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [feedback, setFeedback] = useState("");
@@ -28,9 +31,8 @@ const ProductDetail = () => {
 
   const { id } = useParams();
 
-  useEffect(() => {
-    // function for get data.
-    const getProductDetail = async () => {
+   const getProductDetail = async () => {
+      setProductLoading(true)
       try {
         let result = await api.get(`/product-details/${id}`);
         console.log(result.data.products);
@@ -40,7 +42,14 @@ const ProductDetail = () => {
       } catch (error) {
         console.log(error);
       }
+      finally{
+        setProductLoading(false);
+      }
     };
+
+  useEffect(() => {
+    // function for get data.
+   
 
     getProductDetail();
   }, [id, resetRating]);
@@ -49,7 +58,7 @@ const ProductDetail = () => {
   const relatedProducts = async (Product) => {
     try {
       let get_related_products = await api.get(
-        `related-products?productCategory=${Product?.category_name}&productId=${Product?.product_id}`
+        `related-products?productCategory=${Product?.category_name}&productId=${Product?.product_id}`,
       );
       // const filteredProduct = get_related_products.data.products.filter((product) => product.product_id != Product.product_id)
       setRelatedProduct(get_related_products.data.products);
@@ -140,64 +149,56 @@ const ProductDetail = () => {
   const getAverageRating = async (Product) => {
     try {
       let response = await api.get(
-        `/reviews?product_id=${Product?.product_id}`
+        `/reviews?product_id=${Product?.product_id}`,
       );
       console.log(response.data);
-      let reviews = response.data.reviews;
-      if (reviews.length === 0) return 0; // avoid divide by zero
+      let reviews = response?.data?.reviews;
+      if (reviews?.length === 0) return 0; // avoid divide by zero
       const avgRating =
-        reviews.reduce((sum, review) => sum + review.rating, 0) /
-        reviews.length;
+        reviews?.reduce((sum, review) => sum + review?.rating, 0) /
+        reviews?.length;
       setAverageRating(avgRating);
-      setRatings(response?.data.reviews);
+      setRatings(response?.data?.reviews);
     } catch (error) {
       console.log(error);
     }
   };
 
-
   // delete reviews
-  const deleteReview = async (user_id,review_id) => {
-
-    try{
-      let response = await api.post("/delete-review",{
-        user_id : user_id,
-        review_id: review_id
+  const deleteReview = async (user_id, review_id) => {
+    try {
+      let response = await api.post("/delete-review", {
+        user_id: user_id,
+        review_id: review_id,
       });
-      setResetRating(!resetRating)
-      
+      setResetRating(!resetRating);
 
-
-       const Toast = Swal.mixin({
-      toast: true,
-      position: "top-end",
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
-      icon: "success",
-      title: "Feedback Delete Successfully",
-    });
-    }
-    catch(error){
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Feedback Delete Successfully",
+      });
+    } catch (error) {
       console.log(error);
-      
-
     }
-   
   };
 
   // function for add to cart
   const addtoCart = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       let addTOCart = await api.post("/add-cart", {
-        productId : Product.product_id,
+        productId: Product.product_id,
         productName: Product.name,
         productPrice: Product.price,
         productDiscount: Product.discount,
@@ -207,7 +208,7 @@ const ProductDetail = () => {
         quantity: counter,
         user_id: state?.user.user_id,
       });
-      dispatch({type: "TOGGLE_CART"});
+      dispatch({ type: "TOGGLE_CART" });
       const Toast = Swal.mixin({
         toast: true,
         position: "top-end",
@@ -228,50 +229,43 @@ const ProductDetail = () => {
       setCounter("1");
     } catch (e) {
       console.error("Error adding document: ", e);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
   // rate a product--------------------
 
-
-  
-
   let newPrice = Number(Product.price) * (Product.discount / 100);
 
+  const [selectedImage, setSelectedImage] = React.useState(null);
+
   return (
-    <div className="container mx-auto px-4 py-2 sm:py-4">
+    <div className="container mx-auto py-2 sm:py-4 px-4 md:px-8 lg:px-14  w-full">
       {/* Breadcrums */}
 
-      <div className="flex gap-2 items-center md:container  md:mx-auto px-3 sm:px-4 md:px-8 lg:px-10 mt-3  ">
-        <Link
-          to={"/"}
-          className="text-base  sm:text-xl font-normal text-gray-500 cursor-pointer"
-        >
-          Home
-        </Link>
-        <PiGreaterThan />
-        <Link
-          to={"/Shop"}
-          className="text-sm  sm:text-base font-normal text-gray-500"
-        >
-          Shop
-        </Link>
-        <PiGreaterThan />
-        <Link className="text-sm  sm:text-base font-normal ">
-          {Product?.name}
-        </Link>
-      </div>
+      <Breadcrums
+        currentPage={
+          Product?.name ? (
+            Product.name
+          ) : (
+            <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
+          )
+        }
+        prevPages={[{ name: "shop", url: "/Shop" }]}
+      />
 
       {/* Product Detail */}
-
-      <div className=" container mx-auto  px-4 lg:px-20  my-5 ">
-        {/* Product details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Images Section */}
-          <div className="grid grid-cols-4 gap-4 h-full">
-            {/* Sidebar Thumbnails */}
-            <div className="col-span-1 space-y-4 flex  items-center  flex-col    h-full">
+      {productLoading ? (
+        <ProductDetailSkeleton />
+      ) : (
+        <div className=" container   my-5 ">
+          {/* mx-auto  px-4 lg:px-20 */}
+          {/* Product details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Images Section */}
+            <div className="grid grid-cols-4 gap-4 h-full">
+              {/* Sidebar Thumbnails */}
+              {/* <div className="col-span-1 space-y-4 flex  items-center  flex-col    h-full">
               {Product?.image_urls?.map((image, i) => (
                 <div
                   key={i}
@@ -284,10 +278,40 @@ const ProductDetail = () => {
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
 
-            {/* Main Image */}
-            <div className="col-span-3">
+              <div className="col-span-1 space-y-2 flex items-center flex-col h-full">
+                {Product?.image_urls
+                  ? Product.image_urls.map((image, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setSelectedImage(image)}
+                        className={`border rounded-3xl overflow-hidden cursor-pointer transition-all p-1 h-[110px] w-[110px] flex justify-center items-center
+          ${
+            selectedImage === image
+              ? "ring-2 ring-theme-primary"
+              : "hover:ring-1 hover:ring-gray-300"
+          }`}
+                      >
+                        <img
+                          src={image}
+                          alt={`thumb-${i}`}
+                          // className="w-full h-auto object-cover "
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                    ))
+                  : // Skeletons
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-[110px] h-[110px] bg-gray-200 rounded-3xl animate-pulse"
+                      />
+                    ))}
+              </div>
+
+              {/* Main Image */}
+              {/* <div className="col-span-3">
               <div className="border rounded-3xl overflow-hidden h-full  w-full flex justify-center items-center">
                 <img
                   src={Product?.image_urls ? Product.image_urls[0] : null}
@@ -295,169 +319,202 @@ const ProductDetail = () => {
                   className=" h-[50%] object-cover"
                 />
               </div>
-            </div>
-          </div>
+            </div> */}
 
-          {/* Product? Details Section */}
-          <div className="space-y-3 h-full">
-            {/* Product? Name */}
-            <h1 className="text-4xl font-bold h11">{Product?.name}</h1>
-
-            {/* Rating */}
-            <div className="flex items-center space-x-4">
-              <div className="flex text-yellow-500">
-                <ReactStars
-                  count={5}
-                  value={averageRating > 0 ? averageRating : 4.5}
-                  edit={false}
-                  size={24}
-                  color2={"#ffd700"}
-                />
+              <div className="col-span-3">
+                <div className="border rounded-3xl overflow-hidden h-full w-full max-h-[452px] flex justify-center items-center bg-gray-50">
+                  {Product?.image_urls ? (
+                    <img
+                      src={selectedImage || Product.image_urls[0]}
+                      alt={Product?.name}
+                      className="h-[50%] object-cover transition-opacity duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full max-h-[452px] bg-gray-200 animate-pulse rounded-3xl" />
+                  )}
+                </div>
               </div>
-              {/* <span className="text-gray-600 text-xl">
+            </div>
+
+            {/* Product? Details Section */}
+            <div className="space-y-3 h-full">
+              {/* Product? Name */}
+              <h1 className="text-4xl font-bold h11">
+                {Product?.name || (
+                  <span className="inline-block w-64 h-8 bg-gray-200 rounded animate-pulse" />
+                )}
+              </h1>
+
+              {/* Rating */}
+              <div className="flex items-center space-x-4">
+                <div className="flex text-yellow-500">
+                  <ReactStars
+                    count={5}
+                    value={averageRating > 0 ? averageRating : 4.5}
+                    edit={false}
+                    size={24}
+                    color2={"#ffd700"}
+                  />
+                </div>
+                {/* <span className="text-gray-600 text-xl">
                 {averageRating > 0 ? averageRating.toFixed(1) : 4.5/5}
               </span> */}
-              <span className="text-xl text-gray-500">
-                ({ratings.length} Reviews) |{" "}
-                {(Product.quantity) ? (
-                  <span className="text-xl text-green-300">In Stock {Product.quantity}</span>
-                ) : (
-                  <span className="text-xl text-red-500">Sold Out</span>
-                )}
-              </span>
-            </div>
-
-            {/* Price */}
-            <div>
-              <div className="flex">
-                <span className="text-2xl font-bold mr-4">
-                  ${Math.round(Number(Product?.price) - newPrice)}
+                <span className="text-xl text-gray-500">
+                  ({ratings?.length} Reviews) |{" "}
+                  {Product.quantity ? (
+                    <span className="text-xl text-green-300">
+                      In Stock {Product.quantity}
+                    </span>
+                  ) : (
+                    <span className="text-xl text-red-500">Sold Out</span>
+                  )}
                 </span>
-
-                {Product?.discount > 0 ? (
-                  <>
-                    <span className="line-through text-gray-400 text-2xl">
-                      ${Product?.price}
-                    </span>
-                    <span className="text-theme-secondary bg-red-200 px-1  md:text-md xl:text-xl md:px-2 rounded-full  py-1  ml-3 text-sm">
-                      -{Product?.discount}%
-                    </span>
-                  </>
-                ) : null}
               </div>
-            </div>
 
-            {/* Description */}
-            <p className="text-black">{Product?.description}</p>
+              {/* Price */}
+              <div>
+                <div className="flex">
+                  <span className="text-2xl font-bold mr-4">
+                    ${Math.round(Number(Product?.price) - newPrice)}
+                  </span>
 
-            {/* Color Selection */}
-            <div className="mt-10"></div>
-            <hr />
-            <div>
-              <p className="font-normal mb-2 text-xl">Colors</p>
-
-              {/* color option */}
-              <div className="flex space-x-3 ">
-                {Product?.colors?.map((color, index) => (
-                  <button
-                    key={index}
-                    style={{
-                      backgroundColor: color.toLowerCase(),
-                      padding: "10px",
-                      border: "none",
-                      cursor: "pointer",
-                      color: "#fff",
-                      borderRadius: "50%",
-                      width: "30px",
-                      height: "30px",
-                      position: "relative",
-                      // fontWeight: selectedColor === color ? "bold" : "normal",
-                      border:
-                        selectedColor === color
-                          ? "2px solid black"
-                          : "2px solid transparent",
-                    }}
-                    onClick={() => handleColorSelect(color)}
-                  >
-                    {/* {color} */}
-
-                    {selectedColor == color ? (
-                      <span className="flex justify-center items-center">
-                        <MdDone className="absolute text-xl font-bold" />
+                  {Product?.discount > 0 ? (
+                    <>
+                      <span className="line-through text-gray-400 text-2xl">
+                        ${Product?.price}
                       </span>
-                    ) : null}
-                  </button>
-                ))}
+                      <span className="text-theme-white bg-theme-primary px-1  md:text-md xl:text-xl md:px-2 rounded-full  py-1  ml-3 text-sm">
+                        -{Product?.discount}%
+                      </span>
+                    </>
+                  ) : null}
+                </div>
               </div>
-            </div>
 
-            {/* Size Selection */}
-            <div className="mt-10"></div>
-            <hr />
-            <div>
-              <p className="font-normal mb-2 text-xl">Sizes</p>
-              <div className="grid grid-cols-6  sm:grid-cols-10 sm:gap-3 gap-2 ">
-                {Product?.sizes?.map((size, index) => (
-                  <button
-                    key={index}
-                    className={`p-2 rounded border col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-2  cursor-pointer ${
-                      selectedSize == size
-                        ? "bg-theme-primary text-white border-theme-prbg-theme-primary font-semibold text-xl shadow  shadow-theme-secondary"
-                        : "bg-white-100 text-black border-gray-600"
-                    }`}
-                    onClick={() => handleSizeSelect(size)}
-                  >
-                    {size}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Quantity and Add to Cart */}
-            <hr />
-            <div className="flex space-x-4">
-              {/* counter */}
-              <div className="flex items-center border border-gray-600 rounded bg-White">
-                <button
-                  className="px-4 py-2 text-3xl  border-r-black hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary transition-all duration-300"
-                  onClick={handleDecreaseCounter}
-                >
-                  -
-                </button>
-                <span className="px-4 text-2xl">{counter}</span>
-                <button
-                  className="px-4 py-2 text-3xl border-l-black hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary transition-all duration-300"
-                  onClick={handleIncreaseCounter}
-                >
-                  +
-                </button>
-              </div>
-              <button
-                className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded px-6 hover:shadow-xl  text-xl  "
-                onClick={addtoCart}
-                disabled={loading}
-                type="submit"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center px-1 py-2 gap-2">
-                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
-                  </div>
-                ) : (
-                  "Add to Cart"
+              {/* Description */}
+              <p className="text-black">
+                {" "}
+                {Product?.description || (
+                  <span className="block w-full h-4 bg-gray-200 rounded animate-pulse" />
                 )}
-                
-              </button>
-                
+              </p>
 
-              <button className="p-2 border-2 rounded flex justify-center items-center text-2xl outline-none border-gray-600 ">
+              {/* Color Selection */}
+              <div className="mt-10"></div>
+              <hr />
+              {Product?.colors?.length > 0 ? (
+                <>
+                  <div>
+                    <p className="font-normal mb-2 text-xl">Colors</p>
+
+                    {/* color option */}
+
+                    <div className="flex space-x-3 ">
+                      {Product?.colors?.map((color, index) => (
+                        <button
+                          key={index}
+                          style={{
+                            backgroundColor: color.toLowerCase(),
+                            padding: "10px",
+                            border: "none",
+                            cursor: "pointer",
+                            color: "#fff",
+                            borderRadius: "50%",
+                            width: "30px",
+                            height: "30px",
+                            position: "relative",
+                            // fontWeight: selectedColor === color ? "bold" : "normal",
+                            border:
+                              selectedColor === color
+                                ? "2px solid black"
+                                : "2px solid transparent",
+                          }}
+                          onClick={() => handleColorSelect(color)}
+                        >
+                          {/* {color} */}
+
+                          {selectedColor == color ? (
+                            <span className="flex justify-center items-center">
+                              <MdDone className="absolute text-xl font-bold" />
+                            </span>
+                          ) : null}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mt-10"></div>
+                </>
+              ) : null}
+
+              {/* Size Selection */}
+              <hr />
+              {Product?.sizes?.length > 0 ? (
+                <div>
+                  <p className="font-normal mb-2 text-xl">Sizes</p>
+                  <div className="grid grid-cols-6  sm:grid-cols-10 sm:gap-3 gap-2 ">
+                    {Product?.sizes?.map((size, index) => (
+                      <button
+                        key={index}
+                        className={`p-2 rounded border font-medium tracking-tight col-span-2 sm:col-span-2 md:col-span-3 lg:col-span-2 h-10 max-h-12 flex justify-center items-center cursor-pointer hover:bg-theme-primary hover:text-white hover:border-theme-primary transition-all duration-200 ${
+                          selectedSize == size
+                            ? "bg-theme-primary text-white border-theme-primary font-semibold text-xl shadow  shadow-theme-secondary"
+                            : "bg-white-100 text-black border-gray-600"
+                        }`}
+                        onClick={() => handleSizeSelect(size)}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Quantity and Add to Cart */}
+              <hr />
+              <div className="flex space-x-4">
+                {/* counter */}
+                <div className="grid grid-cols-3 place-content-center place-items-center border border-gray-600 rounded bg-White">
+                  <button
+                    disabled={counter <= 1}
+                    className="px-4 py-2 text-3xl w-full h-full  border-r-gray-600 hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary disabled:opacity-50 disabled:cursor-not-allowed
+             transition-all duration-300"
+                    onClick={handleDecreaseCounter}
+                  >
+                    -
+                  </button>
+                  <span className="px-4 text-2xl w-full">{counter}</span>
+                  <button
+                    className="px-4 py-2 text-3xl w-full h-full border-l-gray-600 hover:bg-theme-primary hover:text-white shadow hover:shadow-theme-secondary transition-all duration-300"
+                    onClick={handleIncreaseCounter}
+                  >
+                    +
+                  </button>
+                </div>
+                <button
+                  className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded px-6 hover:shadow-xl  text-base sm:text-xl  "
+                  onClick={addtoCart}
+                  disabled={loading}
+                  type="submit"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center px-1 py-2 gap-2">
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
+                    </div>
+                  ) : (
+                    "Add to Cart"
+                  )}
+                </button>
+
+                {/* <button className="p-2 border-2 rounded flex justify-center items-center text-2xl outline-none border-gray-600 ">
                 <FaRegHeart />
-              </button>
+              </button> */}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       <hr />
 
@@ -481,7 +538,7 @@ const ProductDetail = () => {
             />
 
             <p className="text-base sm:text-xl font-medium text-gray-500">
-              based on {ratings.length} reviews
+              based on {ratings?.length} reviews
             </p>
           </div>
         </div>
@@ -491,10 +548,11 @@ const ProductDetail = () => {
       <div className=" container mx-auto px-4 lg:px-10  mt-5">
         <p className="text-xl sm:text-2xl font-bold">
           All Reviews (
-          <span className="text-base text-gray-500">{ratings.length}</span>){" "}
+          <span className="text-base text-gray-500">{ratings.length}</span>
+          ){" "}
         </p>
 
-        {ratings.length > 0 ? (
+        {ratings?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-5 mt-5">
             {(ratings?.length > 6 ? ratings.slice(-6) : ratings).map(
               (rating, index) => {
@@ -513,24 +571,27 @@ const ProductDetail = () => {
                         <span className="font-bold">...</span>
 
                         {state?.user?.user_id == rating.user_id ? (
-                        <div>
-                          <IoMdClose
-                            className="hover:text-red-500 shadow-lg "
-                            onClick={() => {
-                              Swal.fire({
-                                title: "Do you want delete this Feedback?",
-                                icon: "warning",
-                                showCancelButton: true,
-                                confirmButtonText: "Delete",
-                              }).then((result) => {
-                                if (result.isConfirmed) {
-                                  deleteReview(rating.user_id, rating.review_id);
-                                }
-                              });
-                            }}
-                          />
-                        </div>
-                      ) : null}
+                          <div>
+                            <IoMdClose
+                              className="hover:text-red-500 shadow-lg "
+                              onClick={() => {
+                                Swal.fire({
+                                  title: "Do you want delete this Feedback?",
+                                  icon: "warning",
+                                  showCancelButton: true,
+                                  confirmButtonText: "Delete",
+                                }).then((result) => {
+                                  if (result.isConfirmed) {
+                                    deleteReview(
+                                      rating.user_id,
+                                      rating.review_id,
+                                    );
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
+                        ) : null}
                       </div>
                     </div>
 
@@ -548,11 +609,12 @@ const ProductDetail = () => {
                     </p>
 
                     <p className="text-sm sm:text-base font-medium">
-                      Posted On {moment(rating.created_at).format("MMM Do YY")}{" "}
+                      Posted On{" "}
+                      {moment(rating.created_at).format("MMM Do YY")}{" "}
                     </p>
                   </div>
                 );
-              }
+              },
             )}
           </div>
         ) : (
