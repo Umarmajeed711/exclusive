@@ -94,11 +94,11 @@ const Breadcrumbs = ({ currentPage, prevPages = [] }) => {
           </React.Fragment>
         ))}
 
-        {prevPages?.length > 0 && (
+        
           <motion.div variants={itemVariants}>
             <PiGreaterThan className="text-gray-400 text-sm" />
           </motion.div>
-        )}
+       
 
         <motion.span
           variants={itemVariants}
