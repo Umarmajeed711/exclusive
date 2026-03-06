@@ -763,8 +763,11 @@ const ProductDetail = () => {
                 </div>
               </>
             ) : (
-              // <p className="bg-gray-200 text-center">No reviews yet.</p>
+              
+              // {/* <p className="bg-gray-200 text-center">No reviews yet.</p> */}
+              
               null
+              
             )}
           </>
         )}
