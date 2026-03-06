@@ -300,13 +300,13 @@ const ProductDetail = () => {
               ))}
             </div> */}
 
-              <div className="col-span-4 sm:col-span-1 space-y-2 flex items-center flex-col h-full">
+              <div className="col-span-4 sm:col-span-1 space-y-2 flex items-center sm:flex-col  h-full gap-1">
                 {Product?.image_urls
                   ? Product.image_urls.map((image, i) => (
                       <div
                         key={i}
                         onClick={() => setSelectedImage(image)}
-                        className={`border rounded-3xl overflow-hidden cursor-pointer transition-all p-1 h-[110px] w-[110px] flex justify-center items-center
+                        className={`border rounded-3xl overflow-hidden cursor-pointer transition-all p-1 h-[80px] sm:h-[110px] w-[80px] sm:w-[110px] flex justify-center items-center
           ${
             selectedImage === image
               ? "ring-2 ring-theme-primary"
@@ -763,7 +763,8 @@ const ProductDetail = () => {
                 </div>
               </>
             ) : (
-              <p className="bg-gray-200 text-center">No reviews yet.</p>
+              // <p className="bg-gray-200 text-center">No reviews yet.</p>
+              null
             )}
           </>
         )}
