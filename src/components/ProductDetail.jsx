@@ -449,7 +449,7 @@ const ProductDetail = () => {
                         >
                           {/* {color} */}
 
-                          {selectedColor == color ? (
+                          {selectedColor === color ? (
                             <span className="flex justify-center items-center">
                               <MdDone className="absolute text-xl font-bold" />
                             </span>
@@ -472,7 +472,7 @@ const ProductDetail = () => {
                       <button
                         key={index}
                         className={`p-2 rounded border font-medium tracking-tight col-span-1 sm:col-span-2 md:col-span-3 lg:col-span-2 h-10 max-h-12 flex justify-center items-center cursor-pointer hover:bg-theme-primary hover:text-white hover:border-theme-primary hover:font-semibold transition-all duration-200 ${
-                          selectedSize == size
+                          selectedSize === size
                             ? "bg-theme-primary text-white border-theme-primary font-semibold text-xl shadow  shadow-theme-secondary"
                             : "bg-white-100 text-black"
                         }`}
@@ -709,7 +709,7 @@ const ProductDetail = () => {
                           />
 
                           <div className="flex items-center gap-2">
-                            {state?.user?.user_id == rating.user_id ? (
+                            {state?.user?.user_id === rating.user_id ? (
                               <div>
                                 <IoMdClose
                                   className="hover:text-red-500 shadow-lg cursor-pointer "

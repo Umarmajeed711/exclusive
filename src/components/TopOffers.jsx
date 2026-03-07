@@ -1,10 +1,6 @@
-import React from "react";
 import api from "./api";
 import { useState } from "react";
 import { useEffect } from "react";
-import Title from "./Title";
-import { AiOutlineEye, AiOutlineHeart } from "react-icons/ai";
-import { Link } from "react-router-dom";
 import OurProducts from "./OurProducts";
 
 const TopOffers = () => {

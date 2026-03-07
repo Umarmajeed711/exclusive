@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { Signup } from "../pages/signup";
 import { Login } from "../pages/login";
@@ -22,11 +22,11 @@ import Dash from "../pages/PrivatePages/Dash";
 import AddProduct from "../pages/PrivatePages/AddProduct";
 
 const Myroute = () => {
-  let { state, dispatch } = useContext(GlobalContext);
+  let { state } = useContext(GlobalContext);
 
   return (
     <div>
-      {state?.isLogin == true ? (
+      {state?.isLogin === true ? (
         <Routes>
           <Route path="/" index element={<Home />}></Route>
           <Route path="/Category" element={<Category />}></Route>
@@ -54,7 +54,7 @@ const Myroute = () => {
           <Route path="/NotFound" element={<NotFound />}></Route>
           <Route path="*" element={<Navigate to="/" />}></Route>
         </Routes>
-      ) : state?.isLogin == false ? (
+      ) : state?.isLogin === false ? (
         <Routes>
           <Route path="/signup" element={<Signup />}></Route>
           <Route path="/verify_email" element={<Verify_email />}></Route>

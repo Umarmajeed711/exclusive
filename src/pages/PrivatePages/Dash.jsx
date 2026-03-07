@@ -1,13 +1,9 @@
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import Swal from "sweetalert2";
-import { div } from "framer-motion/client";
-import { Link } from "react-router";
-import { FaGreaterThan } from "react-icons/fa";
-import { PiGreaterThan } from "react-icons/pi";
 import { GlobalContext } from "../../context/Context";
 import moment from "moment";
 
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import {
   BarChart,
   Bar,
@@ -108,7 +104,7 @@ const Dash = () => {
       calculatedTotal += Number(product.total_price);
 
       let paidAmount =
-        product.payment_status == "paid" ? Number(product.total_price) : 0;
+        product.payment_status === "paid" ? Number(product.total_price) : 0;
       calculatedEarnedAmount += paidAmount;
     });
 
@@ -318,7 +314,7 @@ const Dash = () => {
                           {Orders?.map((order, i) => {
                             return (
                               <>
-                                {order?.order_id == Customer?.order_id ? (
+                                {order?.order_id === Customer?.order_id ? (
                                   <div>
                                     <img
                                       src={order?.image_url}
@@ -339,7 +335,7 @@ const Dash = () => {
                         <td className="p-1  text-center">
                           <span
                             className={`${
-                              Customer.payment_status == "pending"
+                              Customer.payment_status === "pending"
                                 ? "bg-[#fadab0] text-[#e8a20b]"
                                 : " bg-[#a0e9db] text-[#00C49F]"
                             } px-2 py-1 rounded-full text-center `}
@@ -349,7 +345,7 @@ const Dash = () => {
                         </td>
 
                         <td className="p-1  text-center">
-                          {/* <span className={`${Customer.payment_method == "online" ? 'bg-[#28fff8]':' bg-[#90eb35]' } p-1 rounded `}>
+                          {/* <span className={`${Customer.payment_method === "online" ? 'bg-[#28fff8]':' bg-[#90eb35]' } p-1 rounded `}>
                             
                           </span>{" "} */}
                           {Customer.payment_method}
@@ -357,12 +353,12 @@ const Dash = () => {
                         <td className="p-1  text-center">
                           <span
                             className={`${
-                              Customer.delivery_status == "pending"
+                              Customer.delivery_status === "pending"
                                 ? "bg-[#fadab0] text-[#e8a20b]"
                                 : " bg-[#a0e9db] text-[#00C49F]"
                             } px-2 py-1 rounded-full text-center `}
                           >
-                            {/* <span className={`${Customer.delivery_status == "pending" ? 'bg-[#ffc068]':' bg-[#00C49F]' } px-2 py-1 rounded-full text-center `}> */}
+                            {/* <span className={`${Customer.delivery_status === "pending" ? 'bg-[#ffc068]':' bg-[#00C49F]' } px-2 py-1 rounded-full text-center `}> */}
                             {Customer.delivery_status}
                           </span>{" "}
                         </td>

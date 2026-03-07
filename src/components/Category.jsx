@@ -1,11 +1,9 @@
 import Modal from '@mui/material/Modal';
 import { useFormik } from 'formik';
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { useEffect } from 'react';
 import * as yup from "yup";
 import { AiOutlineClose } from "react-icons/ai";
-import { Login } from '../pages/login';
-import axios from 'axios';
 import Alert from '@mui/material/Alert';
 import Swal from 'sweetalert2';
 import api from './api';

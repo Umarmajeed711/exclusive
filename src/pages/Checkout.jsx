@@ -1,10 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import  { useContext, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { Link, useNavigate } from "react-router";
-import { PiGreaterThan } from "react-icons/pi";
-import { Alert, Snackbar } from "@mui/material";
-import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 import { GlobalContext } from "../context/Context";
 import api from "../components/api";
 import { loadStripe } from "@stripe/stripe-js";
@@ -15,7 +12,7 @@ const stripePromise = loadStripe(
 ); // publishable key
 
 const Checkout = () => {
-  const [CoupenCode, setCoupenCode] = useState("");
+  // const [CoupenCode, setCoupenCode] = useState("");
   const [loading, setloading] = useState(false);
   const [OnlinePay, setOnlinePay] = useState(true);
   const [paymentMethod, setPaymentMethod] = useState("online");
@@ -51,6 +48,8 @@ const Checkout = () => {
       
 
       if (productCart?.length >= 1) {
+
+        setloading(true)
         // checkout start
        
           let address = `${values.address},${values.city}`;

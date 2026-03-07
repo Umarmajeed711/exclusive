@@ -2,20 +2,10 @@ import "./App.css";
 import Myroute from "./components/Myroute";
 import { useContext, useEffect } from "react";
 import { GlobalContext } from "./context/Context";
-import axios from "axios";
-import { Navigate, Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
-import { Signup } from "./pages/signup";
-import { Login } from "./pages/login";
-import Category from "./components/Category";
 // import AddProduct from "./components/AddProduct";
-import Products from "./pages/PrivatePages/Products";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import NewArrivals from "./components/NewArrivals";
 import api from "./components/api";
-import OurProducts from "./components/OurProducts";
-import { useState } from "react";
 
 const App = () => {
   // data store in a context api
@@ -69,7 +59,7 @@ const App = () => {
     try {
       let response = await api.get(`/user-detail`);
 
-      let adminLogin = response.data.user.email == "umarmajeed711@gmail.com";
+      let adminLogin = response.data.user.email === "umarmajeed711@gmail.com";
       if (adminLogin) {
         dispatch({ type: "ADMIN_LOGIN", payload: response.data.user });
         getCategory();

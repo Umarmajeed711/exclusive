@@ -1,17 +1,12 @@
-import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import "../App.css";
 import { useContext, useState } from "react";
-import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
 import { GlobalContext } from "../context/Context";
-import axios from "axios";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
-import { PiGreaterThan } from "react-icons/pi";
 import api from "../components/api";
 import Breadcrums from "../components/Breadcrums";
 
