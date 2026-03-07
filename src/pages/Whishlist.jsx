@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { GlobalContext } from '../context/Context';
 import api from '../components/api';
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ import Title from '../components/Title';
 
 const Whishlist = () => {
 
-    let {state,dispatch} = useContext(GlobalContext);
+    let {state} = useContext(GlobalContext);
 
 
 
@@ -61,7 +61,7 @@ const Whishlist = () => {
 
   const addToFavorite = async (product_id) => {
   
-    let check = wishlist?.find((fav) => fav?.product_id == product_id);
+    let check = wishlist?.find((fav) => fav?.product_id === product_id);
     if(check){
       return
     }
@@ -88,7 +88,7 @@ const Whishlist = () => {
 
    const removeToFavorite = async (product_id) => {
   
-    let check = wishlist?.find((fav) => fav?.product_id == product_id);
+    let check = wishlist?.find((fav) => fav?.product_id === product_id);
     try {
       if(check){
         let response  =  await api.delete("/remove_to_favorite", {

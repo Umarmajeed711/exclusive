@@ -1,24 +1,17 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import "../App.css";
-import { useContext, useState } from "react";
-import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
-import { MdEmail } from "react-icons/md";
-import { GlobalContext } from "../context/Context";
-import axios from "axios";
+import {useState } from "react";
 import Swal from "sweetalert2";
-import Alert from "@mui/material/Alert";
-import { PiGreaterThan } from "react-icons/pi";
 import Breadcrums from "../components/Breadcrums";
 
 const Contact = () => {
   const [loading, setloading] = useState(false);
   const formRef = React.useRef(null); // reference to native HTML form
 
-  const [apiError, setApiError] = useState("");
+  // const [apiError, setApiError] = useState("");
   const contactValidation = yup.object({
     name: yup.string().trim().required("Name is required"),
     email: yup
@@ -160,7 +153,7 @@ const Contact = () => {
                     value={contactFormik.values.name}
                     onChange={(e) => {
                       contactFormik.handleChange(e);
-                      setApiError(""); // clear backend error
+                      // setApiError(""); // clear backend error
                     }}
                     className={Styles.inputField}
                     disabled={loading}
@@ -188,7 +181,7 @@ const Contact = () => {
                     value={contactFormik.values.email}
                     onChange={(e) => {
                       contactFormik.handleChange(e);
-                      setApiError(""); // clear backend error
+                      // setApiError(""); // clear backend error
                     }}
                     className={Styles.inputField}
                     disabled={loading}
@@ -217,7 +210,7 @@ const Contact = () => {
                     value={contactFormik.values.phone}
                     onChange={(e) => {
                       contactFormik.handleChange(e);
-                      setApiError(""); // clear backend error
+                      // setApiError(""); // clear backend error
                     }}
                     className={Styles.inputField}
                     disabled={loading}
@@ -242,7 +235,7 @@ const Contact = () => {
                 value={contactFormik.values.message}
                 onChange={(e) => {
                   contactFormik.handleChange(e);
-                  setApiError(""); // clear backend error
+                  // setApiError(""); // clear backend error
                 }}
                 disabled={loading}
                 placeholder="Your Message *"

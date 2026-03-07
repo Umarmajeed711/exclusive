@@ -2,11 +2,9 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import "../App.css";
 import { useContext, useState } from "react";
-import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
+import { FaEye, FaEyeSlash} from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { GlobalContext } from "../context/Context";
-import axios from "axios";
-import { useEffect } from "react";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
@@ -18,7 +16,7 @@ const ResetPassword = () => {
 
     const navigate = useNavigate();
 
-    let { state, dispatch } = useContext(GlobalContext);
+    let { state} = useContext(GlobalContext);
   
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);

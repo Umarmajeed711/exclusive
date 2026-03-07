@@ -1,18 +1,15 @@
-import React, { useContext, useEffect } from "react";
+import {useEffect } from "react";
 import "../App.css";
 import { Link } from "react-router";
-import { GlobalContext } from "../context/Context";
 import api from "../components/api";
 import { useState } from "react";
-import NewArrivals from "../components/NewArrivals";
 import OurProducts from "../components/OurProducts";
-import Title from "../components/Title";
 import TopOffers from "../components/TopOffers";
 import HeroCarousel from "../components/HeroCarousal";
 import HeroSection from "../components/heroSection";
 
 const Home = () => {
-  let { state, dispatch } = useContext(GlobalContext);
+  // let { state, dispatch } = useContext(GlobalContext);
 
   const [Products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +31,7 @@ const Home = () => {
   }, []);
 
   const handleProductUpdate = (product) => {
-    setProducts((prev) => prev.map((p) => (p.product_id == product.product_id ? product : p)));
+    setProducts((prev) => prev.map((p) => (p.product_id === product.product_id ? product : p)));
   };
 
   const handleProductDelete = (id) => {

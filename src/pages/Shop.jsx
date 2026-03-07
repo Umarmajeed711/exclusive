@@ -1,23 +1,15 @@
-import React, { useContext, useState } from "react";
-import { useFormik } from "formik";
+import  { useContext, useState } from "react";
 import { useEffect } from "react";
-import * as yup from "yup";
-import { AiOutlineClose } from "react-icons/ai";
-import axios from "axios";
 import Swal from "sweetalert2";
-import Alert from "@mui/material/Alert";
 import api from "../components/api";
 import OurProducts from "../components/OurProducts";
 import Modal from "../components/modal";
 import AddProductForm from "../components/addProject";
 import { GlobalContext } from "../context/Context";
-import { BiGrid, BiListCheck, BiPlus } from "react-icons/bi";
 import {
-  MdFormatListBulleted,
   MdOutlineAdd,
   MdOutlineFilterAlt,
 } from "react-icons/md";
-import ProductListView from "../components/ProductList";
 import SmartFilter from "../components/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES } from "../components/types";
 import { ActiveFilters } from "../components/ActiveFilters";
@@ -89,7 +81,7 @@ const Shop = () => {
 
   const handleProductUpdate = (product) => {
     setProducts((prev) => {
-      const exists = prev?.some((p) => p?.product_id == product?.product_id);
+      const exists = prev?.some((p) => p?.product_id === product?.product_id);
 
       if (exists) {
         // UPDATE
@@ -299,10 +291,10 @@ const Shop = () => {
 
               {totalProducts > 100 ? (
                 <select
-                  defaultValue={limit == totalProducts ? "All Products" : limit}
+                  defaultValue={limit === totalProducts ? "All Products" : limit}
                   onChange={(e) => {
                     const newLimit =
-                      e.target.value == "all"
+                      e.target.value === "all"
                         ? Number(totalProducts)
                         : Number(e.target.value);
                     setLimit(newLimit);

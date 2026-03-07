@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import api from "../components/api";
@@ -6,10 +6,6 @@ import { GlobalContext } from "../context/Context";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Link } from "react-router";
-import { PiGreaterThan } from "react-icons/pi";
-import { Alert, Snackbar } from "@mui/material";
-import Swal from "sweetalert2";
-
 const stripePromise = loadStripe("pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf");
 
 function Form() {

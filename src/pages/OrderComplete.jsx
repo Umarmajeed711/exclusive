@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from "react";
+import  { useContext, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link, useParams } from "react-router";
+import { Link } from "react-router";
 import { GlobalContext } from "../context/Context";
 import api from "../components/api";
 

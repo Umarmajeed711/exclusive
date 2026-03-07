@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useEffect } from "react";
-import { PiGreaterThan } from "react-icons/pi";
 import { Link } from "react-router-dom";
 import api from "../components/api";
 import { useContext } from "react";
@@ -12,7 +11,7 @@ import Breadcrums from "../components/Breadcrums";
 
 const Cart = () => {
   let { state, dispatch } = useContext(GlobalContext);
-  let user_id = state?.user.user_id;
+  // let user_id = state?.user.user_id;
 
   const [productCart, setProductCart] = useState([]);
   const [total, setTotal] = useState(0);

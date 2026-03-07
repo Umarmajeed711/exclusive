@@ -1,14 +1,8 @@
-import React from "react";
 import { useState } from "react";
-import { useContext } from "react";
 import api from "../components/api";
 import OurProducts from "../components/OurProducts";
-import TopOffers from "../components/TopOffers";
 import { useEffect } from "react";
-import { GlobalContext } from "../context/Context";
-
 const Shop = () => {
-  let { state, dispatch } = useContext(GlobalContext);
 
   const [Products, setProducts] = useState([]);
   const [Category, setCategory] = useState("");

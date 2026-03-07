@@ -1,14 +1,8 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import Swal from "sweetalert2";
-import { Link, useNavigate } from "react-router";
-import { MdEmail } from "react-icons/md";
-import { RiLockPasswordFill } from "react-icons/ri";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-import axios from "axios";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { GlobalContext } from "../context/Context";
-import Alert from "@mui/material/Alert";
 import api from "./api";
 // import {
 //   Heading,

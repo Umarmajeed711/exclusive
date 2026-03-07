@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdOutlineClose } from "react-icons/md";
@@ -7,7 +7,6 @@ import { GlobalContext } from "../context/Context";
 import api from "./api";
 import { FaRegUser } from "react-icons/fa6";
 
-import { FiSearch } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa";
 import { GrCart } from "react-icons/gr";
 import { TbShoppingBagCheck } from "react-icons/tb";

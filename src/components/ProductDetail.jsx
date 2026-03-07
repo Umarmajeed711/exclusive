@@ -2,15 +2,11 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { GlobalContext } from "../context/Context";
 import api from "./api";
 import Swal from "sweetalert2";
-import { Link, useParams } from "react-router-dom";
-import { PiFileMdDuotone, PiGreaterThan } from "react-icons/pi";
+import { useParams } from "react-router-dom";
 import { MdDone } from "react-icons/md";
-import { FaRegHeart } from "react-icons/fa";
 import OurProducts from "./OurProducts";
 import ReactStars from "react-stars";
-import moment from "moment/moment";
 import { IoMdClose } from "react-icons/io";
-import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
 import Breadcrums from "./Breadcrums";
 import {
   HorizontalReviewSkeleton,
