@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Modal from "./modal";
 import { buildFilterQuery } from "./types";
-import { MdOutlineFilterAlt } from "react-icons/md";
+// import { MdOutlineFilterAlt } from "react-icons/md";
 
 const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , onClose = () => {}}) => {
 
