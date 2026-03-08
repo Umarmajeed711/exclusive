@@ -165,14 +165,23 @@ export const Login = () => {
                     className={Styles.inputField}
                   />
 
-                  {loginFormik.touched.email &&
+                  {/* {loginFormik.touched.email &&
                   Boolean(loginFormik.errors.email) ? (
                     <p className="requiredError">
                       {loginFormik.touched.email && loginFormik.errors.email}
                     </p>
                   ) : (
                     <p className="ErrorArea">Error Area</p>
-                  )}
+                  )} */}
+
+                  <div className="error-wrapper">
+                    {loginFormik.touched.email &&
+                      loginFormik.errors.email && (
+                        <p className="requiredError">
+                          {loginFormik.errors.email}
+                        </p>
+                      )}
+                  </div>
                 </div>
               </div>
 
@@ -214,7 +223,7 @@ export const Login = () => {
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </p>
 
-                  {loginFormik.touched.password &&
+                  {/* {loginFormik.touched.password &&
                   Boolean(loginFormik.errors.password) ? (
                     <p className="requiredError">
                       {loginFormik.touched.password &&
@@ -222,7 +231,16 @@ export const Login = () => {
                     </p>
                   ) : (
                     <p className="ErrorArea">Error Area</p>
-                  )}
+                  )} */}
+
+                  <div className="error-wrapper">
+                    {loginFormik.touched.password &&
+                      loginFormik.errors.password && (
+                        <p className="requiredError">
+                          {loginFormik.errors.password}
+                        </p>
+                      )}
+                  </div>
                 </div>
               </div>
             </div>
