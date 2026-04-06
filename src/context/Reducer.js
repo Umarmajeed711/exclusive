@@ -21,6 +21,19 @@ export const reducer = (state, action) => {
       case "TOGGLE_CART": {
         return{...state , isReloadCart : !state.isReloadCart}
       }
+      case "LODING_CART": {
+        return{...state , cardLoading : action.payload}
+      }
+      case "WISHLIST_CART": {
+        return{...state , wishlist : action.payload}
+      }
+      case "WISHLIST_RELOAD": {
+        return{...state , isWishlistReload : !state.isWishlistReload}
+      }
+      case "WISHLIST_LODING_CART": {
+        return{...state , wishlistLoading : action.payload}
+      }
+      
       case "ORDER_DETAILS": {
         return{...state , orderDetails : action.payload}
       }

@@ -4,7 +4,8 @@ import Modal from "./modal";
 import AddProductForm from "./addProject";
 import api from "./api";
 import { GlobalContext } from "../context/Context";
-import useClickOutside from "./OutsideClick";
+import useOutsideClick from "./outSideClick";
+// import useClickOutside from "./OutsideClick";
 
 /* ==============================
    DEFAULT COLUMN CONFIG
@@ -255,7 +256,7 @@ const ProductListView = ({
 
     const menuRef = useRef(null);
 
-  useClickOutside(menuRef, () => setOpen(false));
+  useOutsideClick(menuRef, () => setOpen(false));
 
 
 

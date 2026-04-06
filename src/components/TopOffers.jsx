@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import OurProducts from "./OurProducts";
 
-const TopOffers = () => {
+const TopOffers = ({onAdd = () => {}}) => {
   const [DiscountProducts, setDiscountProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,6 +23,7 @@ const TopOffers = () => {
   }, []);
   return (
     <OurProducts
+      onAdd={onAdd}
       products={DiscountProducts}
       skeletonProducts={4}
       title="Top Offers"

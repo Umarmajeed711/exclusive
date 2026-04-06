@@ -13,6 +13,7 @@ import { TbShoppingBagCheck } from "react-icons/tb";
 import { ImCancelCircle } from "react-icons/im";
 import { HiOutlineArrowLeftStartOnRectangle } from "react-icons/hi2";
 import { IoStarOutline } from "react-icons/io5";
+import useOutsideClick from "./outSideClick";
 
 const Navbar = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -35,6 +36,8 @@ const Navbar = () => {
     try {
       let user_logout = await api.get("/logout");
       console.log("user logout", user_logout);
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
       dispatch({ type: "USER_LOGOUT" });
     } catch (error) {
       console.log(error);
@@ -59,6 +62,10 @@ const Navbar = () => {
       "text-[18px] hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 hover:after:w-full active:w-full after:bg-black acitve:bg-black after:transition-all after:duration-300",
     active: "text-black after:w-full",
   };
+
+  const menuRef = useOutsideClick(() => {
+    setShowDropdown(false); // close when clicked outside
+  });
 
   return (
     <header className="relative z-[1000]">
@@ -180,14 +187,22 @@ const Navbar = () => {
             {/* cart icons */}
             <div className="hidden md:flex  gap-4 items-center">
               <Link to="/CheckOut" className="link">
-                <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
+              <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
+                  <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
+                  {state?.wishlist?.length > 0 && (
+                    <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
+                      {state?.wishlist?.length}
+                    </span>
+                  )}
+                </span>
+                {/* <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" /> */}
               </Link>
 
               <Link to="/Cart" className="link text-xl">
-                <span className="relative text-xl cursor-pointer">
+                <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
                   <GrCart className="text-xl hover:scale-110 transition-all duration-200" />
                   {state?.cart?.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded px-1  text-xs">
+                    <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
                       {state?.cart?.length}
                     </span>
                   )}
@@ -261,14 +276,17 @@ const Navbar = () => {
               </div> */}
               <div
                 className="relative !z-50"
-                onMouseEnter={() => {
-                  setShowDropdown(true);
-                }}
-                onMouseLeave={() => {
-                  setShowDropdown(false);
-                }}
+                ref={menuRef}
+                // onMouseEnter={() => {
+                //   setShowDropdown(true);
+                // }}
+                // onMouseLeave={() => {
+                //   setShowDropdown(false);
+                // }}
+                onClick={() => {setShowDropdown(!showDropdown)}}
+                
               >
-                <p className="text-xl">
+                <p className="text-xl cursor-pointer">
                   <FaRegUser />
                 </p>
 

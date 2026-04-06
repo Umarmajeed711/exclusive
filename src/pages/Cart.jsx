@@ -8,6 +8,7 @@ import { RiDeleteBin6Fill } from "react-icons/ri";
 import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
 import Breadcrums from "../components/Breadcrums";
+import { PiMinus, PiPlus } from "react-icons/pi";
 
 const Cart = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -16,7 +17,7 @@ const Cart = () => {
   const [productCart, setProductCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
-  const [toggleCart, setToggleCart] = useState(false);
+  // const [toggleCart, setToggleCart] = useState(false);
   const [cartLoading, setCartLoading] = useState(true);
 
   // const getCartProduct = async () => {
@@ -34,13 +35,17 @@ const Cart = () => {
   //   getCartProduct();
   // }, [toggleCart]);
 
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     console.log("Cart product from context after 5s", state?.cart);
+  //     setProductCart(state?.cart);
+  //     setCartLoading(false);
+  //   }, 5000);
+  // }, [toggleCart]);
+
   useEffect(() => {
-    setTimeout(() => {
-      console.log("Cart product from context", state?.cart);
-      setProductCart(state?.cart);
-      setCartLoading(false);
-    }, 5000);
-  }, [toggleCart]);
+    setProductCart(state?.cart);
+  }, [state?.cart]);
 
   useEffect(() => {
     let calculatedTotal = 0;
@@ -69,6 +74,12 @@ const Cart = () => {
   }, [productCart]);
 
   const deleteCart = async (user_id, cart_id) => {
+
+    let oldCart = state?.cart;
+
+    dispatch({type:"UPDATE_CART",
+      payload:state?.cart?.filter((item) => item.cart_id !== cart_id)
+    })
     try {
       let response = await api.post("/remove-cart", {
         user_id: user_id,
@@ -76,16 +87,68 @@ const Cart = () => {
       });
 
       console.log(response.data);
-      setToggleCart(!toggleCart);
+      // setToggleCart(!toggleCart);
+      Swal.fire("Deleted!", "Product removed successfully", "success");
       dispatch({ type: "TOGGLE_CART" });
-      dispatch({
-        type: "UPDATE_CART",
-        payload: state?.cart.filter((item) => item?.cart_id !== cart_id),
-      });
+      // dispatch({
+      //   type: "UPDATE_CART",
+      //   payload: state?.cart.filter((item) => item?.cart_id !== cart_id),
+      // });
     } catch (error) {
-      console.log(error);
+       Swal.fire("Error!", "Something went wrong", "error");
+      dispatch({
+      type: "UPDATE_CART",
+      payload: oldCart,
+    });
+
     }
   };
+
+  const handleQuantity = async (cartItem, type) => {
+  const oldCart = state.cart;
+
+  let updatedCart = state?.cart?.map((item) => {
+    if (item?.cart_id === cartItem?.cart_id) {
+      let newQty =
+        type === "increase"
+          ? item.quantity + 1
+          : item.quantity - 1;
+
+      
+      if (newQty < 1) return item;
+
+      return { ...item, quantity: newQty };
+    }
+    return item;
+  });
+
+  // ✅ 1. Instant UI update
+  dispatch({
+    type: "UPDATE_CART",
+    payload: updatedCart,
+  });
+
+  try {
+    // ✅ 2. Backend update
+    await api.put("/update-cart-quantity", {
+      cart_id: cartItem.cart_id,
+      quantity:
+        type === "increase"
+          ? cartItem.quantity + 1
+          : cartItem.quantity - 1,
+    });
+  } catch (error) {
+    console.log(error);
+
+    // ❌ rollback
+    dispatch({
+      type: "UPDATE_CART",
+      payload: oldCart,
+    });
+
+    Swal.fire("Error!", "Quantity update failed", "error");
+  }
+};
 
   const handleCheckout = () => {
     if (productCart.length > 0) {
@@ -111,7 +174,7 @@ const Cart = () => {
       </h1>
 
       <div>
-        {cartLoading ? (
+        {state?.cardLoading ? (
           <div className="flex justify-center items-center min-h-56 sm:min-h-[350px] h-full">
             <div className="loading"></div>
           </div>
@@ -160,7 +223,7 @@ const Cart = () => {
                             <p className="text-base lg:text-xl font-semibold  text-[rgba(0,0,0,0.4)] line-through  ">
                               ${cart.price}
                             </p>
-                            <span className="text-red-600 bg-red-200 px-1 italic text-base lg:text-xl lg:px-2 rounded-xl">
+                            <span className="text-white bg-theme-secondary px-1 italic text-base lg:text-xl lg:px-2 rounded-xl">
                               -{cart.discount}%
                             </span>
                           </div>
@@ -168,9 +231,16 @@ const Cart = () => {
                       </div>
 
                       {/* quantity */}
-                      <div className="col-span-1 flex items-center justify-center">
+                      {/* <div className="col-span-1 flex items-center justify-center">
                         {cart.quantity}
-                      </div>
+                      </div> */}
+                      <div className="col-span-1 flex items-center gap-3">
+  <button onClick={() => handleQuantity(cart, "decrease")} className={`shadow p-1 py-2 ${cart.quantity <= 1 ? "cursor-not-allowed" : "cursor-pointer"}`}><PiMinus  /></button>
+  
+  <span>{cart.quantity}</span>
+  
+  <button onClick={() => handleQuantity(cart, "increase")} className="shadow p-1 py-2 cursor-pointer"><PiPlus /></button>
+</div>
                       {/* color */}
                       <div className="col-span-1 flex items-center justify-center">
                         <span
@@ -193,20 +263,21 @@ const Cart = () => {
                       <div className="col-span-1 flex items-center justify-center">
                         <RiDeleteBin6Fill
                           className="text-red-500 cursor-pointer text-xl sm:text-2xl"
-                          onClick={() => {
+                          onClick={()  => {
                             Swal.fire({
                               title: "Do you want delete this product?",
                               icon: "warning",
                               showCancelButton: true,
                               confirmButtonText: "Delete",
-                            }).then((result) => {
+                            }).then(async (result) => {
                               /* Read more about isConfirmed, isDenied below */
                               if (result.isConfirmed) {
-                                deleteCart(cart.user_id, cart.cart_id);
-                                Swal.fire("Delete!", "", "success");
+                               await deleteCart(cart.user_id, cart.cart_id);
+                                // Swal.fire("Delete!", "", "success");
                               }
                             });
                           }}
+                          
                         />
                       </div>
                     </div>
@@ -311,7 +382,7 @@ const Cart = () => {
             })}
           </>
         ) : (
-          <div className="flex justify-center flex-col items-center text-base sm:text-2xl sm:min-h-80 h-full my-10 ">
+          <div className="flex justify-center flex-col items-center text-base sm:text-2xl sm:min-h-80 h-[70vh] my-10 ">
             <p className="text-center font-bold text-xl sm:text-4xl md:text-5xl  ">
               YOUR CART IS EMPTY.
             </p>
@@ -322,7 +393,7 @@ const Cart = () => {
               to={"/home"}
               // className=" bg-theme-primary text-white w-full sm:w-auto px-9 py-3 rounded-full text-base text-center font-normal
               //         hover:shadow-theme-secondary hover:shadow hover:scale-105 transition duration-300 mb-8 md:mb-10"
-                      className=" bg-theme-primary transition-all duration-200 rounded flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+              className=" bg-theme-primary transition-all duration-200 rounded flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
             >
               Shop Now
             </Link>
@@ -364,8 +435,6 @@ const Cart = () => {
                 </p>
               </div>
             </div>
-
-           
 
             <div className="flex justify-end items-center">
               <button

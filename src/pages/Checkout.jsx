@@ -1,4 +1,4 @@
-import  { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router";
@@ -8,8 +8,27 @@ import { loadStripe } from "@stripe/stripe-js";
 import Breadcrums from "../components/Breadcrums";
 
 const stripePromise = loadStripe(
-  "pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf"
+  "pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf",
 ); // publishable key
+
+const CheckoutPriceSkeleton = ({ count = 3 }) => {
+  return (
+    <div>
+      {Array.from({ length: count }).map((_, i) => (
+        <div className="flex justify-between mt-2 animate-pulse" key={i}>
+          {/* Left side (product name + quantity) */}
+          <div className="flex flex-col gap-2 w-2/3">
+            <div className="h-4 md:h-6 bg-gray-300 rounded w-3/4"></div>
+            {/* <div className="h-3 md:h-6 bg-gray-200 rounded w-1/4"></div> */}
+          </div>
+
+          {/* Right side (price) */}
+          <div className="h-4 md:h-6 bg-gray-300 rounded w-16"></div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const Checkout = () => {
   // const [CoupenCode, setCoupenCode] = useState("");
@@ -18,7 +37,6 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("online");
 
   const navigate = useNavigate();
-
 
   // billing Validation
   const billingValidation = yup.object({
@@ -29,7 +47,13 @@ const Checkout = () => {
       .required("Email is required"),
     address: yup.string().required("address is required"),
     city: yup.string().required("city name is required"),
-    number: yup.number().required("phone number is required").min(11),
+    // number: yup.number().required("phone number is required").min(11),
+    number: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^[0-9]+$/, "Phone number must contain only digits")
+      .min(11, "Phone number must be at least 11 digits")
+      .max(13, "Phone number is too long"),
   });
 
   // initailizes the billingFormik
@@ -41,22 +65,17 @@ const Checkout = () => {
       number: "",
       email: "",
     },
-      validationSchema: billingValidation,
+    validationSchema: billingValidation,
 
     onSubmit: async (values) => {
       console.log(values);
-      
 
       if (productCart?.length >= 1) {
-
-        setloading(true)
+        setloading(true);
         // checkout start
-       
-          let address = `${values.address},${values.city}`;
-          try{
-            
-          
 
+        let address = `${values.address},${values.city}`;
+        try {
           let response = await api.post("/create-order", {
             user_id: state?.user.user_id,
             shipping_name: values.name,
@@ -69,24 +88,21 @@ const Checkout = () => {
           });
 
           console.log(response);
-          
 
           // If Online Payment, redirect to Stripe Checkout
-        if (paymentMethod === "online" && response?.data?.id) {
-          const stripe = await stripePromise;
-          await stripe.redirectToCheckout({ sessionId: response?.data.id });
-        } else {
-          // COD or Offline Order Success
-          console.log("Order placed successfully", response?.data);
-          // Optionally redirect to success page
-          dispatch({type: "UPDATE_CART", payload: null})
-          navigate("/OrderComplete");
+          if (paymentMethod === "online" && response?.data?.id) {
+            const stripe = await stripePromise;
+            await stripe.redirectToCheckout({ sessionId: response?.data.id });
+          } else {
+            // COD or Offline Order Success
+            console.log("Order placed successfully", response?.data);
+            // Optionally redirect to success page
+            dispatch({ type: "UPDATE_CART", payload: null });
+            navigate("/OrderComplete");
+          }
+        } catch (error) {
+          console.log(error);
         }
-      }catch(error){
-        console.log(error);
-        
-      }
-        
       }
     },
   });
@@ -96,16 +112,11 @@ const Checkout = () => {
       items: productCart,
     });
 
-  
     console.log("response.id", response?.data.id);
-      console.log("response.session", response?.data.session);
+    console.log("response.session", response?.data.session);
     const stripe = await stripePromise;
     await stripe.redirectToCheckout({ sessionId: response?.data.id });
-
-
   };
-
-  
 
   let { state, dispatch } = useContext(GlobalContext);
   let user_id = state?.user.user_id;
@@ -113,47 +124,55 @@ const Checkout = () => {
   const [productCart, setProductCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [deliveryFee, setDeliveryFee] = useState(0);
-  const [toggleCart, setToggleCart] = useState(false);
 
-  const getCartProduct = async () => {
-    try {
-      let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
-      setProductCart(cart_products.data.products);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const getCartProduct = async () => {
+  //   setProductLoading(true);
+  //   try {
+  //     let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
+  //     setProductCart(cart_products.data.products);
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setProductLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getCartProduct();
+  // }, [toggleCart]);
 
   useEffect(() => {
-    getCartProduct();
-  }, [toggleCart]);
+    setProductCart(state?.cart);
+  }, [state?.cart]);
 
-   useEffect(() => {
-      let calculatedTotal = 0;
-      // let calculatedDeliveryFee = 0;
-  
-      productCart?.forEach((product) => {
-        const discountedPrice =
-          product.price - product.price * (product.discount / 100);
-        calculatedTotal += discountedPrice * product.quantity;
-        // Add a fixed delivery fee for each product (adjust if necessary)
-        // calculatedDeliveryFee += 5; // Example of a fixed delivery fee per product or total
-      });
-  
-       // Example dynamic delivery fee logic
-      let deliveryFeeAmount = 0;
-        if (calculatedTotal < 200) {
-          deliveryFeeAmount = 5; // $5
-        } else if (calculatedTotal < 500) {
-          deliveryFeeAmount = 3; // $3
-        } else {
-          deliveryFeeAmount = 0; // Free delivery
-        }
-  
-      setTotal(calculatedTotal);
-      setDeliveryFee(deliveryFeeAmount);
-  
-    }, [productCart]);
+  useEffect(() => {
+    let calculatedTotal = 0;
+    // let calculatedDeliveryFee = 0;
+
+    productCart?.forEach((product) => {
+      const discountedPrice =
+        product.price - product.price * (product.discount / 100);
+      calculatedTotal += discountedPrice * product.quantity;
+      // Add a fixed delivery fee for each product (adjust if necessary)
+      // calculatedDeliveryFee += 5; // Example of a fixed delivery fee per product or total
+    });
+
+    // Example dynamic delivery fee logic
+    let deliveryFeeAmount = 0;
+
+    if (calculatedTotal > 0) {
+      if (calculatedTotal < 200) {
+        deliveryFeeAmount = 5; // $5
+      } else if (calculatedTotal < 500) {
+        deliveryFeeAmount = 3; // $3
+      } else {
+        deliveryFeeAmount = 0; // Free delivery
+      }
+    }
+
+    setTotal(calculatedTotal);
+    setDeliveryFee(deliveryFeeAmount);
+  }, [productCart]);
   let Styles = {
     fieldName: "text-base sm:text-xl text-slate-500",
     inputField:
@@ -164,9 +183,10 @@ const Checkout = () => {
     <div className="px-5 md:px-8 lg:px-14  w-full">
       {/* Breadcrums */}
 
-      
-
-      <Breadcrums currentPage="Checkout" prevPages={[{name:"cart",url:"/cart"}]} />
+      <Breadcrums
+        currentPage="Checkout"
+        prevPages={[{ name: "cart", url: "/cart" }]}
+      />
 
       <div className=" ">
         {/* container mx-auto px-2 sm:px-4  flex justify-center */}
@@ -179,7 +199,7 @@ const Checkout = () => {
               </p>
 
               {/*  name div */}
-              <div className="my-3 ">
+              <div className="mt-3 ">
                 <label htmlFor="name">
                   <p className={Styles.fieldName}>
                     Name <span className="text-red-500">*</span>
@@ -193,16 +213,22 @@ const Checkout = () => {
                     onChange={billingFormik.handleChange}
                   />
                 </label>
-                {billingFormik.touched.name &&
+                {/* {billingFormik.touched.name &&
                 Boolean(billingFormik.errors.name) ? (
                   <p className="requiredError">
                     {billingFormik.touched.name && billingFormik.errors.name}
                   </p>
-                ) : null}
+                ) : null} */}
+
+                <div className="error-wrapper">
+                  {billingFormik.touched.name && billingFormik.errors.name && (
+                    <p className="requiredError">{billingFormik.errors.name}</p>
+                  )}
+                </div>
               </div>
 
               {/*address div */}
-              <div className="my-3">
+              <div className="mt-2">
                 <label htmlFor="Address">
                   <p className={Styles.fieldName}>
                     Address <span className="text-red-500">*</span>
@@ -216,17 +242,19 @@ const Checkout = () => {
                     onChange={billingFormik.handleChange}
                   />
                 </label>
-                {billingFormik.touched.address &&
-                Boolean(billingFormik.errors.address) ? (
-                  <p className="requiredError">
-                    {billingFormik.touched.address &&
-                      billingFormik.errors.address}
-                  </p>
-                ) : null}
+
+                <div className="error-wrapper">
+                  {billingFormik.touched.address &&
+                    billingFormik.errors.address && (
+                      <p className="requiredError">
+                        {billingFormik.errors.address}
+                      </p>
+                    )}
+                </div>
               </div>
 
               {/* town city div */}
-              <div className="my-3 ">
+              <div className="mt-2 ">
                 <label htmlFor="townCity">
                   <p className={Styles.fieldName}>
                     Town / City <span className="text-red-500">*</span>
@@ -240,41 +268,43 @@ const Checkout = () => {
                     onChange={billingFormik.handleChange}
                   />
                 </label>
-                {billingFormik.touched.city &&
-                Boolean(billingFormik.errors.city) ? (
-                  <p className="requiredError">
-                    {billingFormik.touched.city && billingFormik.errors.city}
-                  </p>
-                ) : null}
+
+                <div className="error-wrapper">
+                  {billingFormik.touched.city && billingFormik.errors.city && (
+                    <p className="requiredError">{billingFormik.errors.city}</p>
+                  )}
+                </div>
               </div>
 
               {/* phone number */}
-              <div className="my-3 ">
+              <div className="mt-2 ">
                 <label htmlFor="phoneNumber">
                   <p className={Styles.fieldName}>
                     Phone number <span className="text-red-500">*</span>
                   </p>
                   <input
-                    type="number"
+                    type="tel"
                     id="phoneNumber"
                     className={Styles.inputField}
-                    maxLength={12}
+                    // maxLength={12}
                     name="number"
                     value={billingFormik.values.number}
                     onChange={billingFormik.handleChange}
                   />
                 </label>
-                {billingFormik.touched.number &&
-                Boolean(billingFormik.errors.number) ? (
-                  <p className="requiredError">
-                    {billingFormik.touched.number &&
-                      billingFormik.errors.number}
-                  </p>
-                ) : null}
+
+                <div className="error-wrapper">
+                  {billingFormik.touched.number &&
+                    billingFormik.errors.number && (
+                      <p className="requiredError">
+                        {billingFormik.errors.number}
+                      </p>
+                    )}
+                </div>
               </div>
 
               {/* Email address */}
-              <div className="my-3  ">
+              <div className="mt-2  ">
                 <label htmlFor="emailAddress">
                   <p className={Styles.fieldName}>
                     Email address <span className="text-red-500">*</span>
@@ -288,12 +318,15 @@ const Checkout = () => {
                     onChange={billingFormik.handleChange}
                   />
                 </label>
-                {billingFormik.touched.email &&
-                Boolean(billingFormik.errors.email) ? (
-                  <p className="requiredError">
-                    {billingFormik.touched.email && billingFormik.errors.email}
-                  </p>
-                ) : null}
+
+                <div className="error-wrapper">
+                  {billingFormik.touched.email &&
+                    billingFormik.errors.email && (
+                      <p className="requiredError">
+                        {billingFormik.errors.email}
+                      </p>
+                    )}
+                </div>
               </div>
             </div>
 
@@ -312,34 +345,45 @@ const Checkout = () => {
                       </p>
                     </div>
 
-                    {productCart?.map((product, i) => {
-                      let newPrice = product.price * (product.discount / 100);
-                      return (
-                        <div className="flex justify-between mt-2" key={i}>
-                          <p className="text-base md:text-xl  text-gray-600 ">
-                            {product.name}{" "}
-                            <span className="text-black">
-                              x {product.quantity}
-                            </span>
-                          </p>
-                          <p className="text-base md:text-xl">
-                            {" "}
-                            $
-                            {Math.round(
-                              (product.price - newPrice) * product.quantity
-                            )}
-                          </p>
-                        </div>
-                      );
-                    })}
+                    {state?.cardLoading ? (
+                      <CheckoutPriceSkeleton
+                        count={state?.carts?.length || 1}
+                      />
+                    ) : (
+                      productCart?.map((product, i) => {
+                        let newPrice = product.price * (product.discount / 100);
+                        return (
+                          <div className="flex justify-between mt-2" key={i}>
+                            <p className="text-base md:text-xl  text-gray-600 ">
+                              {product.name}{" "}
+                              <span className="text-black">
+                                x {product.quantity}
+                              </span>
+                            </p>
+                            <p className="text-base md:text-xl">
+                              {" "}
+                              $
+                              {Math.round(
+                                (product.price - newPrice) * product.quantity,
+                              )}
+                            </p>
+                          </div>
+                        );
+                      })
+                    )}
 
                     <div className="flex justify-between mt-2">
                       <p className="text-base md:text-xl font-medium">
                         Subtotal:
                       </p>
-                      <p className="text-base md:text-xl">
-                        ${Math.round(total)}
-                      </p>
+
+                      {total ? (
+                        <p className="text-base md:text-xl">
+                          ${Math.round(total)}
+                        </p>
+                      ) : (
+                        <div className="h-4 md:h-5 bg-gray-300 animate-pulse w-12 rounded"></div>
+                      )}
                     </div>
                     <hr />
 
@@ -347,20 +391,32 @@ const Checkout = () => {
                       <p className="text-base md:text-xl font-medium">
                         Shipping:
                       </p>
-                      <p className="text-base md:text-xl">
-                        {" "}
-                        ${Math.round(deliveryFee)}
-                      </p>
+
+                      {deliveryFee || total ? (
+                        <p className="text-base md:text-xl">
+                          {" "}
+                          {deliveryFee > 0
+                            ? `$` + Math.round(deliveryFee)
+                            : "Free"}
+                        </p>
+                      ) : (
+                        <div className="h-4 md:h-5 bg-gray-300 animate-pulse w-12 rounded"></div>
+                      )}
                     </div>
 
                     <hr />
 
                     <div className="flex justify-between mt-2">
                       <p className="text-base md:text-xl font-bold">Total</p>
-                      <p className="text-base md:text-xl font-bold text-[#b88e2f]">
-                        {" "}
-                        ${Math.round(total + deliveryFee)}
-                      </p>
+
+                      {total + deliveryFee ? (
+                        <p className="text-base md:text-xl font-bold text-[#b88e2f]">
+                          {" "}
+                          ${Math.round(total + deliveryFee)}
+                        </p>
+                      ) : (
+                        <div className="h-4 md:h-5 bg-gray-300 animate-pulse w-12 rounded"></div>
+                      )}
                     </div>
 
                     <hr />

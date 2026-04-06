@@ -12,12 +12,16 @@ import { Link } from "react-router-dom";
 import api from "../components/api";
 
 export const Login = () => {
-
+  // const navigate = useNavigate();
   let { dispatch } = useContext(GlobalContext);
 
   const [showPassword, setShowPassword] = useState(false);
 
   const [rememberMe, setRememberMe] = useState(false);
+
+  // const [user, setUser] = useState({});
+
+  // const [load, setload] = useState(false);
 
   const [loading, setloading] = useState(false);
 
@@ -36,7 +40,6 @@ export const Login = () => {
     initialValues: {
       email: "",
       password: "",
-      rememberMe:rememberMe
     },
     validationSchema: loginValidation,
 
@@ -58,7 +61,7 @@ export const Login = () => {
         setloading(false);
         const Toast = Swal.mixin({
           toast: true,
-          position: "bottom-left",
+          position: "top-end",
           showConfirmButton: false,
           timer: 3000,
           timerProgressBar: true,
@@ -269,8 +272,8 @@ export const Login = () => {
               </div>
             </div>
 
-            <div className="flex justify-center items-center text-base cursor-pointer text-gray-500">
-              <div className="flex items-center gap-2 mt-2 ">
+            <div>
+              <div className="flex items-center gap-2 mt-2">
                 <input
                   type="checkbox"
                   id="rememberMe"

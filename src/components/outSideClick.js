@@ -1,10 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-const useClickOutside = (ref, onOutsideClick) => {
+const useOutsideClick = (callback) => {
+  const ref = useRef(null);
+
   useEffect(() => {
     const handleClick = (event) => {
-      if (!ref.current || ref.current.contains(event.target)) return;
-      onOutsideClick(event);
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback(); // close menu
+      }
     };
 
     document.addEventListener("mousedown", handleClick);
@@ -14,7 +17,9 @@ const useClickOutside = (ref, onOutsideClick) => {
       document.removeEventListener("mousedown", handleClick);
       document.removeEventListener("touchstart", handleClick);
     };
-  }, [ref, onOutsideClick]);
+  }, [callback]);
+
+  return ref;
 };
 
-export default useClickOutside;
+export default useOutsideClick;

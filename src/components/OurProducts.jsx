@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { AiOutlineHeart} from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
 import { BiEditAlt } from "react-icons/bi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import "../App.css";
@@ -11,6 +11,7 @@ import Modal from "./modal";
 import AddProductForm from "./addProject";
 import Swal from "sweetalert2";
 import ProductCardSkeleton from "./productCardSkeleton";
+import { MdClose } from "react-icons/md";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -20,13 +21,15 @@ const isNewArrival = (createdAt) => {
 };
 
 const OurProducts = ({
+  isWishList = false,
   products = [],
   title = "",
   description = "",
   loading = false,
-  updateProduct,
-  delProduct,
-  skeletonProducts= 4
+  updateProduct = () => {},
+  delProduct =  () => {},
+  skeletonProducts = 4,
+  onAdd = () => {},
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
   let Admin = state?.isAdmin;
@@ -38,13 +41,79 @@ const OurProducts = ({
   const addToFavorite = async (product_id) => {
     try {
       let response = await api.post("/add_to_favorite", {
-        user_id: state?.user.user_id,
+        user_id: state?.user?.user_id,
         product_id: product_id,
       });
+      onAdd();
+      dispatch({ type: "isWishlistReload" });
+
 
       console.log("Add to Wishlist", response);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const removeToFavorite = async (product_id) => {
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to remove from favorites?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    // ✅ If user confirms
+    if (result?.isConfirmed) {
+      let oldCart = state?.wishlist;
+
+      dispatch({
+        type: "WISHLIST_CART",
+        payload: state?.wishlist?.filter(
+          (item) => item.product_id !== product_id,
+        ),
+      });
+      // let check = products?.find((fav) => fav?.product_id === product_id);
+      try {
+        let user_id = state?.user?.user_id;
+
+        let response = await api.delete(
+          `/remove_to_favorite?user_id=${user_id}&product_id=${product_id}`,
+        );
+        // Success toast
+        Swal.fire({
+          icon: "success",
+          title: "Product Removed Successfully",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+        dispatch({ type: "isWishlistReload" });
+        // delProduct(product_id);
+      } catch (error) {
+        console.log("eror", error);
+
+        // Error toast
+        Swal.fire({
+          icon: "error",
+          title: error?.response?.data?.message || "Something went wrong",
+          toast: true,
+          position: "bottom-left",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+        });
+
+        dispatch({
+          type: "WISHLIST_CART",
+          payload: oldCart,
+        });
+      }
     }
   };
 
@@ -136,6 +205,46 @@ const OurProducts = ({
     });
   };
 
+  const [cartLoading, setcartLoading] = useState(false);
+
+  // function for add to cart
+  const addtoCart = async (product) => {
+    setcartLoading(true);
+    try {
+      let addTOCart = await api.post("/add-cart", {
+        productId: product.product_id,
+        productName: product.name,
+        productPrice: product.price,
+        productDiscount: product.discount,
+        productImage: product?.image_urls[0],
+        productSize: product?.sizes[0],
+        productColor: product?.colors[0],
+        quantity: 1,
+        user_id: state?.user?.user_id,
+      });
+      dispatch({ type: "TOGGLE_CART" });
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "bottom-left",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        },
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Add product successfully",
+      });
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    } finally {
+      setcartLoading(false);
+    }
+  };
+
   // const products = [
   //   {
   //     product_id:"1",
@@ -179,17 +288,12 @@ const OurProducts = ({
         //   <div className="loading"></div>
         // </div>
         <div className="grid gap-10 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 my-5 md:my-8">
-          {
-
-          Array.from({ length: skeletonProducts }).map((_, i) => (
-       <ProductCardSkeleton key={i} />
-     ))
-          }
-          
+          {Array.from({ length: skeletonProducts }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
         </div>
-  
       ) : products?.length === 0 ? (
-        <div className="flex justify-center items-center h-[50vh]">
+        <div className="flex justify-center items-center h-[60vh]">
           <div className="text-md sm:text-xl font-medium  drop-shadow">
             No products found
           </div>
@@ -219,17 +323,32 @@ const OurProducts = ({
 
                     {/* Favorite & Quick View */}
                     <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
-                      <button
-                        className="bg-white p-2 rounded-full shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          alert("Add to favorite");
-                          addToFavorite(product?.product_id);
-                        }}
-                      >
-                        <AiOutlineHeart className="text-lg text-gray-700 " />
-                      </button>
+                      {isWishList ? (
+                        <button
+                          className="bg-white p-2 rounded-full shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // alert("Remove to favorite");
+                            removeToFavorite(product?.product_id);
+                          }}
+                        >
+                          <MdClose className="text-lg text-gray-700 " />
+                        </button>
+                      ) : (
+                        <button
+                          className="bg-white p-2 rounded-full shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // alert("Add to favorite");
+                            addToFavorite(product?.product_id);
+                          }}
+                        >
+                          <AiOutlineHeart className="text-lg text-gray-700 " />
+                        </button>
+                      )}
+
                       {/* <button
                         className="bg-white p-2 rounded-full shadow hover:bg-gray-200"
                         onClick={(e) => {
@@ -240,7 +359,7 @@ const OurProducts = ({
                       >
                         <AiOutlineEye className="text-lg text-gray-700" />
                       </button> */}
-                      {Admin ? (
+                      {Admin && !isWishList ? (
                         <>
                           <button
                             className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary "
@@ -292,9 +411,11 @@ const OurProducts = ({
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        alert(`Add ${product?.name} to cart`);
+                        // alert(`Add ${product?.name} to cart`);
+                        addtoCart(product);
                       }}
-                      className="absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition"
+                      disabled={cartLoading}
+                      className={`absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition ${cartLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
                     >
                       Add to Cart
                     </button>

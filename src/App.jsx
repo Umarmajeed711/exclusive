@@ -55,6 +55,12 @@ const App = () => {
   //     }
   //     getUserData();
 
+  // useEffect(() => {
+  //   checkLogin();
+  // }, [state?.isReloadCart]);
+  // 3120294147799 
+
+
   const checkLogin = async () => {
     try {
       let response = await api.get(`/user-detail`);
@@ -67,23 +73,74 @@ const App = () => {
         dispatch({ type: "USER_LOGIN", payload: response.data.user });
       }
       console.log(response);
-      getCartProduct(response?.data.user.user_id);
+      getCartProduct(response?.data?.user?.user_id);
+      getWishlist(response?.data?.user?.user_id)
     } catch (error) {
+      // localStorage.removeItem("user");
+      // sessionStorage.removeItem("user");
       dispatch({ type: "USER_LOGOUT" });
     }
   };
 
-  useEffect(() => {
-    checkLogin();
-  }, [state?.isReloadCart]);
+  
+useEffect(() => {
+  // const user =
+  //   JSON.parse(localStorage.getItem("user")) ||
+  //   JSON.parse(sessionStorage.getItem("user"));
+
+  //   console.log("user FRom storage",user)
+
+  // if (user) {
+  //   if (user.email === "umarmajeed711@gmail.com") {
+  //     dispatch({ type: "ADMIN_LOGIN", payload: user });
+  //   } else {
+  //     dispatch({ type: "USER_LOGIN", payload: user });
+  //   }
+  // }else{
+  //   dispatch({ type: "USER_LOGOUT" });
+
+  // }
+  checkLogin();
+}, []);
+
+useEffect(() => {
+  if (state?.user?.user_id) {
+    getCartProduct(state.user.user_id);
+  }
+}, [state?.isReloadCart]);
+
+useEffect(() => {
+  if (state?.user?.user_id) {
+    getWishlist(state.user.user_id);
+  }
+}, [state?.isWishlistReload]);
+
+
 
   const getCartProduct = async (user_id) => {
+    dispatch({ type: "LODING_CART",payload:true });
     try {
       let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
       console.log(cart_products.data.products);
       dispatch({ type: "UPDATE_CART", payload: cart_products?.data?.products });
+     
     } catch (error) {
       console.log(error);
+    }
+    finally{
+       dispatch({ type: "LODING_CART",payload:false});
+    }
+  };
+
+   const getWishlist = async (user_id) => {
+    dispatch({ type: "WISHLIST_LODING_CART",payload:true });
+    try {
+      let result = await api.get(`/wishlist?user_id=${user_id}`);
+      dispatch({ type: "WISHLIST_CART", payload: result.data.products });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      dispatch({ type: "WISHLIST_LODING_CART",payload:false});
     }
   };
 

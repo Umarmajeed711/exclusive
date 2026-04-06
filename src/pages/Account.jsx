@@ -169,7 +169,7 @@ const Account = () => {
 
       <Breadcrums currentPage="My Account" />
 
-      <div className="my-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="my-10 grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
         {/* side Navigation section */}
         <div
           // className="col-span-3 lg:col-span-1 min-w-80 shadow-lg flex flex-col gap-5  p-10"
@@ -364,7 +364,7 @@ const Account = () => {
 
             <div className="flex flex-col gap-3 justify-center col-span-3">
               <div>Password Changes</div>
-              <div className=" grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className=" grid grid-cols-1 md:grid-cols-3 gap-2">
                 {/* Password */}
                 <div className="flex gap-3 items-center col-span-1 ">
                   <div className="w-full">

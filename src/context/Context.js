@@ -9,7 +9,11 @@ let data = {
     basedUrl :"http://localhost:5002/api/v1",
     userData: "",
     cart: [],
+    cardLoading:true,
     isReloadCart: false,
+    wishlist:[],
+    wishlistLoading:true,
+    isWishlistReload:false,
     orderDetails: {},
     isAdmin:false,
     categoryList:[]
