@@ -45,7 +45,7 @@ const OurProducts = ({
         product_id: product_id,
       });
       onAdd();
-      dispatch({ type: "isWishlistReload" });
+      dispatch({ type: "WISHLIST_RELOAD" });
 
 
       console.log("Add to Wishlist", response);
@@ -93,7 +93,7 @@ const OurProducts = ({
           timer: 3000,
           timerProgressBar: true,
         });
-        dispatch({ type: "isWishlistReload" });
+        dispatch({ type: "WISHLIST_RELOAD" });
         // delProduct(product_id);
       } catch (error) {
         console.log("eror", error);

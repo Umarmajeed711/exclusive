@@ -37,7 +37,7 @@ const Myroute = () => {
           {/* <Route path="/Product" element={<Products />}></Route> */}
           <Route path="/Contact" element={<Contact />}></Route>
           <Route path="/Checkout" element={<Checkout />}></Route>
-          <Route path="/Whishlist" element={<Whishlist/>}></Route>
+          <Route path="/wishlist" element={<Whishlist/>}></Route>
           <Route path="/Shop" element={<Shop/>}></Route>
           <Route path="/OrderComplete" element={<OrderConfirmation/>}></Route>
           <Route path="/Account" element={<Account/>}></Route>

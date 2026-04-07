@@ -162,7 +162,7 @@ const Navbar = () => {
                     Login
                   </NavLink>
                 </li>
-                <li>
+                {/* <li>
                   <NavLink
                     to="/signup"
                     className={({ isActive }) =>
@@ -171,7 +171,7 @@ const Navbar = () => {
                   >
                     Sign Up
                   </NavLink>
-                </li>
+                </li> */}
               </>
             )}
           </ul>
@@ -186,7 +186,7 @@ const Navbar = () => {
 
             {/* cart icons */}
             <div className="hidden md:flex  gap-4 items-center">
-              <Link to="/CheckOut" className="link">
+              <Link to="/wishlist" className="link">
               <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
                   <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
                   {state?.wishlist?.length > 0 && (
@@ -532,7 +532,7 @@ const Navbar = () => {
 
               {/* Icons */}
               <div className="flex justify-around py-4 border-t border-b border-gray-100 mb-6">
-                <Link to="/CheckOut">
+                <Link to="/wishlist">
                   <FaRegHeart className="text-xl text-gray-600 hover:text-black transition" />
                 </Link>
 

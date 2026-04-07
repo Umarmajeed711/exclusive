@@ -111,6 +111,8 @@ useEffect(() => {
 
 useEffect(() => {
   if (state?.user?.user_id) {
+    console.log("Whishlsit load");
+    
     getWishlist(state.user.user_id);
   }
 }, [state?.isWishlistReload]);
@@ -121,7 +123,7 @@ useEffect(() => {
     dispatch({ type: "LODING_CART",payload:true });
     try {
       let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
-      console.log(cart_products.data.products);
+      // console.log(cart_products.data.products);
       dispatch({ type: "UPDATE_CART", payload: cart_products?.data?.products });
      
     } catch (error) {

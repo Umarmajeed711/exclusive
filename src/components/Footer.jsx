@@ -161,7 +161,7 @@ const Footer = () => {
           <li><Link to="/Account" className="footer-link">My Account</Link></li>
           <li><Link to="/login" className="footer-link">Login / Register</Link></li>
           <li><Link to="/Cart" className="footer-link">Cart</Link></li>
-          <li><Link to="/Whishlist" className="footer-link">Wishlist</Link></li>
+          <li><Link to="/wishlist" className="footer-link">Wishlist</Link></li>
           <li><Link to="/Shop" className="footer-link">Shop</Link></li>
         </ul>
       </div>
