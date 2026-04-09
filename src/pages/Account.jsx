@@ -225,7 +225,7 @@ const Account = () => {
 
         {/* contact Form */}
 
-        <div className="col-span-3 lg:col-span-2  min-w-80 p-5 md:p-8 h-full  shadow-[0_0_7px_rgba(0,0,0,.5)]">
+        <div className="col-span-3 lg:col-span-2  min-w-[300px] p-5 md:p-8 h-full  shadow-[0_0_7px_rgba(0,0,0,.5)]">
           <div className="h-[40px] w-full flex justify-center items-center mb-2 overflow-hidden">
             <Alert
               severity="error"

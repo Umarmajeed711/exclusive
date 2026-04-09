@@ -12,7 +12,7 @@ import { GrCart } from "react-icons/gr";
 import { TbShoppingBagCheck } from "react-icons/tb";
 import { ImCancelCircle } from "react-icons/im";
 import { HiOutlineArrowLeftStartOnRectangle } from "react-icons/hi2";
-import { IoStarOutline } from "react-icons/io5";
+import { IoLogIn, IoStarOutline } from "react-icons/io5";
 import useOutsideClick from "./outSideClick";
 
 const Navbar = () => {
@@ -31,6 +31,17 @@ const Navbar = () => {
       setShow(false);
     }, 500);
   };
+
+   useEffect(() => {
+    if (show) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [show]);
+
 
   const logout = async () => {
     try {
@@ -491,9 +502,9 @@ const Navbar = () => {
         //     </div>
         //   </div>
         // </nav>
-        <nav className="fixed inset-y-0  navbar" id="hideSideBar">
+        <nav className="fixed inset-y-0 scroll-none navbar" id="hideSideBar">
           <div
-            className="flex flex-col justify-between h-screen px-5 py-6"
+            className="flex flex-col justify-between h-full px-5 py-6"
             onClick={() => {
               setTimeout(() => {
                 HideSideBar();
@@ -514,8 +525,8 @@ const Navbar = () => {
                 Quick Links
               </h3>
 
-              <ul className="flex flex-col gap-3 mb-8">
-                {["Home", "Contact", "About", "Sign Up"].map((item, idx) => (
+              <ul className="flex flex-col mb-8">
+                {["Home", "Shop","Contact", "Account",].map((item, idx) => (
                   <li
                     key={idx}
                     //  onClick={HideSideBar}
@@ -533,19 +544,29 @@ const Navbar = () => {
               {/* Icons */}
               <div className="flex justify-around py-4 border-t border-b border-gray-100 mb-6">
                 <Link to="/wishlist">
-                  <FaRegHeart className="text-xl text-gray-600 hover:text-black transition" />
+                 <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
+                  <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
+                  {state?.wishlist?.length > 0 && (
+                    <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
+                      {state?.wishlist?.length}
+                    </span>
+                  )}
+                </span>
+                  {/* <FaRegHeart className="text-xl text-gray-600 hover:text-black transition" /> */}
                 </Link>
 
                 <Link to="/Cart" className="relative">
-                  <GrCart className="text-xl text-gray-600 hover:text-black transition" />
+                   <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
+                  <GrCart className="text-xl hover:scale-110 transition-all duration-200" />
                   {state?.cart?.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5">
+                    <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
                       {state?.cart?.length}
                     </span>
                   )}
+                </span>
                 </Link>
 
-                <Link to="/MyAccount">
+                <Link to="/Account">
                   <FaRegUser className="text-xl text-gray-600 hover:text-black transition" />
                 </Link>
               </div>
@@ -555,10 +576,10 @@ const Navbar = () => {
                 Manage Account
               </h3>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col">
                 <Link
                   to="/Account"
-                  className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
+                  className="flex items-center  !gap-3 w-full px-3 py-2 rounded-lg hover:bg-gray-100 transition"
                 >
                   <TbShoppingBagCheck className="text-gray-500" />
                   <span className="text-gray-700">My Orders</span>
@@ -599,7 +620,14 @@ const Navbar = () => {
                   <HiOutlineArrowLeftStartOnRectangle />
                   <button onClick={logout}>Logout</button>
                 </div>
-              ) : null}
+              ) : 
+              <div className="flex items-center justify-center gap-2 bg-gray-900 text-white py-3 rounded-xl hover:bg-black transition">
+                  <IoLogIn />
+                  <Link to="/login"
+                    className={({ isActive }) =>
+                      `${style.navLink} ${isActive ? style.active : "after:w-0 hover:after:w-full"}`
+                    }>Login</Link>
+                </div>}
             </div>
           </div>
         </nav>

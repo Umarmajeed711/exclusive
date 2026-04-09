@@ -104,7 +104,7 @@ export const Login = () => {
   };
   return (
     <div className="flex justify-center  items-center main">
-      <div className=" flex items-center  gap-20 p-10 bg-theme-background">
+      <div className=" flex items-center  gap-20 sm:p-10 bg-theme-background min-w-[320px]">
         {/* Image div */}
         <div className="hidden md:flex flex-col ">
           <div>

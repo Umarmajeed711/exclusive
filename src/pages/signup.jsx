@@ -110,7 +110,7 @@ export const Signup = () => {
   };
   return (
     <div className="flex justify-center items-center main">
-      <div className="flex justify-center items-center  gap-20 p-10 bg-slate-100 ">
+      <div className="flex justify-center items-center  gap-20 sm:p-10 bg-slate-100 min-w-[320px]">
         {/* Image div */}
         
         <div className="hidden  md:flex flex-col ">

@@ -80,10 +80,11 @@ const Contact = () => {
     <div className="mx-5 md:mx-8 lg:mx-14">
       {/* BreadCrums */}
 
+
       <Breadcrums currentPage="Contact" />
 
       <div className="my-10  grid grid-cols-1 lg:grid-cols-3 place-content-center gap-10 ">
-        <div className="col-span-3 lg:col-span-1 min-w-80 shadow-[0_0_7px_rgba(0,0,0,.5)] flex flex-col gap-5  p-5 md:p-8">
+        <div className="col-span-3 lg:col-span-1 min-w-[300px] shadow-[0_0_7px_rgba(0,0,0,.5)] flex flex-col gap-5  p-5 md:p-8">
           {/* Calls to Us */}
           <div>
             <div className="flex gap-10 items-center ">
@@ -189,16 +190,16 @@ const Contact = () => {
 
         {/* contact Form */}
 
-        <div className="col-span-3 lg:col-span-2 min-w-80 p-5 md:p-8 lg:p-8 h-full shadow-[0_0_7px_rgba(0,0,0,.5)]">
+        <div className="col-span-3 lg:col-span-2 min-w-[300px] p-5 md:p-8 lg:p-8 h-full shadow-[0_0_7px_rgba(0,0,0,.5)]">
           <form
             action="https://formsubmit.co/abc@gmail.com"
             method="POST"
             ref={formRef}
             onSubmit={contactFormik.handleSubmit}
           >
-            <div className=" grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* name */}
-              <div className="flex gap-3 items-center col-span-1 ">
+              <div className="flex gap-3 items-center col-span-3  md:col-span-1">
                 <div className="w-full">
                   <input
                     type="text"
@@ -228,7 +229,7 @@ const Contact = () => {
               </div>
 
               {/* email */}
-              <div className="flex gap-3 items-center col-span-1">
+              <div className="flex gap-3 items-center col-span-3 md:col-span-1">
                 <div className="w-full">
                   <input
                     type="email"
@@ -256,7 +257,7 @@ const Contact = () => {
               </div>
 
               {/* phone */}
-              <div className="flex gap-3 items-center col-span-1">
+              <div className="flex gap-3 items-center col-span-3 md:col-span-1 ">
                 <div className="w-full">
                   <input
                     type="tel"

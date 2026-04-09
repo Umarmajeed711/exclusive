@@ -6,6 +6,7 @@ import { GlobalContext } from "../context/Context";
 import api from "../components/api";
 import { loadStripe } from "@stripe/stripe-js";
 import Breadcrums from "../components/Breadcrums";
+import Swal from "sweetalert2";
 
 const stripePromise = loadStripe(
   "pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf",
@@ -92,7 +93,7 @@ const Checkout = () => {
           // If Online Payment, redirect to Stripe Checkout
           if (paymentMethod === "online" && response?.data?.id) {
             const stripe = await stripePromise;
-            await stripe.redirectToCheckout({ sessionId: response?.data.id });
+            await stripe.redirectToCheckout({ sessionId: response?.data?.id });
           } else {
             // COD or Offline Order Success
             console.log("Order placed successfully", response?.data);
@@ -102,6 +103,10 @@ const Checkout = () => {
           }
         } catch (error) {
           console.log(error);
+          Swal.fire("Error!", "Something went wrong", "error");
+        }
+        finally{
+          setloading(false);
         }
       }
     },
@@ -191,9 +196,9 @@ const Checkout = () => {
       <div className=" ">
         {/* container mx-auto px-2 sm:px-4  flex justify-center */}
         <form onSubmit={billingFormik.handleSubmit}>
-          <div className="grid grid-cols-2 gap-3  ">
+          <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-8  ">
             {/* Billing Details */}
-            <div className="col-span-2 sm:col-span-1 p-4 md:p-8">
+            <div className="col-span-2 sm:col-span-1  sm:py-4  md:py-8">
               <p className=" text-3xl sm:text-4xl md:text-5xl  bli">
                 Billing Details
               </p>
