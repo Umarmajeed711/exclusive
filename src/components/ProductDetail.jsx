@@ -26,6 +26,7 @@ const ProductDetail = () => {
   const [resetRating, setResetRating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [cartloading, setcartLoading] = useState(false);
+  const [selectedImage, setSelectedImage] = React.useState(null);
 
   //  useEffect for get product detail
 
@@ -36,6 +37,8 @@ const ProductDetail = () => {
     try {
       let result = await api.get(`/product-details/${id}`);
       console.log(result.data.products);
+
+      setSelectedImage(result?.data?.products?.main_image);
       setProduct(result?.data.products);
       relatedProducts(result?.data.products);
       getAverageRating(result?.data.products);
@@ -240,7 +243,9 @@ const ProductDetail = () => {
 
   let newPrice = Number(Product.price) * (Product.discount / 100);
 
-  const [selectedImage, setSelectedImage] = React.useState(null);
+ 
+
+
 
   const scrollContainerRef = useRef(null);
 

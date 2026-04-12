@@ -1,5 +1,5 @@
-import  { useContext, useEffect, useMemo, useRef, useState } from "react";
-import {useNavigate } from "react-router";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { GlobalContext } from "../context/Context";
@@ -90,7 +90,7 @@ const DiscountField = ({ originalPrice = 0, formik, loading }) => {
 const CategorySelect = ({ formik, categoryList, loading }) => {
   const [open, setOpen] = useState(false);
   const selected = categoryList?.find(
-    (c) => c.category_id == formik.values.productCategory
+    (c) => c.category_id == formik.values.productCategory,
   );
 
   return (
@@ -159,7 +159,6 @@ const AddProductForm = ({
   const [imgError, setImageError] = useState(false);
   const [mainImage, setMainImage] = useState(null);
 
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -170,7 +169,7 @@ const AddProductForm = ({
     addProjectFormik.setFieldValue("productName", productData?.name);
     addProjectFormik.setFieldValue(
       "productDescription",
-      productData?.description
+      productData?.description,
     );
     addProjectFormik.setFieldValue("productPrice", productData?.price);
     addProjectFormik.setFieldValue("productQuantity", productData?.quantity);
@@ -182,17 +181,17 @@ const AddProductForm = ({
     setOldImages(productData?.image_urls || []);
   }, []);
 
-
-
-useEffect(() => {
-  if (productData?.main_image_index) {
-    // backend main image always assumed to be index 0 in oldImages
-    setMainImage({ type: "old", index: Number(productData?.main_image_index) });
-  } else if (productData?.image_urls?.length > 0) {
-    setMainImage({ type: "old", index: 0 });
-  }
-}, [productData]);
-
+  useEffect(() => {
+    if (productData?.main_image_index) {
+      // backend main image always assumed to be index 0 in oldImages
+      setMainImage({
+        type: "old",
+        index: Number(productData?.main_image_index),
+      });
+    } else if (productData?.image_urls?.length > 0) {
+      setMainImage({ type: "old", index: 0 });
+    }
+  }, [productData]);
 
   const ProductValidation = yup.object({
     productName: yup.string().required("This field is required"),
@@ -219,15 +218,12 @@ useEffect(() => {
 
     onSubmit: async (values) => {
       console.log("values", values);
-      console.log("mainImage",mainImage);
-      
+      console.log("mainImage", mainImage);
 
       setloading(true);
 
       let productSizes = values.productSizes.split(",");
       let productColor = values.productColor.split(",");
-
-      
 
       const formData = new FormData();
       formData.append("name", values.productName);
@@ -262,12 +258,15 @@ useEffect(() => {
       try {
         let response = productData.product_id
           ? await api.put(`/products/${productData?.product_id}`, formData)
-          : await api.post(`/products`, formData);
+          : await api.post(`/products`, formData, {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            });
 
-        console.log(response);
+        // console.log(response);
 
         setloading(false);
-        
 
         addProjectFormik.resetForm();
 
@@ -278,7 +277,7 @@ useEffect(() => {
         });
       } catch (error) {
         setloading(false);
-        console.log(error?.response.data?.message);
+        console.log(error);
         OnError({
           icon: "warning",
           title: error?.response.data?.message || "Something went wrong",
@@ -354,64 +353,54 @@ useEffect(() => {
     setNewImages((prev) => [...prev, ...files]);
   };
 
- 
-  
   const removeOldImage = (img, index) => {
-  setOldImages((prev) => {
-    const updated = prev.filter((_, i) => i !== index);
+    setOldImages((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
 
-    if (mainImage?.type === "old" && mainImage.index === index) {
-      if (updated.length > 0) {
-        setMainImage({ type: "old", index: 0 });
-      } else if (newImages.length > 0) {
-        setMainImage({ type: "new", index: 0 });
-      } else {
-        setMainImage(null);
+      if (mainImage?.type === "old" && mainImage.index === index) {
+        if (updated.length > 0) {
+          setMainImage({ type: "old", index: 0 });
+        } else if (newImages.length > 0) {
+          setMainImage({ type: "new", index: 0 });
+        } else {
+          setMainImage(null);
+        }
       }
-    }
 
-    return updated;
-  });
+      return updated;
+    });
 
-  setRemovedImages((prev) => [...prev, img]);
-};
-
-
-
-
-
+    setRemovedImages((prev) => [...prev, img]);
+  };
 
   const removeNewImage = (index) => {
-  setNewImages((prev) => {
-    const updated = prev.filter((_, i) => i !== index);
+    setNewImages((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
 
-    if (mainImage?.type === "new" && mainImage.index === index) {
-      if (updated.length > 0) {
-        setMainImage({ type: "new", index: 0 });
-      } else if (oldImages?.length > 0) {
-        setMainImage({ type: "old", index: 0 });
-      } else {
-        setMainImage(null);
+      if (mainImage?.type === "new" && mainImage.index === index) {
+        if (updated.length > 0) {
+          setMainImage({ type: "new", index: 0 });
+        } else if (oldImages?.length > 0) {
+          setMainImage({ type: "old", index: 0 });
+        } else {
+          setMainImage(null);
+        }
       }
-    }
 
-    return updated;
-  });
-};
-
-
-const newImagePreviews = useMemo(
-  () => newImages?.map((file) => URL.createObjectURL(file)),
-  [newImages]
-);
-
-useEffect(() => {
-  return () => {
-    newImagePreviews?.forEach(URL.revokeObjectURL);
+      return updated;
+    });
   };
-}, [newImagePreviews]);
 
+  const newImagePreviews = useMemo(
+    () => newImages?.map((file) => URL.createObjectURL(file)),
+    [newImages],
+  );
 
+  useEffect(() => {
+    return () => {
+      newImagePreviews?.forEach(URL.revokeObjectURL);
+    };
+  }, [newImagePreviews]);
 
   return (
     <div className="overflow-auto h-full w-full bg-transparent">
@@ -738,7 +727,6 @@ useEffect(() => {
 
                     {/* NEW IMAGES */}
                     {newImages.map((file, i) => {
-                      
                       return (
                         <div key={i} className="relative">
                           <img
@@ -746,18 +734,22 @@ useEffect(() => {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              setMainImage({ type: "new", index: ((oldImages?.length) + i )});
+                              setMainImage({
+                                type: "new",
+                                index: oldImages?.length + i,
+                              });
                             }}
                             className={`w-full h-28 object-cover rounded-lg border-2 cursor-pointer
             ${
-              mainImage?.type === "new" && mainImage.index === ((oldImages?.length) + i )
+              mainImage?.type === "new" &&
+              mainImage.index === oldImages?.length + i
                 ? "border-green-500"
                 : "border-gray-400"
             }`}
                           />
 
                           {mainImage?.type === "new" &&
-                            mainImage.index === ((oldImages?.length) + i ) && (
+                            mainImage.index === oldImages?.length + i && (
                               <span className="absolute bottom-1 left-1 bg-green-600 text-white text-xs px-2 rounded">
                                 MAIN
                               </span>
@@ -771,8 +763,7 @@ useEffect(() => {
                               removeNewImage(i);
                             }}
                             className="z-10 flex justify-center items-center absolute top-0 -pt-2 right-0 text-xl font-bold bg-theme-primary   hover:bg-red-600 hover:scale-105 -m-1 text-white rounded-full w-6 h-6 transition-all duration-300"
-                           
-                         >
+                          >
                             ×
                           </button>
                         </div>

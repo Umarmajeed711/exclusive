@@ -90,7 +90,7 @@ const Dash = () => {
 
   }
   useEffect(() => {
-    getAllOrders();
+    // getAllOrders();
   }, [toggle]);
 
   const [total, setTotal] = useState(0);

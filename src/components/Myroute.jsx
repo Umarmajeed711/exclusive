@@ -20,6 +20,7 @@ import Account from "../pages/Account";
 import Shop from "../pages/Shop";
 import Dash from "../pages/PrivatePages/Dash";
 import AddProduct from "../pages/PrivatePages/AddProduct";
+import Orders from "../pages/PrivatePages/Orders";
 
 const Myroute = () => {
   let { state } = useContext(GlobalContext);
@@ -43,6 +44,7 @@ const Myroute = () => {
           <Route path="/Account" element={<Account/>}></Route>
           <Route path="/Dashboard" element={<Dash/>}/>
           <Route path="/Account" element={<Account/>}></Route>
+          <Route path="/Orders" element={<Orders/>}></Route>
           <Route path="/Product" element={<Products />}></Route>
           <Route path="/AddProduct" element={<AddProduct />}></Route>
           {/* /////

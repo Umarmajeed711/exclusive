@@ -139,6 +139,7 @@ const AddProduct = () => {
   };
 
   const onSuccess = ({ position, icon, message, product }) => {
+    getProducts();
     setProjectData({});
     setShowModal(false);
     dynamicToast({ position, icon, message });
