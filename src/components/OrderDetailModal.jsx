@@ -1,9 +1,10 @@
 import { useState } from "react";
 import api from "./api";
 import Swal from "sweetalert2";
-// import jsPDF from "jspdf";
-// import html2canvas from "html2canvas";
-
+import Modal from "./modal";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import autoTable from "jspdf-autotable";
 const STATUS_FLOW = [
   "pending",
   "processing",
@@ -59,28 +60,200 @@ const OrderDetailsModal = ({
   /* =========================
      PDF INVOICE GENERATOR
   ========================= */
-//   const generateInvoice = async () => {
-//     const input = document.getElementById("invoice-box");
 
-//     const canvas = await html2canvas(input, { scale: 2 });
-//     const imgData = canvas.toDataURL("image/png");
+/* =========================
+   CONFIG (CHANGE THIS)
+========================= */
+const COMPANY = {
+  name: "Exclusive Store",
+  address: "Karachi, Pakistan",
+  phone: "+92 300 0000000",
+  email: "support@exlusive.com",
+};
 
-//     const pdf = new jsPDF("p", "mm", "a4");
+/* =========================
+   IMAGE HELPER (ALL FORMAT SUPPORT)
+========================= */
+const loadImageAsBase64 = (url) => {
+  return new Promise((resolve) => {
+    if (!url) return resolve(null);
 
-//     const pdfWidth = pdf.internal.pageSize.getWidth();
-//     const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    const img = new Image();
+    img.crossOrigin = "Anonymous";
 
-//     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-//     pdf.save(`invoice-${order.order_id}.pdf`);
-//   };
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      resolve(canvas.toDataURL("image/jpeg")); // universal format
+    };
+
+    img.onerror = () => resolve(null);
+
+    img.src = url;
+  });
+};
+
+const preloadImages = async (items) => {
+  const images = [];
+
+  for (let item of items) {
+    const base64 = await loadImageAsBase64(item.image_url);
+    images.push(base64);
+  }
+
+  return images;
+};
+
+/* =========================
+   MAIN INVOICE FUNCTION
+========================= */
+const generateInvoice = async (order) => {
+  const doc = new jsPDF();
+
+
+  const images = await preloadImages(order.items);
+
+  /* =========================
+     HEADER
+  ========================= */
+  doc.setFontSize(18);
+  doc.setTextColor(40);
+  doc.text("INVOICE", 14, 20);
+
+  doc.setFontSize(10);
+  doc.text(COMPANY.name, 14, 30);
+  doc.text(COMPANY.address, 14, 35);
+  doc.text(COMPANY.phone, 14, 40);
+  doc.text(COMPANY.email, 14, 45);
+
+  /* =========================
+     ORDER INFO
+  ========================= */
+  doc.text(`Invoice #: INV-${order.order_id}`, 140, 30);
+  doc.text(
+    `Date: ${new Date(order.order_date).toLocaleDateString()}`,
+    140,
+    35
+  );
+  doc.text(`Payment: ${order.payment_status}`, 140, 40);
+
+  /* =========================
+     CUSTOMER INFO
+  ========================= */
+  doc.text("Bill To:", 14, 60);
+  doc.setFont("helvetica", "bold");
+  doc.text(order.shipping_name || "-", 14, 66);
+  doc.setFont("helvetica", "normal");
+  doc.text(order.shipping_phone || "-", 14, 72);
+  doc.text(order.shipping_address || "-", 14, 78);
+
+  /* =========================
+     PREPARE TABLE
+  ========================= */
+  let tableRows = [];
+
+  let subtotal = 0;
+
+  for (let i = 0; i < order?.items?.length; i++) {
+    const item = order.items[i];
+
+    const total = item.quantity * item.price;
+    subtotal += total;
+
+     tableRows.push([
+      i + 1,
+      "", // image column
+      item.product_name || "Product",
+      item.quantity,
+      `$${item.price}`,
+      `$${total}`,
+    ]);
+  }
+
+  /* =========================
+     TABLE
+  ========================= */
+ autoTable(doc, {
+    startY: 90,
+    head: [["#", "Image", "Product", "Qty", "Price", "Total"]],
+    body: tableRows,
+
+    didDrawCell: (data) => {
+      if (data.section === "body" && data.column.index === 1) {
+        const img = images[data.row.index];
+
+        if (img) {
+          doc.addImage(
+            img,
+            "JPEG",
+            data.cell.x + 2,
+            data.cell.y + 2,
+            10,
+            5
+          );
+        }
+      }
+    },
+  });
+
+
+  /* =========================
+     TOTAL CALCULATION
+  ========================= */
+  const finalY = doc.lastAutoTable.finalY + 10;
+
+  const taxRate = 0.05; // 5%
+  const tax = subtotal * taxRate;
+
+  const discount = order.discount || 0;
+
+  const grandTotal = subtotal + tax - discount;
+
+  doc.setFontSize(11);
+
+  doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 140, finalY);
+  doc.text(`Tax (5%): $${tax.toFixed(2)}`, 140, finalY + 6);
+  doc.text(`Discount: $${discount}`, 140, finalY + 12);
+
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total: $${grandTotal.toFixed(2)}`, 140, finalY + 20);
+
+  /* =========================
+     FOOTER
+  ========================= */
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+
+  doc.text("Thank you for shopping with us!", 14, finalY + 30);
+
+  doc.text(
+    "This is a system generated invoice.",
+    14,
+    finalY + 36
+  );
+
+  /* =========================
+     SAVE
+  ========================= */
+  doc.save(`invoice-${order.order_id}.pdf`);
+};
+
 
   return (
     <>
       {/* BACKDROP */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1010]">
 
         {/* MODAL */}
         <div className="w-[95%] md:w-[1000px] max-h-[92vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+       
+
+        
 
           {/* ================= HEADER ================= */}
           <div className="p-5 border-b flex justify-between items-center bg-white sticky top-0 z-10">
@@ -250,7 +423,8 @@ const OrderDetailsModal = ({
               </p>
 
               <button
-                // onClick={generateInvoice}
+                onClick={() => {generateInvoice(order)}}
+
                 className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90"
               >
                 Download Invoice PDF
@@ -283,8 +457,9 @@ const OrderDetailsModal = ({
               </h2>
             </div>
           </div>
+          
         </div>
-      </div>
+       </div>
 
       {/* ================= IMAGE ZOOM ================= */}
       {zoomImg && (
