@@ -47,6 +47,7 @@ export const Login = () => {
         let response = await api.post(`/login`, {
           email: values.email,
           password: values.password,
+          rememberMe: rememberMe
         });
 
         if(rememberMe){
