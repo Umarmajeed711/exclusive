@@ -71,7 +71,7 @@ const Modal = ({ isOpen, onClose, children, className }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[1010] flex items-center justify-center bg-black/30 backdrop-blur-md modal"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1010] flex items-center justify-center modal"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

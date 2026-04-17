@@ -12,22 +12,21 @@ import SmartFilter from "../components/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES } from "../components/types";
 
 const OrdersPage = () => {
-  const { state,dispatch} = useContext(GlobalContext);
+  const { state, dispatch } = useContext(GlobalContext);
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  
-    const [showFilter, setShowFilter] = useState(false);
-     const [productsByPage, setProductsByPage] = useState({});
 
-  
-    const [OrdersByPage, setOrdersByPage] = useState({});
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
-  
-    const [limit, setLimit] = useState(12);
-    const [totalOrders, setTotalOrders] = useState(0);
+  const [showFilter, setShowFilter] = useState(false);
+  const [productsByPage, setProductsByPage] = useState({});
+
+  const [OrdersByPage, setOrdersByPage] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [limit, setLimit] = useState(12);
+  const [totalOrders, setTotalOrders] = useState(0);
 
   // const fetOrders = async () => {
   //   try {
@@ -41,7 +40,7 @@ const OrdersPage = () => {
   //   }
   // };
 
-   const getOrders = async ({ filters = {}, page = 1, limit = 12 } = {}) => {
+  const getOrders = async ({ filters = {}, page = 1, limit = 12 } = {}) => {
     setLoading(true);
 
     try {
@@ -53,16 +52,14 @@ const OrdersPage = () => {
         },
       });
 
-        setOrders(result?.data?.data);
-        setCurrentPage(result?.data?.currentPage);
-        setTotalPages(result?.data?.totalPages);
-        setTotalOrders(result?.data?.totalOrders);
-        setOrdersByPage((prev) => ({
-          ...prev,
-          [page]: result?.data,
-        }));
-
-      
+      setOrders(result?.data?.data);
+      setCurrentPage(result?.data?.currentPage);
+      setTotalPages(result?.data?.totalPages);
+      setTotalOrders(result?.data?.totalOrders);
+      setOrdersByPage((prev) => ({
+        ...prev,
+        [page]: result?.data,
+      }));
     } catch (error) {
       Swal.fire("Error", "Failed to load orders", "error");
       console.error(error);
@@ -129,9 +126,8 @@ const OrdersPage = () => {
   const handleReorder = async (order) => {
     try {
       for (let item of order?.items) {
-
         console.log("item", item);
-        
+
         await api.post("/add-cart", {
           productId: item.product_id,
           productName: item?.product_name,
@@ -160,7 +156,6 @@ const OrdersPage = () => {
     }
   };
 
- 
   const COMPANY = {
     name: "Exclusive Store",
     address: "Karachi, Pakistan",
@@ -168,7 +163,6 @@ const OrdersPage = () => {
     email: "support@exlusive.com",
   };
 
-  
   const loadImageAsBase64 = (url) => {
     return new Promise((resolve) => {
       if (!url) return resolve(null);
@@ -364,34 +358,40 @@ const OrdersPage = () => {
     }
   };
 
-    const orderFilters = [
-       {
-         key: "product_name",
-         label: "Product Name",
-         operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
-         inputType: INPUT_TYPES.TEXT,
-       },
-      
-       {
-         key: "payment_status",
-         label: "Payment Status",
-         operators: [FILTER_OPERATORS.IS],
-         inputType: INPUT_TYPES.SELECT,
-         options: [
-           { label: "Paid", value: "paid" },
-           { label: "pending", value: "pending" },
-         ],
-       },
-       {
-         key: "created_at",
-         label: "Order Date",
-         operators: [FILTER_OPERATORS.BETWEEN],
-         inputType: INPUT_TYPES.DATE,
-       },
-     ];
-  
-    const [filters, setFilters] = useState([]);
-    const [filterquery, setFilterQuery] = useState([]);
+  const orderFilters = [
+    {
+      key: "product_name",
+      label: "Product Name",
+      operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.TEXT,
+    },
+    {
+      key: "order_id",
+      label: "Order ID",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.TEXT,
+    },
+
+    {
+      key: "payment_status",
+      label: "Payment Status",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.SELECT,
+      options: [
+        { label: "Paid", value: "paid" },
+        { label: "pending", value: "pending" },
+      ],
+    },
+    {
+      key: "order_date",
+      label: "Order Date",
+      operators: [FILTER_OPERATORS.BETWEEN],
+      inputType: INPUT_TYPES.DATE,
+    },
+  ];
+
+  const [filters, setFilters] = useState([]);
+  const [filterquery, setFilterQuery] = useState([]);
 
   const handleFilterApply = (query, activeFilters) => {
     setFilters(activeFilters);
@@ -448,39 +448,40 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="px-5 md:px-8 lg:px-14 py-8 bg-gray-50 min-h-screen">
+    <div className="mx-5  md:mx-8 lg:mx-14 py-4 min-h-screen">
       {/* <h2 className="text-3xl font-bold mb-8 tracking-tight">My Orders</h2> */}
       <div className="flex flex-col  gap-5 my-5 sm:my-10">
-                <div className="flex flex-col gap-2 md:flex-row justify-between h-full md:items-center">
-                  <div className="flex gap-5 items-center">
-                    <p className="h-10 w-5 rounded bg-theme-primary"></p>
-                    <p className="text-theme-primary text-xl font-medium py-1">
-                      My Orders
-                    </p>
-                  </div>
-                  <ActiveFilters
-                    filters={filters}
-                    onRemove={removeFilter}
-                    onClear={clearAllFilters}
-                    showFilterModal={() => {
-                      setShowFilter(true);
-                    }}
-                  />
-                </div>
-                <div className="flex justify-center cursor-pointer">
-                      <button
-                        className={`button   text-xl ${filters?.length > 0 ? "active" : ""}`}
-                        onClick={() => {
-                          setShowFilter(!showFilter);
-                        }}
-                      >
-                        <MdOutlineFilterAlt />
-                      </button>
-                    </div>
-              </div>
+        <div className="flex flex-row justify-between h-full md:items-center">
+          <div className="flex gap-5 items-center">
+            <p className="h-10 w-5 rounded bg-theme-primary"></p>
+            <p className="text-theme-primary text-xl font-medium py-1">
+              My Orders
+            </p>
+          </div>
+
+          <div className="flex justify-center cursor-pointer">
+            <button
+              className={`button !p-[5px]  text-xl ${filters?.length > 0 ? "active" : ""}`}
+              onClick={() => {
+                setShowFilter(!showFilter);
+              }}
+            >
+              <MdOutlineFilterAlt />
+            </button>
+          </div>
+        </div>
+        <ActiveFilters
+          filters={filters}
+          onRemove={removeFilter}
+          onClear={clearAllFilters}
+          showFilterModal={() => {
+            setShowFilter(true);
+          }}
+        />
+      </div>
 
       <div className="sticky top-0 z-40 backdrop-blur bg-gray-50/80 py-3 mb-2">
-        <div className="flex gap-3 mb-4 bg-white p-2 rounded-xl shadow-sm w-fit">
+        <div className="flex flex-wrap gap-3  bg-white p-2 rounded-xl shadow-sm w-fit">
           {[
             { key: "active", label: "Active", count: counts?.active },
             { key: "completed", label: "Completed", count: counts?.completed },
@@ -489,7 +490,7 @@ const OrdersPage = () => {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+              className={`flex  items-center gap-2 px-5 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
                 activeTab === tab.key
                   ? "bg-black text-white shadow"
                   : "text-gray-600 hover:bg-gray-100"
@@ -517,7 +518,7 @@ const OrdersPage = () => {
           <p className="text-lg">No {activeTab} orders</p>
         </div>
       ) : (
-        <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-4 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredOrders.map((order) => {
             const isActive = ["pending", "processing", "shipped"].includes(
               order.delivery_status,
@@ -621,25 +622,25 @@ const OrdersPage = () => {
           })}
 
           <Pagination
-        currentPage={currentPage}
-        totalPages={Math.ceil(totalOrders / limit)}
-        totalProducts={totalOrders}
-        pageSize={limit}
-        isLoading={loading}
-        onPageChange={handlePageChange}
-      />
+            currentPage={currentPage}
+            totalPages={Math.ceil(totalOrders / limit)}
+            totalProducts={totalOrders}
+            pageSize={limit}
+            isLoading={loading}
+            onPageChange={handlePageChange}
+          />
 
-      {showFilter && (
-        <SmartFilter
-          showFilterModal={showFilter}
-          filters={orderFilters}
-          onChange={handleFilterApply}
-          value={filters}
-          onClose={() => {
-            setShowFilter(false);
-          }}
-        />
-      )}
+          {showFilter && (
+            <SmartFilter
+              showFilterModal={showFilter}
+              filters={orderFilters}
+              onChange={handleFilterApply}
+              value={filters}
+              onClose={() => {
+                setShowFilter(false);
+              }}
+            />
+          )}
 
           {/* ORDER DETAILS MODAL */}
           {selectedOrder && (
@@ -685,8 +686,6 @@ const OrdersPage = () => {
               </div>
             </div>
           )}
-
-          
         </div>
       )}
     </div>

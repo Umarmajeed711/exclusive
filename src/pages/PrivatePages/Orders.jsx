@@ -7,6 +7,8 @@ import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
 import api from "../../components/api";
 import SmartFilter from "../../components/SmartFilters";
 import { ActiveFilters } from "../../components/ActiveFilters";
+import { MdOutlineFilterAlt } from "react-icons/md";
+import Swal from "sweetalert2";
 
 const Orders = () => {
   const { state } = useContext(GlobalContext);
@@ -37,14 +39,14 @@ const Orders = () => {
         },
       });
 
-        setOrders(result?.data?.data);
-        setCurrentPage(result?.data?.currentPage);
-        setTotalPages(result?.data?.totalPages);
-        setTotalOrders(result?.data?.totalOrders);
-        setOrdersByPage((prev) => ({
-          ...prev,
-          [page]: result?.data,
-        }));
+      setOrders(result?.data?.data);
+      setCurrentPage(result?.data?.currentPage);
+      setTotalPages(result?.data?.totalPages);
+      setTotalOrders(result?.data?.totalOrders);
+      setOrdersByPage((prev) => ({
+        ...prev,
+        [page]: result?.data,
+      }));
 
       console.log("total Orders", result?.data?.totalOrders);
       console.log("total Orders", result?.data);
@@ -60,32 +62,74 @@ const Orders = () => {
   }, []);
 
   const updateProduct = (updated) => {
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.order_id === updated.order_id ? { ...o, ...updated } : o,
+      ),
+    );
+  };
+
+   const [loadingId, setLoadingId] = useState(null);
+  
+  const updateOrderStatus = async (order_id, field, value) => {
+  const prevOrders = Orders;
+
+  setLoadingId(order_id);
+
   setOrders((prev) =>
     prev.map((o) =>
-      o.order_id === updated.order_id ? { ...o, ...updated } : o
+      o.order_id === order_id ? { ...o, [field]: value } : o
     )
   );
-};
 
-  const handleProductUpdate = (product) => {
-    setOrders((prev) => {
-      const exists = prev?.some((p) => p?.product_id == product?.product_id);
-
-      if (exists) {
-        // UPDATE
-        return prev?.map((p) =>
-          p.product_id === product.product_id ? product : p,
-        );
-      }
-
-      // ADD
-      return [product, ...prev];
+  try {
+    await api.put(`/orders/${order_id}/status`, {
+      [field]: value,
     });
+  } catch (error) {
+    setOrders(prevOrders);
+  } finally {
+    setLoadingId(null);
+  }
+};
+  
+
+  const deleteProduct = async (id) => {
+    const previousOrders = Orders;
+
+    setLoadingId(id);
+
+    setOrders((prev) => prev.filter((p) => p.order_id !== id));
+
+    try {
+      await api.delete(`/order/${id}`);
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted Successfully",
+        toast: true,
+        position: "bottom-left",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.log(error);
+
+      setOrders(previousOrders);
+
+      Swal.fire({
+        icon: "error",
+        title: "Delete Failed",
+        text: "Something went wrong",
+        toast: true,
+        position: "bottom-left",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
   };
 
-  const handleProductDelete = (id) => {
-    setOrders((prev) => prev.filter((p) => p.product_id !== id));
-  };
+
 
   const orderFilters = [
     {
@@ -94,6 +138,13 @@ const Orders = () => {
       operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.TEXT,
     },
+    {
+      key: "order_id",
+      label: "Order ID",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.TEXT,
+    },
+
     {
       key: "customer_name",
       label: "Customer Name",
@@ -107,7 +158,10 @@ const Orders = () => {
       inputType: INPUT_TYPES.SELECT,
       options: [
         { label: "Paid", value: "paid" },
-        { label: "pending", value: "pending" },
+        { label: "Un Paid", value: "unpaid" },
+        { label: "Failed", value: "failed" },
+        { label: "Refunded", value: "refunded" },
+        { label: "Pending", value: "pending" },
       ],
     },
     {
@@ -118,12 +172,14 @@ const Orders = () => {
       options: [
         { label: "Pending", value: "pending" },
         { label: "Processing", value: "processing" },
+        { label: "shipped", value: "shipped" },
+        { label: "Out Of Delivery", value: "out_for_delivery" },
         { label: "Delivered", value: "delivered" },
         { label: "Cancelled", value: "cancelled" },
       ],
     },
     {
-      key: "payment_methoad",
+      key: "payment_method",
       label: "Payment Method",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
@@ -133,7 +189,7 @@ const Orders = () => {
       ],
     },
     {
-      key: "created_at",
+      key: "order_date",
       label: "Order Date",
       operators: [FILTER_OPERATORS.BETWEEN],
       inputType: INPUT_TYPES.DATE,
@@ -183,29 +239,32 @@ const Orders = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
-    <div className="mx-5  md:mx-8 lg:mx-14">
+    <div className="mx-5  md:mx-8 lg:mx-14 py-4">
       <div>
         <div className="flex flex-col  gap-5 my-5 sm:my-10">
-          <div className="flex flex-col gap-2 md:flex-row justify-between h-full md:items-center">
+          <div className="flex flex-row justify-between h-full md:items-center">
             <div className="flex gap-5 items-center">
               <p className="h-10 w-5 rounded bg-theme-primary"></p>
               <p className="text-theme-primary text-xl font-medium">
                 Explore All Orders
               </p>
             </div>
-            <ActiveFilters
-              filters={filters}
-              onRemove={removeFilter}
-              onClear={clearAllFilters}
-              showFilterModal={() => {
-                setShowFilter(true);
-              }}
-            />
+
+            <div className="flex justify-center cursor-pointer">
+              <button
+                className={`button !p-[5px]  text-xl ${filters?.length > 0 ? "active" : ""}`}
+                onClick={() => {
+                  setShowFilter(!showFilter);
+                }}
+              >
+                <MdOutlineFilterAlt />
+              </button>
+            </div>
           </div>
 
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-2">
-              {totalOrders > 100 ? (
+              {totalOrders > 1 ? (
                 <select
                   defaultValue={limit == totalOrders ? "All Orders" : limit}
                   onChange={(e) => {
@@ -232,12 +291,17 @@ const Orders = () => {
                   <option value={500}>500 Orders</option>
                   <option value="all">All Orders</option>
                 </select>
-              ) : (
-                <div className="text-xl sm:text-4xl font-medium py-1">
-                  Explore All Orders
-                </div>
-              )}
+              ) : null}
             </div>
+
+            <ActiveFilters
+              filters={filters}
+              onRemove={removeFilter}
+              onClear={clearAllFilters}
+              showFilterModal={() => {
+                setShowFilter(true);
+              }}
+            />
           </div>
         </div>
       </div>
@@ -245,9 +309,9 @@ const Orders = () => {
       <OrderList
         products={Orders}
         loading={loading}
-        updateProduct={updateProduct}
-        // updateProduct={handleProductUpdate}
-        // delProduct={handleProductDelete}
+        loadingId={loadingId}
+        updateOrderStatus={updateOrderStatus}
+        deleteProduct={deleteProduct}
       />
 
       <Pagination

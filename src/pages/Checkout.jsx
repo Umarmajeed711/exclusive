@@ -82,7 +82,7 @@ const Checkout = () => {
             shipping_name: values.name,
             shipping_phone: values.number,
             shipping_address: address,
-            payment_status: "pending",
+            payment_status: "unpaid",
             payment_method: paymentMethod,
             delivery_status: "pending",
             cartItems: productCart,

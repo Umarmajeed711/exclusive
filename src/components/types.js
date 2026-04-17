@@ -44,4 +44,13 @@ export const buildFilterQuery = (filters = []) => {
   return query;
 };
 
+export const formatText = (text) => {
+  if (!text) return "";
+
+  return text
+    .replace(/_/g, " ")        // underscores → space
+    .toLowerCase()            // normalize
+    .replace(/\b\w/g, (c) => c.toUpperCase()); // capitalize each word
+};
+
 

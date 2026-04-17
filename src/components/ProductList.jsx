@@ -254,9 +254,11 @@ const ProductListView = ({
     });
   };
 
-    const menuRef = useRef(null);
+  
 
-  useOutsideClick(menuRef, () => setOpen(false));
+  const menuRef = useOutsideClick(() => {
+    setOpen(false); // close when clicked outside
+  });
 
 
 
@@ -328,7 +330,7 @@ const ProductListView = ({
             </div>
 
             {/* TABLE */}
-            <div className="overflow-x-auto w-full h-full max-h-[500px]">
+            <div className="overflow-x-auto w-full h-full max-h-[500px] custom-scrollbar">
               <table className="w-full border-collapse">
                 <thead className="bg-gray-100 text-sm">
                   <tr>

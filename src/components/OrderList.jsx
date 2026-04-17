@@ -4,6 +4,10 @@ import api from "./api";
 import { GlobalContext } from "../context/Context";
 import useOutsideClick from "./outSideClick";
 import OrderDetailsModal from "./OrderDetailModal";
+import { RiDeleteBin6Fill } from "react-icons/ri";
+import { formatText } from "./types";
+import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
+import Modal from "./modal";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -32,13 +36,50 @@ const DELIVERY_STATUS = [
   "delivered",
   "cancelled",
 ];
+const statusColors = {
+  pending: "bg-gray-100 text-gray-700 border-gray-300",
+
+  processing: "bg-blue-100 text-blue-700 border-blue-300",
+
+  shipped: "bg-indigo-100 text-indigo-700 border-indigo-300",
+
+  out_for_delivery: "bg-purple-100 text-purple-700 border-purple-300",
+
+  delivered: "bg-green-100 text-green-700 border-green-300",
+
+  cancelled: "bg-red-100 text-red-700 border-red-300",
+};
 
 const PAYMENT_STATUS = ["unpaid", "paid", "failed", "refunded"];
+
+const paymentStatusIcons = {
+  unpaid: "⏳",
+  paid: "✅",
+  failed: "❌",
+  refunded: "↩️",
+};
+
+const paymentStatusStyles = {
+  unpaid: "bg-yellow-100 text-yellow-700 border-yellow-300",
+  pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
+
+  paid: "bg-green-100 text-green-700 border-green-300",
+
+  failed: "bg-red-100 text-red-700 border-red-300",
+
+  refunded: "bg-gray-100 text-gray-700 border-gray-300",
+};
 
 /* ==============================
    MAIN COMPONENT
 ================================ */
-const OrderList = ({ products = [], updateProduct, loading = true }) => {
+const OrderList = ({
+  products = [],
+  updateOrderStatus = () => {},
+  loadingId = null,
+  deleteProduct = () => {},
+  loading = true,
+}) => {
   let { state } = useContext(GlobalContext);
 
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
@@ -48,8 +89,17 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
 
-  const menuRef = useRef(null);
-  useOutsideClick(menuRef, () => setOpen(false));
+  useEffect(() => {
+    if(selectedOrder){
+      const select = products?.filter((p) => p?.order_id  == selectedOrder?.order_id);
+      setSelectedOrder(select[0])
+    }
+  },[products])
+  
+
+  const menuRef = useOutsideClick(() => {
+      setOpen(false); // close when clicked outside
+    });
 
   /* ==============================
      LOAD / SAVE COLUMNS
@@ -89,40 +139,39 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
     setDragIndex(null);
   };
 
-  /* ==============================
-     STATUS UPDATE
-  ================================ */
-  const updateOrderStatus = async (order_id, field, value) => {
-    try {
-      await api.put(`/orders/${order_id}/status`, {
-        [field]: value,
-      });
+  // const updateOrderStatus = async (order_id, field, value) => {
 
-      Swal.fire({
-        icon: "success",
-        title: "Status updated",
-        toast: true,
-        position: "bottom-left",
-        showConfirmButton: false,
-        timer: 2000,
-      });
+  //   setLoadingId(order_id);
+  //   try {
+  //     await api.put(`/orders/${order_id}/status`, {
+  //       [field]: value,
+  //     });
 
-      // 🔥 update UI instantly
-      updateProduct({
-        order_id,
-        [field]: value,
-      });
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Failed to update",
-        toast: true,
-        position: "bottom-left",
-        showConfirmButton: false,
-        timer: 2000,
-      });
-    }
-  };
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "Status updated",
+  //       toast: true,
+  //       position: "bottom-left",
+  //       showConfirmButton: false,
+  //       timer: 2000,
+  //     });
+
+  //     // 🔥 update UI instantly
+  //     updateProduct({
+  //       order_id,
+  //       [field]: value,
+  //     });
+  //   } catch (error) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Failed to update",
+  //       toast: true,
+  //       position: "bottom-left",
+  //       showConfirmButton: false,
+  //       timer: 2000,
+  //     });
+  //   }
+  // };
 
   /* ==============================
      CELL RENDER
@@ -154,44 +203,60 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
 
       case "payment_status":
         return (
-          <select
-            value={order.payment_status}
-            onChange={(e) =>
-              updateOrderStatus(
-                order.order_id,
-                "payment_status",
-                e.target.value,
-              )
-            }
-            className="border rounded px-2 py-1 text-sm"
-          >
-            {PAYMENT_STATUS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+          <PaymentStatusDropdown
+            order={order}
+            updateOrderStatus={updateOrderStatus}
+            loadingId={loadingId}
+          />
+          //         <select
+          //           value={order.payment_status}
+          //           onChange={(e) =>
+          //             updateOrderStatus(
+          //               order.order_id,
+          //               "payment_status",
+          //               e.target.value,
+          //             )
+          //           }
+          //           disabled={loadingId === order.order_id}
+          //           className={`border rounded px-2 py-1 text-sm  ${paymentStatusStyles[order.payment_status] || ""}
+          //   ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
+          // `}
+          //         >
+          //           {PAYMENT_STATUS.map((opt) => (
+          //             <option key={opt} value={opt}>
+          //               {paymentStatusIcons[opt]}
+          //               {formatText(opt)}
+          //             </option>
+          //           ))}
+          //         </select>
         );
 
       case "delivery_status":
         return (
-          <select
-            value={order.delivery_status}
-            onChange={(e) =>
-              updateOrderStatus(
-                order.order_id,
-                "delivery_status",
-                e.target.value,
-              )
-            }
-            className="border rounded px-2 py-1 text-sm"
-          >
-            {DELIVERY_STATUS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
+          <DeliveryStatusDropdown
+            order={order}
+            updateOrderStatus={updateOrderStatus}
+            loadingId={loadingId}
+          />
+          //         <select
+          //           value={order.delivery_status}
+          //           onChange={(e) =>
+          //             updateOrderStatus(
+          //               order.order_id,
+          //               "delivery_status",
+          //               e.target.value,
+          //             )
+          //           }
+          //           className={`border rounded px-2 py-1 text-sm  ${statusColors[order.delivery_status] || ""}
+          //   ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
+          // `}
+          //         >
+          //           {DELIVERY_STATUS.map((opt) => (
+          //             <option key={opt} value={opt}>
+          //               {formatText(opt)}
+          //             </option>
+          //           ))}
+          //         </select>
         );
 
       case "date":
@@ -199,15 +264,38 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
 
       case "actions":
         return (
-          <button
-            onClick={() => {
-              setSelectedOrder(order);
-              setShowDetails(true);
-            }}
-            className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
-          >
-            View
-          </button>
+          <div className="flex items-center gap-2 ">
+            <button
+              onClick={() => {
+                setSelectedOrder(order);
+                setShowDetails(true);
+              }}
+              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
+            >
+              View
+            </button>
+
+            <button title="Delete" disabled={loadingId == order?.order_id}>
+              <RiDeleteBin6Fill
+                className={`text-red-500 cursor-pointer text-xl sm:text-2xl hover:text-red-600 hover:scale-105 hover:animate-spin
+                   duration-200 transition-all  ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}`}
+                onClick={() => {
+                  Swal.fire({
+                    title: "Do you want delete this Order?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Delete",
+                  }).then((result) => {
+                    /* Read more about isConfirmed, isDenied below */
+                    if (result.isConfirmed) {
+                      deleteProduct(order?.order_id);
+                      // Swal.fire("Saved!", "", "success");
+                    }
+                  });
+                }}
+              />
+            </button>
+          </div>
         );
 
       default:
@@ -222,7 +310,7 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
     <>
       <div className="bg-white rounded-xl shadow p-4">
         {loading ? (
-          <div className="flex justify-center items-center h-[200px]">
+          <div className="flex justify-center items-center h-48 sm:h-96">
             <div className="loading"></div>
           </div>
         ) : products.length === 0 ? (
@@ -278,9 +366,9 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
             </div>
 
             {/* TABLE */}
-            <div className="overflow-x-auto max-h-[500px]">
+            <div className="overflow-x-auto max-h-[500px] custom-scrollbar">
               <table className="w-full border-collapse">
-                <thead className="bg-gray-100 text-sm sticky top-0">
+                <thead className="bg-gray-100 text-sm sticky top-0 z-20">
                   <tr>
                     {columns
                       .filter((c) => c.visible)
@@ -316,12 +404,29 @@ const OrderList = ({ products = [], updateProduct, loading = true }) => {
       </div>
 
       {showDetails && selectedOrder && (
-        <OrderDetailsModal
-          order={selectedOrder}
-          onClose={() => {setShowDetails(false);setSelectedOrder({})}}
-          isAdmin={true}
-          onStatusUpdate={updateProduct}
-        />
+        <Modal
+          onClose={() => {
+            setSelectedOrder(null);
+            setShowDetails(false);
+          }}
+          isOpen={showDetails}
+
+          className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
+        >
+
+          <OrderDetailsModal
+            order={selectedOrder}
+            onClose={() => {
+              setShowDetails(false);
+              setSelectedOrder({});
+            }}
+            isAdmin={true}
+            // onStatusUpdate={updateOrderStatus}
+            updateOrderStatus={updateOrderStatus}
+            loadingId={loadingId}
+          />
+
+        </Modal>
       )}
     </>
   );

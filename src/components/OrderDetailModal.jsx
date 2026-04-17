@@ -5,6 +5,8 @@ import Modal from "./modal";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import autoTable from "jspdf-autotable";
+import { formatText } from "./types";
+import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
 const STATUS_FLOW = [
   "pending",
   "processing",
@@ -13,11 +15,21 @@ const STATUS_FLOW = [
   "delivered",
 ];
 
+const statusIcons = {
+  pending: "🕒",
+  processing: "⚙️",
+  shipped: "📦",
+  out_for_delivery: "🚚",
+  delivered: "✅",
+};
+
+
 const OrderDetailsModal = ({
   order,
   onClose,
   isAdmin,
-  onStatusUpdate,
+  updateOrderStatus = () => {},
+  loadingId,
 }) => {
   const [zoomImg, setZoomImg] = useState(null);
 
@@ -26,440 +38,427 @@ const OrderDetailsModal = ({
   /* =========================
      STATUS UPDATE
   ========================= */
-  const updateStatus = async (field, value) => {
-    try {
-      await api.put(`/orders/${order.order_id}/status`, {
-        [field]: value,
-      });
+  // const updateStatus = async (field, value) => {
+  //   try {
+  //     await api.put(`/orders/${order.order_id}/status`, {
+  //       [field]: value,
+  //     });
 
-      onStatusUpdate({
-        order_id: order.order_id,
-        [field]: value,
-      });
+  //     onStatusUpdate({
+  //       order_id: order.order_id,
+  //       [field]: value,
+  //     });
 
-      Swal.fire({
-        icon: "success",
-        toast: true,
-        position: "bottom-left",
-        timer: 1500,
-        showConfirmButton: false,
-        title: "Updated",
-      });
-    } catch {
-      Swal.fire({
-        icon: "error",
-        toast: true,
-        position: "bottom-left",
-        timer: 1500,
-        showConfirmButton: false,
-        title: "Failed",
-      });
-    }
+  //     Swal.fire({
+  //       icon: "success",
+  //       toast: true,
+  //       position: "bottom-left",
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       title: "Updated",
+  //     });
+  //   } catch {
+  //     Swal.fire({
+  //       icon: "error",
+  //       toast: true,
+  //       position: "bottom-left",
+  //       timer: 1500,
+  //       showConfirmButton: false,
+  //       title: "Failed",
+  //     });
+  //   }
+  // };
+
+  const COMPANY = {
+    name: "Exclusive Store",
+    address: "Karachi, Pakistan",
+    phone: "+92 300 0000000",
+    email: "support@exlusive.com",
   };
 
   /* =========================
-     PDF INVOICE GENERATOR
-  ========================= */
-
-/* =========================
-   CONFIG (CHANGE THIS)
-========================= */
-const COMPANY = {
-  name: "Exclusive Store",
-  address: "Karachi, Pakistan",
-  phone: "+92 300 0000000",
-  email: "support@exlusive.com",
-};
-
-/* =========================
    IMAGE HELPER (ALL FORMAT SUPPORT)
 ========================= */
-const loadImageAsBase64 = (url) => {
-  return new Promise((resolve) => {
-    if (!url) return resolve(null);
+  const loadImageAsBase64 = (url) => {
+    return new Promise((resolve) => {
+      if (!url) return resolve(null);
 
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
 
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
 
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
 
-      resolve(canvas.toDataURL("image/jpeg")); // universal format
-    };
+        resolve(canvas.toDataURL("image/jpeg")); // universal format
+      };
 
-    img.onerror = () => resolve(null);
+      img.onerror = () => resolve(null);
 
-    img.src = url;
-  });
-};
+      img.src = url;
+    });
+  };
 
-const preloadImages = async (items) => {
-  const images = [];
+  const preloadImages = async (items) => {
+    const images = [];
 
-  for (let item of items) {
-    const base64 = await loadImageAsBase64(item.image_url);
-    images.push(base64);
-  }
+    for (let item of items) {
+      const base64 = await loadImageAsBase64(item.image_url);
+      images.push(base64);
+    }
 
-  return images;
-};
+    return images;
+  };
 
-/* =========================
+  /* =========================
    MAIN INVOICE FUNCTION
 ========================= */
-const generateInvoice = async (order) => {
-  const doc = new jsPDF();
+  const generateInvoice = async (order) => {
+    const doc = new jsPDF();
 
+    const images = await preloadImages(order.items);
 
-  const images = await preloadImages(order.items);
-
-  /* =========================
+    /* =========================
      HEADER
   ========================= */
-  doc.setFontSize(18);
-  doc.setTextColor(40);
-  doc.text("INVOICE", 14, 20);
+    doc.setFontSize(18);
+    doc.setTextColor(40);
+    doc.text("INVOICE", 14, 20);
 
-  doc.setFontSize(10);
-  doc.text(COMPANY.name, 14, 30);
-  doc.text(COMPANY.address, 14, 35);
-  doc.text(COMPANY.phone, 14, 40);
-  doc.text(COMPANY.email, 14, 45);
+    doc.setFontSize(10);
+    doc.text(COMPANY.name, 14, 30);
+    doc.text(COMPANY.address, 14, 35);
+    doc.text(COMPANY.phone, 14, 40);
+    doc.text(COMPANY.email, 14, 45);
 
-  /* =========================
+    /* =========================
      ORDER INFO
   ========================= */
-  doc.text(`Invoice #: INV-${order.order_id}`, 140, 30);
-  doc.text(
-    `Date: ${new Date(order.order_date).toLocaleDateString()}`,
-    140,
-    35
-  );
-  doc.text(`Payment: ${order.payment_status}`, 140, 40);
+    doc.text(`Invoice #: INV-${order.order_id}`, 140, 30);
+    doc.text(
+      `Date: ${new Date(order.order_date).toLocaleDateString()}`,
+      140,
+      35,
+    );
+    doc.text(`Payment: ${order.payment_status}`, 140, 40);
 
-  /* =========================
+    /* =========================
      CUSTOMER INFO
   ========================= */
-  doc.text("Bill To:", 14, 60);
-  doc.setFont("helvetica", "bold");
-  doc.text(order.shipping_name || "-", 14, 66);
-  doc.setFont("helvetica", "normal");
-  doc.text(order.shipping_phone || "-", 14, 72);
-  doc.text(order.shipping_address || "-", 14, 78);
+    doc.text("Bill To:", 14, 60);
+    doc.setFont("helvetica", "bold");
+    doc.text(order.shipping_name || "-", 14, 66);
+    doc.setFont("helvetica", "normal");
+    doc.text(order.shipping_phone || "-", 14, 72);
+    doc.text(order.shipping_address || "-", 14, 78);
 
-  /* =========================
+    /* =========================
      PREPARE TABLE
   ========================= */
-  let tableRows = [];
+    let tableRows = [];
 
-  let subtotal = 0;
+    let subtotal = 0;
 
-  for (let i = 0; i < order?.items?.length; i++) {
-    const item = order.items[i];
+    for (let i = 0; i < order?.items?.length; i++) {
+      const item = order.items[i];
 
-    const total = item.quantity * item.price;
-    subtotal += total;
+      const total = item.quantity * item.price;
+      subtotal += total;
 
-     tableRows.push([
-      i + 1,
-      "", // image column
-      item.product_name || "Product",
-      item.quantity,
-      `$${item.price}`,
-      `$${total}`,
-    ]);
-  }
+      tableRows.push([
+        i + 1,
+        "", // image column
+        item.product_name || "Product",
+        item.quantity,
+        `$${item.price}`,
+        `$${total}`,
+      ]);
+    }
 
-  /* =========================
+    /* =========================
      TABLE
   ========================= */
- autoTable(doc, {
-    startY: 90,
-    head: [["#", "Image", "Product", "Qty", "Price", "Total"]],
-    body: tableRows,
+    autoTable(doc, {
+      startY: 90,
+      head: [["#", "Image", "Product", "Qty", "Price", "Total"]],
+      body: tableRows,
 
-    didDrawCell: (data) => {
-      if (data.section === "body" && data.column.index === 1) {
-        const img = images[data.row.index];
+      didDrawCell: (data) => {
+        if (data.section === "body" && data.column.index === 1) {
+          const img = images[data.row.index];
 
-        if (img) {
-          doc.addImage(
-            img,
-            "JPEG",
-            data.cell.x + 2,
-            data.cell.y + 2,
-            10,
-            5
-          );
+          if (img) {
+            doc.addImage(img, "JPEG", data.cell.x + 2, data.cell.y + 2, 10, 5);
+          }
         }
-      }
-    },
-  });
+      },
+    });
 
-
-  /* =========================
+    /* =========================
      TOTAL CALCULATION
   ========================= */
-  const finalY = doc.lastAutoTable.finalY + 10;
+    const finalY = doc.lastAutoTable.finalY + 10;
 
-  const taxRate = 0.05; // 5%
-  const tax = subtotal * taxRate;
+    const taxRate = 0.05; // 5%
+    const tax = subtotal * taxRate;
 
-  const discount = order.discount || 0;
+    const discount = order.discount || 0;
 
-  const grandTotal = subtotal + tax - discount;
+    const grandTotal = subtotal + tax - discount;
 
-  doc.setFontSize(11);
+    doc.setFontSize(11);
 
-  doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 140, finalY);
-  doc.text(`Tax (5%): $${tax.toFixed(2)}`, 140, finalY + 6);
-  doc.text(`Discount: $${discount}`, 140, finalY + 12);
+    doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 140, finalY);
+    doc.text(`Tax (5%): $${tax.toFixed(2)}`, 140, finalY + 6);
+    doc.text(`Discount: $${discount}`, 140, finalY + 12);
 
-  doc.setFont("helvetica", "bold");
-  doc.text(`Total: $${grandTotal.toFixed(2)}`, 140, finalY + 20);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Total: $${grandTotal.toFixed(2)}`, 140, finalY + 20);
 
-  /* =========================
+    /* =========================
      FOOTER
   ========================= */
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
 
-  doc.text("Thank you for shopping with us!", 14, finalY + 30);
+    doc.text("Thank you for shopping with us!", 14, finalY + 30);
 
-  doc.text(
-    "This is a system generated invoice.",
-    14,
-    finalY + 36
-  );
+    doc.text("This is a system generated invoice.", 14, finalY + 36);
 
-  /* =========================
+    /* =========================
      SAVE
   ========================= */
-  doc.save(`invoice-${order.order_id}.pdf`);
-};
-
+    doc.save(`invoice-${order.order_id}.pdf`);
+  };
 
   return (
     <>
       {/* BACKDROP */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1010]">
+      {/* <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[1010]"> */}
 
-        {/* MODAL */}
-        <div className="w-[95%] md:w-[1000px] max-h-[92vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-       
+      {/* MODAL */}
+      {/* <div className="w-[95%] md:w-[1000px] max-h-[92vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"> */}
 
+      {/* ================= HEADER ================= */}
+      <div className="p-5 border-b flex justify-between items-center bg-white sticky top-0 z-10">
+        <div>
+          <h2 className="text-xl font-semibold">Order #{order.order_id}</h2>
+          <p className="text-xs text-gray-500">
+            {new Date(order.order_date).toLocaleString()}
+          </p>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="text-gray-500 hover:text-red-500 text-xl"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* ================= BODY ================= */}
+      <div className="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-6 custom-scrollbar">
+        {/* ================= TIMELINE ================= */}
         
+        <div className="bg-white p-6 rounded-2xl border shadow-sm">
+  <div className="relative ">
+    
+    {/* Base Line */}
+    <div className="absolute top-5 left-0 w-full   h-[3px] bg-gray-200 rounded-full" />
 
-          {/* ================= HEADER ================= */}
-          <div className="p-5 border-b flex justify-between items-center bg-white sticky top-0 z-10">
-            <div>
-              <h2 className="text-xl font-semibold">
-                Order #{order.order_id}
-              </h2>
-              <p className="text-xs text-gray-500">
-                {new Date(order.order_date).toLocaleString()}
-              </p>
+    {/* Active Progress Line */}
+    <div
+      className="absolute top-5 left-0  h-[3px] bg-green-500 rounded-full transition-all duration-500 px-5"
+      style={{
+        width: `${(currentIndex / (STATUS_FLOW.length - 1)) * 100}%`,
+      }}
+    />
+
+    {/* Steps */}
+    <div className="flex justify-between relative">
+      {STATUS_FLOW.map((step, i) => {
+        const isCompleted = i < currentIndex;
+        const isCurrent = i === currentIndex;
+
+        return (
+          <div key={step} className="flex flex-col items-center w-full">
+            
+            {/* Circle */}
+            <div
+              className={`w-10 h-10 flex items-center justify-center rounded-full text-sm z-10 border transition-all duration-300
+                ${
+                  isCompleted
+                    ? "bg-green-500 text-white border-green-500"
+                    : isCurrent
+                    ? "bg-white text-green-600 border-green-500 scale-110 shadow"
+                    : "bg-white text-gray-400 border-gray-300"
+                }
+              `}
+            >
+              {isCompleted ? "✔" : statusIcons[step]}
             </div>
 
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-red-500 text-xl"
+            {/* Label */}
+            <p
+              className={`text-xs mt-2 text-center capitalize
+                ${
+                  isCompleted || isCurrent
+                    ? "text-gray-800 font-medium"
+                    : "text-gray-400"
+                }
+              `}
             >
-              ✕
-            </button>
+              {formatText(step)}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</div>
+
+        {/* ================= INFO ================= */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* CUSTOMER */}
+          <div className="bg-white p-5 rounded-xl border">
+            <h3 className="font-semibold mb-3">Customer</h3>
+
+            <p className="font-medium">{order.shipping_name}</p>
+            <p className="text-sm text-gray-500">{order.shipping_phone}</p>
+            <p className="text-sm text-gray-500">{order.shipping_address}</p>
           </div>
 
-          {/* ================= BODY ================= */}
-          <div className="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-6">
+          {/* ORDER */}
+          <div className="bg-white p-5 rounded-xl border">
+            <h3 className="font-semibold mb-3">Order Info</h3>
 
-            {/* ================= TIMELINE ================= */}
-            <div className="bg-white p-5 rounded-xl border">
+            {/* PAYMENT */}
+            <div className="flex justify-between items-center mb-3">
+              <span>Payment</span>
 
-              <div className="relative mb-4">
-                <div className="h-[4px] bg-gray-200 rounded-full absolute top-4 w-full"></div>
+              {isAdmin ? (
+                // <select
+                //   value={order.payment_status}
+                //   onChange={(e) =>
+                //     updateStatus("payment_status", e.target.value)
+                //   }
+                //   className="border px-2 py-1 rounded text-sm"
+                // >
+                //   <option>paid</option>
+                //   <option>unpaid</option>
+                //   <option>failed</option>
+                //   <option>refunded</option>
+                // </select>
+                <PaymentStatusDropdown
+                  order={order}
+                  updateOrderStatus={updateOrderStatus}
+                  loadingId={loadingId}
+                />
+              ) : (
+                <b>{formatText(order.payment_status)}</b>
+              )}
+            </div>
 
-                <div
-                  className="h-[4px] bg-green-500 rounded-full absolute top-4 transition-all duration-500"
-                  style={{
-                    width: `${
-                      (currentIndex / (STATUS_FLOW.length - 1)) * 100
-                    }%`,
-                  }}
+            {/* DELIVERY */}
+            <div className="flex justify-between items-center">
+              <span>Delivery</span>
+
+              {isAdmin ? (
+                // <select
+                //   value={order.delivery_status}
+                //   onChange={(e) =>
+                //     updateStatus("delivery_status", e.target.value)
+                //   }
+                //   className="border px-2 py-1 rounded text-sm"
+                // >
+                //   {STATUS_FLOW?.map((s) => (
+                //     <option key={s}>{s}</option>
+                //   ))}
+                // </select>
+                <DeliveryStatusDropdown
+                  order={order}
+                  updateOrderStatus={updateOrderStatus}
+                  loadingId={loadingId}
+                />
+              ) : (
+                <b>{formatText(order?.delivery_status)}</b>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ================= PRODUCTS ================= */}
+        <div className="bg-white p-5 rounded-xl border">
+          <h3 className="font-semibold mb-4">Products</h3>
+
+          <div className="max-h-[260px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+            {order.items?.map((item) => (
+              <div
+                key={item.item_id}
+                className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg"
+              >
+                <img
+                  src={item.image_url || "/placeholder.png"}
+                  className="w-14 h-14 rounded object-cover cursor-pointer"
+                  onClick={() => setZoomImg(item.image_url)}
                 />
 
-                <div className="flex justify-between relative">
-                  {STATUS_FLOW.map((step, i) => {
-                    const active = i <= currentIndex;
-
-                    return (
-                      <div
-                        key={step}
-                        className="flex flex-col items-center w-full"
-                      >
-                        <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold z-10
-                          ${
-                            active
-                              ? "bg-green-500 text-white"
-                              : "bg-gray-200 text-gray-500"
-                          }`}
-                        >
-                          {i + 1}
-                        </div>
-
-                        <p className="text-[11px] mt-2 capitalize text-gray-600 text-center">
-                          {step.replaceAll("_", " ")}
-                        </p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            {/* ================= INFO ================= */}
-            <div className="grid md:grid-cols-2 gap-4">
-
-              {/* CUSTOMER */}
-              <div className="bg-white p-5 rounded-xl border">
-                <h3 className="font-semibold mb-3">Customer</h3>
-
-                <p className="font-medium">{order.shipping_name}</p>
-                <p className="text-sm text-gray-500">
-                  {order.shipping_phone}
-                </p>
-                <p className="text-sm text-gray-500">
-                  {order.shipping_address}
-                </p>
-              </div>
-
-              {/* ORDER */}
-              <div className="bg-white p-5 rounded-xl border">
-                <h3 className="font-semibold mb-3">Order Info</h3>
-
-                {/* PAYMENT */}
-                <div className="flex justify-between items-center mb-3">
-                  <span>Payment</span>
-
-                  {isAdmin ? (
-                    <select
-                      value={order.payment_status}
-                      onChange={(e) =>
-                        updateStatus("payment_status", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded text-sm"
-                    >
-                      <option>paid</option>
-                      <option>unpaid</option>
-                      <option>failed</option>
-                      <option>refunded</option>
-                    </select>
-                  ) : (
-                    <b>{order.payment_status}</b>
-                  )}
+                <div className="flex-1">
+                  <p className="font-medium">{item.product_name}</p>
+                  <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                 </div>
 
-                {/* DELIVERY */}
-                <div className="flex justify-between items-center">
-                  <span>Delivery</span>
-
-                  {isAdmin ? (
-                    <select
-                      value={order.delivery_status}
-                      onChange={(e) =>
-                        updateStatus("delivery_status", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded text-sm"
-                    >
-                      {STATUS_FLOW.map((s) => (
-                        <option key={s}>{s}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    <b>{order.delivery_status}</b>
-                  )}
-                </div>
+                <p className="font-semibold">${item.price}</p>
               </div>
-            </div>
-
-            {/* ================= PRODUCTS ================= */}
-            <div className="bg-white p-5 rounded-xl border">
-              <h3 className="font-semibold mb-4">Products</h3>
-
-              <div className="max-h-[260px] overflow-y-auto pr-2 space-y-3">
-                {order.items?.map((item) => (
-                  <div
-                    key={item.item_id}
-                    className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg"
-                  >
-                    <img
-                      src={item.image_url || "/placeholder.png"}
-                      className="w-14 h-14 rounded object-cover cursor-pointer"
-                      onClick={() => setZoomImg(item.image_url)}
-                    />
-
-                    <div className="flex-1">
-                      <p className="font-medium">{item.product_name}</p>
-                      <p className="text-xs text-gray-500">
-                        Qty: {item.quantity}
-                      </p>
-                    </div>
-
-                    <p className="font-semibold">${item.price}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* ================= ACTIONS ================= */}
-            <div className="flex justify-between items-center bg-white p-5 rounded-xl border">
-              <p className="text-lg font-semibold">
-                Total: ${order.total_price}
-              </p>
-
-              <button
-                onClick={() => {generateInvoice(order)}}
-
-                className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90"
-              >
-                Download Invoice PDF
-              </button>
-            </div>
-
-            {/* ================= HIDDEN INVOICE TEMPLATE ================= */}
-            <div id="invoice-box" className="p-10 bg-white hidden">
-              <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
-
-              <p>Order ID: {order.order_id}</p>
-              <p>Name: {order.shipping_name}</p>
-              <p>Phone: {order.shipping_phone}</p>
-
-              <hr className="my-4" />
-
-              {order.items?.map((item) => (
-                <div key={item.item_id} className="flex justify-between">
-                  <span>{item.product_name}</span>
-                  <span>
-                    {item.quantity} x {item.price}
-                  </span>
-                </div>
-              ))}
-
-              <hr className="my-4" />
-
-              <h2 className="text-lg font-bold">
-                Total: ${order.total_price}
-              </h2>
-            </div>
+            ))}
           </div>
-          
         </div>
-       </div>
+
+        {/* ================= HIDDEN INVOICE TEMPLATE ================= */}
+        <div id="invoice-box" className="p-10 bg-white hidden">
+          <h1 className="text-2xl font-bold mb-4">INVOICE</h1>
+
+          <p>Order ID: {order.order_id}</p>
+          <p>Name: {order.shipping_name}</p>
+          <p>Phone: {order.shipping_phone}</p>
+
+          <hr className="my-4" />
+
+          {order.items?.map((item) => (
+            <div key={item.item_id} className="flex justify-between">
+              <span>{item.product_name}</span>
+              <span>
+                {item.quantity} x {item.price}
+              </span>
+            </div>
+          ))}
+
+          <hr className="my-4" />
+
+          <h2 className="text-lg font-bold">Total: ${order.total_price}</h2>
+        </div>
+      </div>
+
+      {/* ================= ACTIONS ================= */}
+      <div className="flex justify-between items-center bg-white p-5 rounded-xl border">
+        <p className="text-lg font-semibold">Total: ${order.total_price}</p>
+
+        <button
+          onClick={() => {
+            generateInvoice(order);
+          }}
+          className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90"
+        >
+          Download Invoice PDF
+        </button>
+      </div>
+
+      {/* </div> */}
+      {/* </div> */}
 
       {/* ================= IMAGE ZOOM ================= */}
       {zoomImg && (
@@ -467,10 +466,7 @@ const generateInvoice = async (order) => {
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={() => setZoomImg(null)}
         >
-          <img
-            src={zoomImg}
-            className="max-w-[90%] max-h-[90%] rounded-xl"
-          />
+          <img src={zoomImg} className="max-w-[90%] max-h-[90%] rounded-xl" />
         </div>
       )}
     </>
