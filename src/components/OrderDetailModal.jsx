@@ -7,6 +7,7 @@ import html2canvas from "html2canvas";
 import autoTable from "jspdf-autotable";
 import { formatText } from "./types";
 import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
+import { generateInvoice } from "./generateInvoice";
 const STATUS_FLOW = [
   "pending",
   "processing",
@@ -68,171 +69,167 @@ const OrderDetailsModal = ({
   //   }
   // };
 
-  const COMPANY = {
-    name: "Exclusive Store",
-    address: "Karachi, Pakistan",
-    phone: "+92 300 0000000",
-    email: "support@exlusive.com",
-  };
+  // const COMPANY = {
+  //   name: "Exclusive Store",
+  //   address: "Karachi, Pakistan",
+  //   phone: "+92 300 0000000",
+  //   email: "support@exlusive.com",
+  // };
 
-  /* =========================
-   IMAGE HELPER (ALL FORMAT SUPPORT)
-========================= */
-  const loadImageAsBase64 = (url) => {
-    return new Promise((resolve) => {
-      if (!url) return resolve(null);
 
-      const img = new Image();
-      img.crossOrigin = "Anonymous";
+  // const loadImageAsBase64 = (url) => {
+  //   return new Promise((resolve) => {
+  //     if (!url) return resolve(null);
 
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-        canvas.width = img.width;
-        canvas.height = img.height;
+  //     const img = new Image();
+  //     img.crossOrigin = "Anonymous";
 
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0);
+  //     img.onload = () => {
+  //       const canvas = document.createElement("canvas");
+  //       canvas.width = img.width;
+  //       canvas.height = img.height;
 
-        resolve(canvas.toDataURL("image/jpeg")); // universal format
-      };
+  //       const ctx = canvas.getContext("2d");
+  //       ctx.drawImage(img, 0, 0);
 
-      img.onerror = () => resolve(null);
+  //       resolve(canvas.toDataURL("image/jpeg")); // universal format
+  //     };
 
-      img.src = url;
-    });
-  };
+  //     img.onerror = () => resolve(null);
 
-  const preloadImages = async (items) => {
-    const images = [];
+  //     img.src = url;
+  //   });
+  // };
 
-    for (let item of items) {
-      const base64 = await loadImageAsBase64(item.image_url);
-      images.push(base64);
-    }
+  // const preloadImages = async (items) => {
+  //   const images = [];
 
-    return images;
-  };
+  //   for (let item of items) {
+  //     const base64 = await loadImageAsBase64(item.image_url);
+  //     images.push(base64);
+  //   }
 
-  /* =========================
-   MAIN INVOICE FUNCTION
-========================= */
-  const generateInvoice = async (order) => {
-    const doc = new jsPDF();
+  //   return images;
+  // };
 
-    const images = await preloadImages(order.items);
 
-    /* =========================
-     HEADER
-  ========================= */
-    doc.setFontSize(18);
-    doc.setTextColor(40);
-    doc.text("INVOICE", 14, 20);
+  // const generateInvoice = async (order) => {
+  //   const doc = new jsPDF();
 
-    doc.setFontSize(10);
-    doc.text(COMPANY.name, 14, 30);
-    doc.text(COMPANY.address, 14, 35);
-    doc.text(COMPANY.phone, 14, 40);
-    doc.text(COMPANY.email, 14, 45);
+  //   const images = await preloadImages(order.items);
 
-    /* =========================
-     ORDER INFO
-  ========================= */
-    doc.text(`Invoice #: INV-${order.order_id}`, 140, 30);
-    doc.text(
-      `Date: ${new Date(order.order_date).toLocaleDateString()}`,
-      140,
-      35,
-    );
-    doc.text(`Payment: ${order.payment_status}`, 140, 40);
+  //   /* =========================
+  //    HEADER
+  // ========================= */
+  //   doc.setFontSize(18);
+  //   doc.setTextColor(40);
+  //   doc.text("INVOICE", 14, 20);
 
-    /* =========================
-     CUSTOMER INFO
-  ========================= */
-    doc.text("Bill To:", 14, 60);
-    doc.setFont("helvetica", "bold");
-    doc.text(order.shipping_name || "-", 14, 66);
-    doc.setFont("helvetica", "normal");
-    doc.text(order.shipping_phone || "-", 14, 72);
-    doc.text(order.shipping_address || "-", 14, 78);
+  //   doc.setFontSize(10);
+  //   doc.text(COMPANY.name, 14, 30);
+  //   doc.text(COMPANY.address, 14, 35);
+  //   doc.text(COMPANY.phone, 14, 40);
+  //   doc.text(COMPANY.email, 14, 45);
 
-    /* =========================
-     PREPARE TABLE
-  ========================= */
-    let tableRows = [];
+  //   /* =========================
+  //    ORDER INFO
+  // ========================= */
+  //   doc.text(`Invoice #: INV-${order.order_id}`, 140, 30);
+  //   doc.text(
+  //     `Date: ${new Date(order.order_date).toLocaleDateString()}`,
+  //     140,
+  //     35,
+  //   );
+  //   doc.text(`Payment: ${order.payment_status}`, 140, 40);
 
-    let subtotal = 0;
+  //   /* =========================
+  //    CUSTOMER INFO
+  // ========================= */
+  //   doc.text("Bill To:", 14, 60);
+  //   doc.setFont("helvetica", "bold");
+  //   doc.text(order.shipping_name || "-", 14, 66);
+  //   doc.setFont("helvetica", "normal");
+  //   doc.text(order.shipping_phone || "-", 14, 72);
+  //   doc.text(order.shipping_address || "-", 14, 78);
 
-    for (let i = 0; i < order?.items?.length; i++) {
-      const item = order.items[i];
+  //   /* =========================
+  //    PREPARE TABLE
+  // ========================= */
+  //   let tableRows = [];
 
-      const total = item.quantity * item.price;
-      subtotal += total;
+  //   let subtotal = 0;
 
-      tableRows.push([
-        i + 1,
-        "", // image column
-        item.product_name || "Product",
-        item.quantity,
-        `$${item.price}`,
-        `$${total}`,
-      ]);
-    }
+  //   for (let i = 0; i < order?.items?.length; i++) {
+  //     const item = order.items[i];
 
-    /* =========================
-     TABLE
-  ========================= */
-    autoTable(doc, {
-      startY: 90,
-      head: [["#", "Image", "Product", "Qty", "Price", "Total"]],
-      body: tableRows,
+  //     const total = item.quantity * item.price;
+  //     subtotal += total;
 
-      didDrawCell: (data) => {
-        if (data.section === "body" && data.column.index === 1) {
-          const img = images[data.row.index];
+  //     tableRows.push([
+  //       i + 1,
+  //       "", // image column
+  //       item.product_name || "Product",
+  //       item.quantity,
+  //       `$${item.price}`,
+  //       `$${total}`,
+  //     ]);
+  //   }
 
-          if (img) {
-            doc.addImage(img, "JPEG", data.cell.x + 2, data.cell.y + 2, 10, 5);
-          }
-        }
-      },
-    });
+  //   /* =========================
+  //    TABLE
+  // ========================= */
+  //   autoTable(doc, {
+  //     startY: 90,
+  //     head: [["#", "Image", "Product", "Qty", "Price", "Total"]],
+  //     body: tableRows,
 
-    /* =========================
-     TOTAL CALCULATION
-  ========================= */
-    const finalY = doc.lastAutoTable.finalY + 10;
+  //     didDrawCell: (data) => {
+  //       if (data.section === "body" && data.column.index === 1) {
+  //         const img = images[data.row.index];
 
-    const taxRate = 0.05; // 5%
-    const tax = subtotal * taxRate;
+  //         if (img) {
+  //           doc.addImage(img, "JPEG", data.cell.x + 2, data.cell.y + 2, 10, 5);
+  //         }
+  //       }
+  //     },
+  //   });
 
-    const discount = order.discount || 0;
+  //   /* =========================
+  //    TOTAL CALCULATION
+  // ========================= */
+  //   const finalY = doc.lastAutoTable.finalY + 10;
 
-    const grandTotal = subtotal + tax - discount;
+  //   const taxRate = 0.05; // 5%
+  //   const tax = subtotal * taxRate;
 
-    doc.setFontSize(11);
+  //   const discount = order.discount || 0;
 
-    doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 140, finalY);
-    doc.text(`Tax (5%): $${tax.toFixed(2)}`, 140, finalY + 6);
-    doc.text(`Discount: $${discount}`, 140, finalY + 12);
+  //   const grandTotal = subtotal + tax - discount;
 
-    doc.setFont("helvetica", "bold");
-    doc.text(`Total: $${grandTotal.toFixed(2)}`, 140, finalY + 20);
+  //   doc.setFontSize(11);
 
-    /* =========================
-     FOOTER
-  ========================= */
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
+  //   doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 140, finalY);
+  //   doc.text(`Tax (5%): $${tax.toFixed(2)}`, 140, finalY + 6);
+  //   doc.text(`Discount: $${discount}`, 140, finalY + 12);
 
-    doc.text("Thank you for shopping with us!", 14, finalY + 30);
+  //   doc.setFont("helvetica", "bold");
+  //   doc.text(`Total: $${grandTotal.toFixed(2)}`, 140, finalY + 20);
 
-    doc.text("This is a system generated invoice.", 14, finalY + 36);
+  //   /* =========================
+  //    FOOTER
+  // ========================= */
+  //   doc.setFont("helvetica", "normal");
+  //   doc.setFontSize(9);
 
-    /* =========================
-     SAVE
-  ========================= */
-    doc.save(`invoice-${order.order_id}.pdf`);
-  };
+  //   doc.text("Thank you for shopping with us!", 14, finalY + 30);
+
+  //   doc.text("This is a system generated invoice.", 14, finalY + 36);
+
+  //   /* =========================
+  //    SAVE
+  // ========================= */
+  //   doc.save(`invoice-${order.order_id}.pdf`);
+  // };
 
   return (
     <>
@@ -243,7 +240,7 @@ const OrderDetailsModal = ({
       {/* <div className="w-[95%] md:w-[1000px] max-h-[92vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"> */}
 
       {/* ================= HEADER ================= */}
-      <div className="p-5 border-b flex justify-between items-center bg-white sticky top-0 z-10">
+      <div className="p-4 sm:p-5 border-b flex justify-between items-start sm:items-center gap-2 bg-white sticky top-0 z-10">
         <div>
           <h2 className="text-xl font-semibold">Order #{order.order_id}</h2>
           <p className="text-xs text-gray-500">
@@ -260,11 +257,11 @@ const OrderDetailsModal = ({
       </div>
 
       {/* ================= BODY ================= */}
-      <div className="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-6 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50 space-y-6 custom-scrollbar">
         {/* ================= TIMELINE ================= */}
 
-        <div className="bg-white p-6 rounded-2xl border shadow-sm">
-          <div className="relative">
+        <div className="bg-white p-4 sm:p-6 rounded-2xl border shadow-sm overflow-x-auto">
+  <div className="relative min-w-[500px]">
             <div className="absolute top-5  left-10 right-10 h-[3px]">
               {/* Base Line */}
               <div className="w-full   h-full bg-gray-200 rounded-full" />
@@ -321,7 +318,7 @@ const OrderDetailsModal = ({
         </div>
 
         {/* ================= INFO ================= */}
-        <div className="grid md:grid-cols-2 gap-4">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* CUSTOMER */}
           <div className="bg-white p-5 rounded-xl border">
             <h3 className="font-semibold mb-3">Customer</h3>
@@ -336,22 +333,11 @@ const OrderDetailsModal = ({
             <h3 className="font-semibold mb-3">Order Info</h3>
 
             {/* PAYMENT */}
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3">
               <span>Payment</span>
 
               {isAdmin ? (
-                // <select
-                //   value={order.payment_status}
-                //   onChange={(e) =>
-                //     updateStatus("payment_status", e.target.value)
-                //   }
-                //   className="border px-2 py-1 rounded text-sm"
-                // >
-                //   <option>paid</option>
-                //   <option>unpaid</option>
-                //   <option>failed</option>
-                //   <option>refunded</option>
-                // </select>
+                
                 <PaymentStatusDropdown
                   order={order}
                   updateOrderStatus={updateOrderStatus}
@@ -363,21 +349,11 @@ const OrderDetailsModal = ({
             </div>
 
             {/* DELIVERY */}
-            <div className="flex justify-between items-center">
+           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
               <span>Delivery</span>
 
               {isAdmin ? (
-                // <select
-                //   value={order.delivery_status}
-                //   onChange={(e) =>
-                //     updateStatus("delivery_status", e.target.value)
-                //   }
-                //   className="border px-2 py-1 rounded text-sm"
-                // >
-                //   {STATUS_FLOW?.map((s) => (
-                //     <option key={s}>{s}</option>
-                //   ))}
-                // </select>
+              
                 <DeliveryStatusDropdown
                   order={order}
                   updateOrderStatus={updateOrderStatus}
@@ -396,22 +372,24 @@ const OrderDetailsModal = ({
 
           <div className="max-h-[260px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
             {order.items?.map((item) => (
-              <div
-                key={item.item_id}
-                className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg"
-              >
+             <div
+  key={item.item_id}
+  className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 hover:bg-gray-50 rounded-lg"
+>
                 <img
                   src={item.image_url || "/placeholder.png"}
-                  className="w-14 h-14 rounded object-cover cursor-pointer"
+                  className="w-16 h-16 sm:w-14 sm:h-14 rounded object-cover cursor-pointer"
                   onClick={() => setZoomImg(item.image_url)}
                 />
+
+
 
                 <div className="flex-1">
                   <p className="font-medium">{item.product_name}</p>
                   <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
                 </div>
 
-                <p className="font-semibold">${item.price}</p>
+               <p className="font-semibold sm:text-right">${item.price}</p>
               </div>
             ))}
           </div>
@@ -443,14 +421,16 @@ const OrderDetailsModal = ({
       </div>
 
       {/* ================= ACTIONS ================= */}
-      <div className="flex justify-between items-center bg-white p-5 rounded-xl border">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-5 rounded-xl border">
         <p className="text-lg font-semibold">Total: ${order.total_price}</p>
 
         <button
           onClick={() => {
             generateInvoice(order);
           }}
-          className="px-4 py-2 bg-black text-white rounded-lg hover:opacity-90"
+        
+  className="w-full sm:w-auto px-4 py-2 bg-black text-white rounded-lg hover:opacity-90"
+
         >
           Download Invoice PDF
         </button>

@@ -8,6 +8,7 @@ import { RiDeleteBin6Fill } from "react-icons/ri";
 import { formatText } from "./types";
 import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
 import Modal from "./modal";
+import { useNavigate } from "react-router-dom";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -370,15 +371,11 @@ const OrderList = ({
     setSelectedOrders([]);
   };
 
-  const DELIVERY_STATUS = [
-    "pending",
-    "processing",
-    "shipped",
-    "out_for_delivery",
-    "delivered",
-    "cancelled",
-  ];
-  const PAYMENT_STATUS = ["unpaid", "paid", "failed", "refunded"];
+  
+
+const navigate = useNavigate();
+
+
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
@@ -540,6 +537,12 @@ const OrderList = ({
                     <tr
                       key={order.order_id}
                       className="border-b hover:bg-gray-50"
+                      onClick={() => {
+  navigate(`/orders/${order.order_id}`);
+}}
+
+
+
                     >
                       <td className="p-3">
                         <input
