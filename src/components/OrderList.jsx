@@ -26,51 +26,6 @@ const DEFAULT_COLUMNS = [
 const STORAGE_KEY = "order_table_columns";
 
 /* ==============================
-   STATUS OPTIONS
-================================ */
-const DELIVERY_STATUS = [
-  "pending",
-  "processing",
-  "shipped",
-  "out_for_delivery",
-  "delivered",
-  "cancelled",
-];
-const statusColors = {
-  pending: "bg-gray-100 text-gray-700 border-gray-300",
-
-  processing: "bg-blue-100 text-blue-700 border-blue-300",
-
-  shipped: "bg-indigo-100 text-indigo-700 border-indigo-300",
-
-  out_for_delivery: "bg-purple-100 text-purple-700 border-purple-300",
-
-  delivered: "bg-green-100 text-green-700 border-green-300",
-
-  cancelled: "bg-red-100 text-red-700 border-red-300",
-};
-
-const PAYMENT_STATUS = ["unpaid", "paid", "failed", "refunded"];
-
-const paymentStatusIcons = {
-  unpaid: "⏳",
-  paid: "✅",
-  failed: "❌",
-  refunded: "↩️",
-};
-
-const paymentStatusStyles = {
-  unpaid: "bg-yellow-100 text-yellow-700 border-yellow-300",
-  pending: "bg-yellow-100 text-yellow-700 border-yellow-300",
-
-  paid: "bg-green-100 text-green-700 border-green-300",
-
-  failed: "bg-red-100 text-red-700 border-red-300",
-
-  refunded: "bg-gray-100 text-gray-700 border-gray-300",
-};
-
-/* ==============================
    MAIN COMPONENT
 ================================ */
 const OrderList = ({
@@ -88,18 +43,24 @@ const OrderList = ({
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [Orders, setOrders] = useState([]);
 
   useEffect(() => {
-    if(selectedOrder){
-      const select = products?.filter((p) => p?.order_id  == selectedOrder?.order_id);
-      setSelectedOrder(select[0])
+    if (selectedOrder) {
+      const select = products?.filter(
+        (p) => p?.order_id == selectedOrder?.order_id,
+      );
+      setSelectedOrder(select[0]);
     }
-  },[products])
-  
+  }, [products]);
+
+  useEffect(() => {
+    setOrders(products);
+  }, [products]);
 
   const menuRef = useOutsideClick(() => {
-      setOpen(false); // close when clicked outside
-    });
+    setOpen(false); // close when clicked outside
+  });
 
   /* ==============================
      LOAD / SAVE COLUMNS
@@ -194,9 +155,19 @@ const OrderList = ({
 
       case "payment_method":
         return (
-          <div className="flex items-center ">
-            <span className="font-semibold bg-slate-300 px-2  rounded">
-              {order.payment_method == "cod" ? "Cash" : "Online"}
+          <div className="flex items-center">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium border
+      ${
+        order.payment_method === "cod"
+          ? "bg-yellow-100 text-yellow-700 border-yellow-300"
+          : "bg-blue-100 text-blue-700 border-blue-300"
+      }
+    `}
+            >
+              {order.payment_method === "cod"
+                ? "💵 Cash on Delivery"
+                : "💳 Online Payment"}
             </span>
           </div>
         );
@@ -303,9 +274,111 @@ const OrderList = ({
     }
   };
 
-  /* ==============================
-     RENDER
-  ================================ */
+  const [selectedOrders, setSelectedOrders] = useState([]);
+
+  const toggleSelectOrder = (id) => {
+    setSelectedOrders((prev) =>
+      prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id],
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedOrders.length === Orders?.length) {
+      setSelectedOrders([]);
+    } else {
+      setSelectedOrders(Orders?.map((o) => o.order_id));
+    }
+  };
+  const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
+  const [bulkDelLoading, setBulkDelLoading] = useState(false);
+
+  const handleBulkUpdate = async (id,field, value) => {
+    if (selectedOrders.length === 1) {
+      // single API
+      await updateOrderStatus(selectedOrders[0], field, value);
+    } else {
+      setBulkUpdLoading(true);
+
+      // bulk API
+      const previosOrders = Orders;
+
+      setOrders((prev) =>
+        prev.map((o) =>
+          selectedOrders.includes(o.order_id) ? { ...o, [field]: value } : o,
+        ),
+      );
+      try {
+        console.log("Selected Orders" , selectedOrders);
+         console.log("Selected Field and value" , field , value);
+
+        
+        await api.put("/orders/bulk-status", {
+          ids: selectedOrders,
+          [field]: value,
+        });
+      } catch (error) {
+        setOrders(previosOrders);
+      } finally {
+        setBulkUpdLoading(false);
+      }
+
+      // optimistic update
+    }
+    setSelectedOrders([]);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedOrders.length === 1) {
+      await deleteProduct(selectedOrders[0]);
+    } else {
+      setBulkDelLoading(true);
+
+      const previousOrders = Orders;
+
+      setOrders((prev) =>
+        prev.filter((o) => !selectedOrders.includes(o.order_id)),
+      );
+
+      try {
+        await api.delete("/orders/bulk-delete", {
+          data: { ids: selectedOrders },
+        });
+
+        Swal.fire({
+          icon: "success",
+          title: "Deleted Successfully",
+          toast: true,
+          position: "bottom-left",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: "Something went wrong",
+          toast: true,
+          position: "bottom-left",
+          timer: 3000,
+          showConfirmButton: false,
+        });
+        setOrders(previousOrders);
+      } finally {
+        setBulkDelLoading(false);
+      }
+    }
+    setSelectedOrders([]);
+  };
+
+  const DELIVERY_STATUS = [
+    "pending",
+    "processing",
+    "shipped",
+    "out_for_delivery",
+    "delivered",
+    "cancelled",
+  ];
+  const PAYMENT_STATUS = ["unpaid", "paid", "failed", "refunded"];
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
@@ -313,7 +386,7 @@ const OrderList = ({
           <div className="flex justify-center items-center h-48 sm:h-96">
             <div className="loading"></div>
           </div>
-        ) : products.length === 0 ? (
+        ) : Orders?.length === 0 ? (
           <div className="flex justify-center items-center h-[50vh]">
             <p className="text-lg font-medium">No Orders Found</p>
           </div>
@@ -322,6 +395,78 @@ const OrderList = ({
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Orders</h2>
+
+              {selectedOrders.length > 0 && (
+                <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
+                  <span className="text-sm font-medium">
+                    {selectedOrders.length} selected
+                  </span>
+
+                  {/* Delivery Status */}
+                  {/* <select
+      onChange={(e) =>
+        handleBulkUpdate("delivery_status", e.target.value)
+      }
+      className="border px-2 py-1 rounded text-sm"
+    >
+      <option value="">Delivery Status</option>
+      {DELIVERY_STATUS.map((s) => (
+        <option key={s} value={s}>
+          {formatText(s)}
+        </option>
+      ))}
+    </select> */}
+                  <DeliveryStatusDropdown
+                    order={Orders}
+                    updateOrderStatus={handleBulkUpdate}
+                    loadingId={loadingId}
+                    isDisabled={bulkUpdLoading}
+                  />
+
+                  {/* Payment Status */}
+                  {/* <select
+      onChange={(e) =>
+        handleBulkUpdate("payment_status", e.target.value)
+      }
+      className="border px-2 py-1 rounded text-sm"
+    >
+      <option value="">Payment Status</option>
+      {PAYMENT_STATUS.map((s) => (
+        <option key={s} value={s}>
+          {formatText(s)}
+        </option>
+      ))}
+    </select> */}
+                  <PaymentStatusDropdown
+                    order={Orders}
+                    updateOrderStatus={handleBulkUpdate}
+                    loadingId={loadingId}
+                    isDisabled={bulkUpdLoading}
+                  />
+
+                  {/* Delete */}
+                  <button
+                    disabled={bulkDelLoading}
+                    onClick={() => {
+                      Swal.fire({
+                        title: "Do you want delete this Order?",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Delete",
+                      }).then((result) => {
+                        /* Read more about isConfirmed, isDenied below */
+                        if (result.isConfirmed) {
+                          handleBulkDelete();
+                        }
+                      });
+                    }}
+                    className={`text-red-500 cursor-pointer px-3 py-1 hover:text-red-600 hover:scale-105 hover:animate-spin
+                   duration-200 transition-all  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
 
               <div className="relative" ref={menuRef}>
                 <button
@@ -370,6 +515,16 @@ const OrderList = ({
               <table className="w-full border-collapse">
                 <thead className="bg-gray-100 text-sm sticky top-0 z-20">
                   <tr>
+                    <th className="p-3">
+                      <input
+                        type="checkbox"
+                        checked={
+                          selectedOrders.length === Orders?.length &&
+                          Orders?.length > 0
+                        }
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
                     {columns
                       .filter((c) => c.visible)
                       .map((col) => (
@@ -381,11 +536,18 @@ const OrderList = ({
                 </thead>
 
                 <tbody>
-                  {products?.map((order) => (
+                  {Orders?.map((order) => (
                     <tr
                       key={order.order_id}
                       className="border-b hover:bg-gray-50"
                     >
+                      <td className="p-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedOrders.includes(order.order_id)}
+                          onChange={() => toggleSelectOrder(order.order_id)}
+                        />
+                      </td>
                       {columns.map(
                         (col) =>
                           col.visible && (
@@ -410,10 +572,8 @@ const OrderList = ({
             setShowDetails(false);
           }}
           isOpen={showDetails}
-
           className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
         >
-
           <OrderDetailsModal
             order={selectedOrder}
             onClose={() => {
@@ -425,7 +585,6 @@ const OrderList = ({
             updateOrderStatus={updateOrderStatus}
             loadingId={loadingId}
           />
-
         </Modal>
       )}
     </>

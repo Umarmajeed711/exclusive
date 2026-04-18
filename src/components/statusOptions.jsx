@@ -50,6 +50,7 @@ export const PaymentStatusDropdown = ({
   order,
   updateOrderStatus,
   loadingId,
+  isDisabled=false
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
@@ -77,7 +78,7 @@ export const PaymentStatusDropdown = ({
     <div className="relative w-36" ref={dropdownRef}>
       {/* Selected */}
       <button
-        disabled={loadingId === order.order_id}
+        disabled={loadingId === order.order_id || isDisabled}
         onClick={() => setOpen((prev) => !prev)}
         className={`w-full flex items-center justify-between px-3 py-1 border rounded text-sm 
           ${paymentStatusStyles[order.payment_status]}
@@ -85,8 +86,8 @@ export const PaymentStatusDropdown = ({
         `}
       >
         <span className="flex items-center gap-2">
-          {paymentStatusIcons[order.payment_status]}
-          {formatText(order.payment_status)}
+          {paymentStatusIcons[order.payment_status ?? PAYMENT_STATUS[0]]}
+          {formatText(order.payment_status ?? PAYMENT_STATUS[0])}
         </span>
 
         <span className="text-xs">▼</span>
@@ -124,6 +125,7 @@ export const DeliveryStatusDropdown = ({
   order,
   updateOrderStatus,
   loadingId,
+  isDisabled=false
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
@@ -151,14 +153,14 @@ export const DeliveryStatusDropdown = ({
     <div className="relative w-36" ref={dropdownRef}>
       {/* Selected */}
       <button
-        disabled={loadingId === order.order_id}
+        disabled={loadingId === order.order_id || isDisabled}
         onClick={() => setOpen((prev) => !prev)}
         className={`w-full flex items-center justify-between px-3 py-1 border rounded text-sm 
           ${statusColors[order.delivery_status]}
           ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
         `}
       >
-        <span>{formatText(order.delivery_status)}</span>
+        <span>{formatText(order.delivery_status ?? DELIVERY_STATUS[0])}</span>
         <span className="text-xs">▼</span>
       </button>
 

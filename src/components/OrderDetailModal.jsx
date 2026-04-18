@@ -23,7 +23,6 @@ const statusIcons = {
   delivered: "✅",
 };
 
-
 const OrderDetailsModal = ({
   order,
   onClose,
@@ -263,63 +262,63 @@ const OrderDetailsModal = ({
       {/* ================= BODY ================= */}
       <div className="flex-1 overflow-y-auto p-6 bg-gray-50 space-y-6 custom-scrollbar">
         {/* ================= TIMELINE ================= */}
-        
+
         <div className="bg-white p-6 rounded-2xl border shadow-sm">
-  <div className="relative ">
-    
-    {/* Base Line */}
-    <div className="absolute top-5 left-0 w-full   h-[3px] bg-gray-200 rounded-full" />
+          <div className="relative">
+            <div className="absolute top-5  left-10 right-10 h-[3px]">
+              {/* Base Line */}
+              <div className="w-full   h-full bg-gray-200 rounded-full" />
 
-    {/* Active Progress Line */}
-    <div
-      className="absolute top-5 left-0  h-[3px] bg-green-500 rounded-full transition-all duration-500 px-5"
-      style={{
-        width: `${(currentIndex / (STATUS_FLOW.length - 1)) * 100}%`,
-      }}
-    />
-
-    {/* Steps */}
-    <div className="flex justify-between relative">
-      {STATUS_FLOW.map((step, i) => {
-        const isCompleted = i < currentIndex;
-        const isCurrent = i === currentIndex;
-
-        return (
-          <div key={step} className="flex flex-col items-center w-full">
-            
-            {/* Circle */}
-            <div
-              className={`w-10 h-10 flex items-center justify-center rounded-full text-sm z-10 border transition-all duration-300
-                ${
-                  isCompleted
-                    ? "bg-green-500 text-white border-green-500"
-                    : isCurrent
-                    ? "bg-white text-green-600 border-green-500 scale-110 shadow"
-                    : "bg-white text-gray-400 border-gray-300"
-                }
-              `}
-            >
-              {isCompleted ? "✔" : statusIcons[step]}
+              {/* Active Line */}
+              <div
+                className="h-full -mt-[2px] top-5 bg-green-500 rounded-full transition-all duration-500"
+                style={{
+                  width: `${(currentIndex / (STATUS_FLOW.length - 1)) * 100}%`,
+                }}
+              />
             </div>
 
-            {/* Label */}
-            <p
-              className={`text-xs mt-2 text-center capitalize
+            {/* Steps */}
+            <div className="flex justify-between relative">
+              {STATUS_FLOW.map((step, i) => {
+                const isCompleted = i < currentIndex || currentIndex == 4;
+                const isCurrent = i === currentIndex;
+
+                return (
+                  <div key={step} className="flex flex-col items-center w-full">
+                    {/* Circle */}
+                    <div
+                      className={`w-[42px] h-[42px] flex items-center justify-center rounded-full text-sm z-10 border transition-all duration-300
+                ${
+                  isCompleted
+                    ? "bg-green-500 text-white border-green-500 border-2"
+                    : isCurrent
+                      ? "bg-white text-green-600 border-green-500 border-2 scale-110 shadow"
+                      : "bg-white text-gray-400 border-gray-300 border-2"
+                }
+              `}
+                    >
+                      {isCompleted ? "✔" : statusIcons[step]}
+                    </div>
+
+                    {/* Label */}
+                    <p
+                      className={`text-xs mt-2 text-center capitalize
                 ${
                   isCompleted || isCurrent
                     ? "text-gray-800 font-medium"
                     : "text-gray-400"
                 }
               `}
-            >
-              {formatText(step)}
-            </p>
+                    >
+                      {formatText(step)}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        );
-      })}
-    </div>
-  </div>
-</div>
+        </div>
 
         {/* ================= INFO ================= */}
         <div className="grid md:grid-cols-2 gap-4">

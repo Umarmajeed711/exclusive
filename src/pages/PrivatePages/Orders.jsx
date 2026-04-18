@@ -69,30 +69,27 @@ const Orders = () => {
     );
   };
 
-   const [loadingId, setLoadingId] = useState(null);
-  
+  const [loadingId, setLoadingId] = useState(null);
+
   const updateOrderStatus = async (order_id, field, value) => {
-  const prevOrders = Orders;
+    const prevOrders = Orders;
 
-  setLoadingId(order_id);
+    setLoadingId(order_id);
 
-  setOrders((prev) =>
-    prev.map((o) =>
-      o.order_id === order_id ? { ...o, [field]: value } : o
-    )
-  );
+    setOrders((prev) =>
+      prev.map((o) => (o.order_id === order_id ? { ...o, [field]: value } : o)),
+    );
 
-  try {
-    await api.put(`/orders/${order_id}/status`, {
-      [field]: value,
-    });
-  } catch (error) {
-    setOrders(prevOrders);
-  } finally {
-    setLoadingId(null);
-  }
-};
-  
+    try {
+      await api.put(`/orders/${order_id}/status`, {
+        [field]: value,
+      });
+    } catch (error) {
+      setOrders(prevOrders);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   const deleteProduct = async (id) => {
     const previousOrders = Orders;
@@ -129,7 +126,7 @@ const Orders = () => {
     }
   };
 
-
+ 
 
   const orderFilters = [
     {
