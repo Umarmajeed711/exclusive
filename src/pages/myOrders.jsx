@@ -11,9 +11,13 @@ import Pagination from "../components/Pagination";
 import SmartFilter from "../components/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES } from "../components/types";
 import { generateInvoice } from "../components/generateInvoice";
+import Modal from "../components/modal";
+import { useNavigate } from "react-router-dom";
 
 const OrdersPage = () => {
   const { state, dispatch } = useContext(GlobalContext);
+
+  const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,6 +32,7 @@ const OrdersPage = () => {
 
   const [limit, setLimit] = useState(12);
   const [totalOrders, setTotalOrders] = useState(0);
+  const [showDetails, setShowDetails] = useState(false);
 
   // const fetOrders = async () => {
   //   try {
@@ -72,6 +77,28 @@ const OrdersPage = () => {
   useEffect(() => {
     getOrders();
   }, []);
+
+   const [loadingId, setLoadingId] = useState(null);
+
+  const updateOrderStatus = async (order_id, field, value) => {
+    const prevOrders = orders;
+
+    setLoadingId(order_id);
+
+    setOrders((prev) =>
+      prev.map((o) => (o.order_id === order_id ? { ...o, [field]: value } : o)),
+    );
+
+    try {
+      await api.put(`/orders/${order_id}/status`, {
+        [field]: value,
+      });
+    } catch (error) {
+      setOrders(prevOrders);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -156,8 +183,6 @@ const OrdersPage = () => {
       console.log(error);
     }
   };
-
-  
 
   const [cancelModal, setCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
@@ -371,6 +396,9 @@ const OrdersPage = () => {
             return (
               <div
                 key={order?.order_id}
+                onClick={() => {
+                        navigate(`/orders/${order.order_id}`);
+                }}
                 className="relative bg-white/70 backdrop-blur-lg border border-gray-200 rounded-2xl p-5 shadow-md hover:shadow-2xl transition duration-500 hover:-translate-y-2 group"
               >
                 {/* HEADER */}
@@ -425,14 +453,23 @@ const OrdersPage = () => {
                 {/* ACTIONS */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setSelectedOrder(order)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedOrder(order);
+                      setShowDetails(true);
+                    }}
                     className="flex-1 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium"
                   >
                     View
                   </button>
 
                   <button
-                    onClick={() => generateInvoice(order)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      generateInvoice(order);
+                    }}
                     className="px-3 py-2 border rounded-lg hover:bg-gray-100 transition"
                   >
                     Invoice
@@ -442,7 +479,11 @@ const OrdersPage = () => {
                 {/* REORDER 🔥 */}
                 {(isCompleted || isCancelled) && (
                   <button
-                    onClick={() => handleReorder(order)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleReorder(order);
+                    }}
                     className="mt-3 w-full py-2 text-sm text-green-700 border border-green-200 bg-green-100 rounded-lg hover:bg-green-200 transition"
                   >
                     Reorder
@@ -454,7 +495,11 @@ const OrdersPage = () => {
                     order?.delivery_status,
                   ) && (
                     <button
-                      onClick={() => openCancelModal(order)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        openCancelModal(order);
+                      }}
                       className="mt-3 w-full py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition"
                     >
                       Cancel Order
@@ -487,10 +532,26 @@ const OrdersPage = () => {
 
           {/* ORDER DETAILS MODAL */}
           {selectedOrder && (
-            <OrderDetailsModal
-              order={selectedOrder}
-              onClose={() => setSelectedOrder(null)}
-            />
+            <Modal
+              onClose={() => {
+                setSelectedOrder(null);
+                setShowDetails(false);
+              }}
+              isOpen={showDetails}
+              className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
+            >
+              <OrderDetailsModal
+                order={selectedOrder}
+                onClose={() => {
+                  setShowDetails(false);
+                  setSelectedOrder({});
+                }}
+                isAdmin={true}
+                // onStatusUpdate={updateOrderStatus}
+                updateOrderStatus={updateOrderStatus}
+                loadingId={loadingId}
+              />
+            </Modal>
           )}
 
           {/* CANCEL MODAL (UPGRADED) */}
@@ -507,6 +568,7 @@ const OrdersPage = () => {
                   placeholder="Enter reason..."
                   value={cancelReason}
                   onChange={(e) => setCancelReason(e.target.value)}
+                  required
                   className="w-full border rounded-lg p-3 !h-28 resize-none focus:outline-none focus:ring-2 focus:ring-red-400 mb-4"
                   rows={4}
                 />

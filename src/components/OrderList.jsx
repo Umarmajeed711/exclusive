@@ -180,27 +180,6 @@ const OrderList = ({
             updateOrderStatus={updateOrderStatus}
             loadingId={loadingId}
           />
-          //         <select
-          //           value={order.payment_status}
-          //           onChange={(e) =>
-          //             updateOrderStatus(
-          //               order.order_id,
-          //               "payment_status",
-          //               e.target.value,
-          //             )
-          //           }
-          //           disabled={loadingId === order.order_id}
-          //           className={`border rounded px-2 py-1 text-sm  ${paymentStatusStyles[order.payment_status] || ""}
-          //   ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
-          // `}
-          //         >
-          //           {PAYMENT_STATUS.map((opt) => (
-          //             <option key={opt} value={opt}>
-          //               {paymentStatusIcons[opt]}
-          //               {formatText(opt)}
-          //             </option>
-          //           ))}
-          //         </select>
         );
 
       case "delivery_status":
@@ -210,25 +189,6 @@ const OrderList = ({
             updateOrderStatus={updateOrderStatus}
             loadingId={loadingId}
           />
-          //         <select
-          //           value={order.delivery_status}
-          //           onChange={(e) =>
-          //             updateOrderStatus(
-          //               order.order_id,
-          //               "delivery_status",
-          //               e.target.value,
-          //             )
-          //           }
-          //           className={`border rounded px-2 py-1 text-sm  ${statusColors[order.delivery_status] || ""}
-          //   ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
-          // `}
-          //         >
-          //           {DELIVERY_STATUS.map((opt) => (
-          //             <option key={opt} value={opt}>
-          //               {formatText(opt)}
-          //             </option>
-          //           ))}
-          //         </select>
         );
 
       case "date":
@@ -251,7 +211,9 @@ const OrderList = ({
               <RiDeleteBin6Fill
                 className={`text-red-500 cursor-pointer text-xl sm:text-2xl hover:text-red-600 hover:scale-105 hover:animate-spin
                    duration-200 transition-all  ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}`}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
                   Swal.fire({
                     title: "Do you want delete this Order?",
                     icon: "warning",
@@ -293,7 +255,7 @@ const OrderList = ({
   const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
 
-  const handleBulkUpdate = async (id,field, value) => {
+  const handleBulkUpdate = async (id, field, value) => {
     if (selectedOrders.length === 1) {
       // single API
       await updateOrderStatus(selectedOrders[0], field, value);
@@ -309,10 +271,9 @@ const OrderList = ({
         ),
       );
       try {
-        console.log("Selected Orders" , selectedOrders);
-         console.log("Selected Field and value" , field , value);
+        console.log("Selected Orders", selectedOrders);
+        console.log("Selected Field and value", field, value);
 
-        
         await api.put("/orders/bulk-status", {
           ids: selectedOrders,
           [field]: value,
@@ -371,10 +332,7 @@ const OrderList = ({
     setSelectedOrders([]);
   };
 
-  
-
-const navigate = useNavigate();
-
+  const navigate = useNavigate();
 
   return (
     <>
@@ -538,11 +496,8 @@ const navigate = useNavigate();
                       key={order.order_id}
                       className="border-b hover:bg-gray-50"
                       onClick={() => {
-  navigate(`/orders/${order.order_id}`);
-}}
-
-
-
+                        navigate(`/orders/${order.order_id}`);
+                      }}
                     >
                       <td className="p-3">
                         <input

@@ -50,7 +50,7 @@ export const PaymentStatusDropdown = ({
   order,
   updateOrderStatus,
   loadingId,
-  isDisabled=false
+  isDisabled = false,
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
@@ -63,8 +63,7 @@ export const PaymentStatusDropdown = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (value) => {
@@ -79,7 +78,11 @@ export const PaymentStatusDropdown = ({
       {/* Selected */}
       <button
         disabled={loadingId === order.order_id || isDisabled}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen((prev) => !prev);
+        }}
         className={`w-full flex items-center justify-between px-3 py-1 border rounded text-sm 
           ${paymentStatusStyles[order.payment_status]}
           ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
@@ -95,11 +98,16 @@ export const PaymentStatusDropdown = ({
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-1 w-full bg-white border rounded shadow-lg overflow-hidden">
           {PAYMENT_STATUS.map((opt) => (
             <div
               key={opt}
-              onClick={() => handleSelect(opt)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                handleSelect(opt);
+              }}
               className={`flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-100
                 ${opt === order.payment_status ? "bg-gray-50" : ""}
               `}
@@ -119,13 +127,11 @@ export const PaymentStatusDropdown = ({
   );
 };
 
-
-
 export const DeliveryStatusDropdown = ({
   order,
   updateOrderStatus,
   loadingId,
-  isDisabled=false
+  isDisabled = false,
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef();
@@ -138,8 +144,7 @@ export const DeliveryStatusDropdown = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSelect = (value) => {
@@ -154,10 +159,15 @@ export const DeliveryStatusDropdown = ({
       {/* Selected */}
       <button
         disabled={loadingId === order.order_id || isDisabled}
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          setOpen((prev) => !prev);
+        }}
         className={`w-full flex items-center justify-between px-3 py-1 border rounded text-sm 
           ${statusColors[order.delivery_status]}
-          ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}
+          ${loadingId === order.order_id ? "opacity-10 cursor-not-allowed" : ""}
         `}
       >
         <span>{formatText(order.delivery_status ?? DELIVERY_STATUS[0])}</span>
@@ -170,7 +180,11 @@ export const DeliveryStatusDropdown = ({
           {DELIVERY_STATUS.map((opt) => (
             <div
               key={opt}
-              onClick={() => handleSelect(opt)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleSelect(opt);
+              }}
               className={`flex items-center px-3 py-2 text-sm cursor-pointer hover:bg-gray-100
                 ${opt === order.delivery_status ? "bg-gray-50" : ""}
               `}
@@ -188,4 +202,3 @@ export const DeliveryStatusDropdown = ({
     </div>
   );
 };
-
