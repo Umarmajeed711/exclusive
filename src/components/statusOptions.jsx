@@ -56,15 +56,27 @@ export const PaymentStatusDropdown = ({
   const dropdownRef = useRef();
 
   // close on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!dropdownRef.current?.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   const handleClickOutside = (e) => {
+  //     if (!dropdownRef.current?.contains(e.target)) {
+  //       setOpen(false);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
+
+  const handleClickOutside = (e) => {
+  if (!dropdownRef.current) return;
+
+  // Agar click dropdown ke andar hai → ignore
+  if (dropdownRef.current.contains(e.target)) return;
+
+  // Agar scrollbar pe click hai → ignore
+  if (e.target === document.documentElement) return;
+
+  setOpen(false);
+};
 
   const handleSelect = (value) => {
     setOpen(false);
@@ -137,15 +149,27 @@ export const DeliveryStatusDropdown = ({
   const dropdownRef = useRef();
 
   // close on outside click
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!dropdownRef.current?.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   const handleClickOutside = (e) => {
+  //     if (!dropdownRef.current?.contains(e.target)) {
+  //       setOpen(false);
+  //     }
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
+
+  const handleClickOutside = (e) => {
+  if (!dropdownRef.current) return;
+
+  // Agar click dropdown ke andar hai → ignore
+  if (dropdownRef.current.contains(e.target)) return;
+
+  // Agar scrollbar pe click hai → ignore
+  if (e.target === document.documentElement) return;
+
+  setOpen(false);
+};
 
   const handleSelect = (value) => {
     setOpen(false);
@@ -176,7 +200,8 @@ export const DeliveryStatusDropdown = ({
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow-lg overflow-hidden">
+   
+        <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow-lg overflow-hidden ">
           {DELIVERY_STATUS.map((opt) => (
             <div
               key={opt}
