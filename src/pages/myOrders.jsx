@@ -17,6 +17,8 @@ import { useNavigate } from "react-router-dom";
 const OrdersPage = () => {
   const { state, dispatch } = useContext(GlobalContext);
 
+  const isAdmin = state?.isAdmin;
+
   const navigate = useNavigate();
 
   const [orders, setOrders] = useState([]);
@@ -50,7 +52,7 @@ const OrdersPage = () => {
     setLoading(true);
 
     try {
-      const result = await api.get("/orders?user_id=${state?.user?.user_id}", {
+      const result = await api.get(`/orders?user_id=${state?.user?.user_id}`, {
         params: {
           page,
           limit,
@@ -227,12 +229,12 @@ const OrdersPage = () => {
   };
 
   const orderFilters = [
-    {
-      key: "product_name",
-      label: "Product Name",
-      operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
-      inputType: INPUT_TYPES.TEXT,
-    },
+    // {
+    //   key: "product_name",
+    //   label: "Product Name",
+    //   operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
+    //   inputType: INPUT_TYPES.TEXT,
+    // },
     {
       key: "order_id",
       label: "Order ID",
@@ -546,7 +548,7 @@ const OrdersPage = () => {
                   setShowDetails(false);
                   setSelectedOrder({});
                 }}
-                isAdmin={true}
+                isAdmin={isAdmin}
                 // onStatusUpdate={updateOrderStatus}
                 updateOrderStatus={updateOrderStatus}
                 loadingId={loadingId}

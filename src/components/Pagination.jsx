@@ -91,6 +91,8 @@ const Pagination = ({
   pageSize,
   totalProducts,
 }) => {
+  console.log("totalPages",totalPages);
+  
   if (totalPages <= 1) return null;
 
   const pages = getPaginationRange(currentPage, totalPages);

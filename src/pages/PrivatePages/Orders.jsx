@@ -20,11 +20,266 @@ const Orders = () => {
   const [showFilter, setShowFilter] = useState(false);
 
   const [Orders, setOrders] = useState([]);
+
+  // const orders = [
+  //   {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  //    {
+  //     cancel_reason: null,
+  //     delivery_status: "processing",
+  //     items: [
+  //       {
+  //         colors: "black",
+  //         discount: 10,
+  //         image_url:
+  //           "https://res.cloudinary.com/djhltc7rf/image/upload/v1755068694/test-images/oda9ftolmgydyqypbi84.png",
+  //         item_id: "33",
+  //         order_id: "22",
+  //         price: "1044.00",
+  //         product_id: "6",
+  //         product_name: "AK-900 Wired Keyboard",
+  //         quantity: 1,
+  //         sizes: "S",
+  //       },
+  //     ],
+  //     order_date: "2026-04-23T00:47:29.334Z",
+  //     order_id: "22",
+  //     payment_method: "cod",
+  //     payment_status: "unpaid",
+  //     shipping_address: "North Nazimabad,Karachi",
+  //     shipping_name: "Umar Majeed",
+  //     shipping_phone: "03125897854",
+  //     total_price: "1044.00",
+  //     user_id: "13",
+  //   },
+  // ];
   const [OrdersByPage, setOrdersByPage] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const [limit, setLimit] = useState(12);
+  const [limit, setLimit] = useState(null);
   const [totalOrders, setTotalOrders] = useState(0);
 
   const getOrders = async ({ filters = {}, page = 1, limit = 12 } = {}) => {
@@ -45,7 +300,7 @@ const Orders = () => {
       setTotalOrders(result?.data?.totalOrders);
       setOrdersByPage((prev) => ({
         ...prev,
-        [page]: result?.data,
+        [page]: result?.data?.data,
       }));
 
       console.log("total Orders", result?.data?.totalOrders);
@@ -126,15 +381,13 @@ const Orders = () => {
     }
   };
 
- 
-
   const orderFilters = [
-    {
-      key: "product_name",
-      label: "Product Name",
-      operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
-      inputType: INPUT_TYPES.TEXT,
-    },
+    // {
+    //   key: "product_name",
+    //   label: "Product Name",
+    //   operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
+    //   inputType: INPUT_TYPES.TEXT,
+    // },
     {
       key: "order_id",
       label: "Order ID",
@@ -143,7 +396,7 @@ const Orders = () => {
     },
 
     {
-      key: "customer_name",
+      key: "shipping_name",
       label: "Customer Name",
       operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.TEXT,
@@ -261,9 +514,11 @@ const Orders = () => {
 
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-2">
-              {totalOrders > 1 ? (
+              {totalOrders > 100 ? (
                 <select
-                  defaultValue={limit == totalOrders ? "All Orders" : limit}
+                  defaultValue={
+                    limit == totalOrders ? "All Orders" : limit || ""
+                  }
                   onChange={(e) => {
                     const newLimit =
                       e.target.value == "all"
@@ -283,6 +538,9 @@ const Orders = () => {
                focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
                hover:border-gray-400 transition"
                 >
+                  <option value="" disabled selected>
+                    - limit Orders -
+                  </option>
                   <option value={100}>100 Orders</option>
                   <option value={200}>200 Orders</option>
                   <option value={500}>500 Orders</option>
@@ -307,15 +565,16 @@ const Orders = () => {
         products={Orders}
         loading={loading}
         loadingId={loadingId}
+        isAdmin={isAdmin}
         updateOrderStatus={updateOrderStatus}
         deleteProduct={deleteProduct}
       />
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(totalOrders / limit)}
+        totalPages={Math.ceil(totalOrders / (limit || 12 ))}
         totalProducts={totalOrders}
-        pageSize={limit}
+        pageSize={limit || 12}
         isLoading={loading}
         onPageChange={handlePageChange}
       />

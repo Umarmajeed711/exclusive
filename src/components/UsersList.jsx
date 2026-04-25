@@ -9,31 +9,32 @@ import { formatText } from "./types";
 import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
 import Modal from "./modal";
 import { useNavigate } from "react-router-dom";
+ import { FiEdit2 } from "react-icons/fi";
 
 /* ==============================
    DEFAULT COLUMNS
 ================================ */
 const DEFAULT_COLUMNS = [
-  { key: "order_id", label: "Order ID", visible: true },
-  { key: "customer", label: "Customer", visible: true },
-  { key: "total", label: "Total", visible: true },
-  { key: "payment_method", label: "Payment Method", visible: true },
-  { key: "payment_status", label: "Payment", visible: true },
-  { key: "delivery_status", label: "Delivery", visible: true },
-  { key: "date", label: "Date", visible: true },
+  { key: "user_id", label: "User ID", visible: true },
+  { key: "name", label: "Name", visible: true },
+  { key: "phone", label: "Phone", visible: true },
+  { key: "email_verified", label: "Email Verified", visible: true },
+  { key: "user_role", label: "Role", visible: true },
+  { key: "created_at", label: "Date", visible: true },
   { key: "actions", label: "Actions", visible: true },
 ];
 
-const STORAGE_KEY = "order_table_columns";
+const STORAGE_KEY = "user_table_columns";
 
 /* ==============================
    MAIN COMPONENT
 ================================ */
-const OrderList = ({
-  products = [],
-  updateOrderStatus = () => {},
+
+const UsersList = ({
+  users = [],
+  updateUser = () => {},
   loadingId = null,
-  deleteProduct = () => {},
+  deleteUser = () => {},
   loading = true,
   isAdmin = false,
 }) => {
@@ -43,22 +44,20 @@ const OrderList = ({
   const [open, setOpen] = useState(false);
   const [dragIndex, setDragIndex] = useState(null);
 
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showDetails, setShowDetails] = useState(false);
   const [Orders, setOrders] = useState([]);
 
   useEffect(() => {
-    if (selectedOrder) {
-      const select = products?.filter(
-        (p) => p?.order_id == selectedOrder?.order_id,
-      );
-      setSelectedOrder(select[0]);
+    if (selectedUser) {
+      const select = users?.filter((p) => p?.user_id == selectedUser?.user_id);
+      setSelectedUser(select[0]);
     }
-  }, [products]);
+  }, [users]);
 
   useEffect(() => {
-    setOrders(products);
-  }, [products]);
+    setOrders(users);
+  }, [users]);
 
   const menuRef = useOutsideClick(() => {
     setOpen(false); // close when clicked outside
@@ -102,145 +101,139 @@ const OrderList = ({
     setDragIndex(null);
   };
 
-  // const updateOrderStatus = async (order_id, field, value) => {
-
-  //   setLoadingId(order_id);
-  //   try {
-  //     await api.put(`/orders/${order_id}/status`, {
-  //       [field]: value,
-  //     });
-
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Status updated",
-  //       toast: true,
-  //       position: "bottom-left",
-  //       showConfirmButton: false,
-  //       timer: 2000,
-  //     });
-
-  //     // 🔥 update UI instantly
-  //     updateProduct({
-  //       order_id,
-  //       [field]: value,
-  //     });
-  //   } catch (error) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Failed to update",
-  //       toast: true,
-  //       position: "bottom-left",
-  //       showConfirmButton: false,
-  //       timer: 2000,
-  //     });
-  //   }
-  // };
-
   /* ==============================
      CELL RENDER
   ================================ */
-  const renderCell = (key, order) => {
-    switch (key) {
-      case "order_id":
-        return <span className="font-medium">#{order.order_id}</span>;
 
-      case "customer":
-        return (
-          <div>
-            <p className="font-medium">{order.shipping_name}</p>
-            <p className="text-xs text-gray-500">{order.shipping_phone}</p>
-          </div>
-        );
 
-      case "total":
-        return <span className="font-semibold">${order.total_price}</span>;
+const getInitials = (name) => {
+  if (!name) return "?";
+  const words = name.split(" ");
+  return words.length > 1
+    ? words[0][0] + words[1][0]
+    : words[0][0];
+};
 
-      case "payment_method":
-        return (
-          <div className="flex items-center">
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-medium border
-      ${
-        order.payment_method === "cod"
-          ? "bg-yellow-100 text-yellow-700 border-yellow-300"
-          : "bg-blue-100 text-blue-700 border-blue-300"
-      }
-    `}
-            >
-              {order.payment_method === "cod"
-                ? "💵 Cash on Delivery"
-                : "💳 Online Payment"}
+const renderCell = (key, user) => {
+  switch (key) {
+    case "user_id":
+      return (
+        <span className="font-semibold text-gray-700">
+          #{user.user_id}
+        </span>
+      );
+
+    case "name":
+      return (
+        <div className="flex items-center gap-3">
+          {/* Avatar */}
+          {user.profile ? (
+            <img
+              src={user.profile}
+              alt={user.name}
+              className="w-10 h-10 rounded-full object-cover border"
+            />
+          ) : (
+            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 font-semibold">
+              {getInitials(user.name)}
+            </div>
+          )}
+
+          {/* Name + Email */}
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-800">
+              {user.name || "-"}
+            </span>
+            <span className="text-xs text-gray-500">
+              {user.email || "-"}
             </span>
           </div>
-        );
+        </div>
+      );
 
-      case "payment_status":
-        return isAdmin ? (
-          <PaymentStatusDropdown
-            order={order}
-            updateOrderStatus={updateOrderStatus}
-            loadingId={loadingId}
-          />
-        ) : (
-          <b>{formatText(order.payment_status)}</b>
-        );
+    case "phone":
+      return (
+        <span className="text-gray-700 font-medium">
+          {user.phone || "-"}
+        </span>
+      );
 
-      case "delivery_status":
-        return isAdmin ? (
-          <DeliveryStatusDropdown
-            order={order}
-            updateOrderStatus={updateOrderStatus}
-            loadingId={loadingId}
-          />
-        ) : (
-          <b>{formatText(order.delivery_status)}</b>
-        );
+    case "email_verified":
+      return user.email_verified ? (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+          Verified
+        </span>
+      ) : (
+        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-600">
+          Not Verified
+        </span>
+      );
 
-      case "date":
-        return new Date(order.order_date).toLocaleDateString();
+    case "user_role":
+      return (
+        <span
+          className={`px-2 py-1 text-xs font-medium rounded-full ${
+            user.user_role === 1
+              ? "bg-purple-100 text-purple-700"
+              : "bg-gray-100 text-gray-600"
+          }`}
+        >
+          {user.user_role === 1 ? "Admin" : "User"}
+        </span>
+      );
 
-      case "actions":
-        return isAdmin ? (
-          <div className="flex items-center gap-2 ">
-            <button
-              onClick={() => {
-                setSelectedOrder(order);
-                setShowDetails(true);
-              }}
-              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
-            >
-              View
-            </button>
+    case "created_at":
+      return (
+        <span className="text-gray-500 text-sm">
+          {new Date(user.created_at).toLocaleDateString()}
+        </span>
+      );
 
-            <button title="Delete" disabled={loadingId == order?.order_id}>
-              <RiDeleteBin6Fill
-                className={`text-red-500 cursor-pointer text-xl sm:text-2xl hover:text-red-600 hover:scale-105 hover:animate-spin
-                   duration-200 transition-all  ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  Swal.fire({
-                    title: "Do you want delete this Order?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Delete",
-                  }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                      deleteProduct(order?.order_id);
-                      // Swal.fire("Saved!", "", "success");
-                    }
-                  });
-                }}
-              />
-            </button>
-          </div>
-        ) : null;
+    case "actions":
+      return isAdmin ? (
+        <div className="flex items-center gap-3">
+          {/* Edit Icon */}
+          <button
+            title="Edit User"
+            onClick={() => {
+              setSelectedUser(user);
+              setShowDetails(true);
+            }}
+            className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+          >
+            <FiEdit2 size={16} />
+          </button>
 
-      default:
-        return null;
-    }
-  };
+          {/* Delete */}
+          <button
+            title="Delete"
+            disabled={loadingId === user.user_id}
+            className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+
+              Swal.fire({
+                title: "Delete this user?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Delete",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  deleteUser(user.user_id);
+                }
+              });
+            }}
+          >
+            <RiDeleteBin6Fill size={16} />
+          </button>
+        </div>
+      ) : null;
+
+    default:
+      return null;
+  }
+};
 
   const [selectedOrders, setSelectedOrders] = useState([]);
 
@@ -263,7 +256,7 @@ const OrderList = ({
   const handleBulkUpdate = async (id, field, value) => {
     if (selectedOrders.length === 1) {
       // single API
-      await updateOrderStatus(selectedOrders[0], field, value);
+      await updateUser(selectedOrders[0], field, value);
     } else {
       setBulkUpdLoading(true);
 
@@ -296,7 +289,7 @@ const OrderList = ({
 
   const handleBulkDelete = async () => {
     if (selectedOrders.length === 1) {
-      await deleteProduct(selectedOrders[0]);
+      await deleteUser(selectedOrders[0]);
     } else {
       setBulkDelLoading(true);
 
@@ -378,7 +371,7 @@ const OrderList = ({
     </select> */}
                   <DeliveryStatusDropdown
                     order={Orders}
-                    updateOrderStatus={handleBulkUpdate}
+                    updateUser={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
                   />
@@ -399,7 +392,7 @@ const OrderList = ({
     </select> */}
                   <PaymentStatusDropdown
                     order={Orders}
-                    updateOrderStatus={handleBulkUpdate}
+                    updateUser={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
                   />
@@ -499,10 +492,10 @@ const OrderList = ({
                   {Orders?.map((order) => (
                     <tr
                       key={order.order_id}
-                      className="border-b hover:bg-gray-50 cursor-pointer  transition"
-                      onClick={() => {
-                        navigate(`/orders/${order.order_id}`);
-                      }}
+                      className="border-b hover:bg-gray-50"
+                      // onClick={() => {
+                      //   navigate(`/orders/${order.order_id}`);
+                      // }}
                     >
                       <td className="p-3">
                         <input
@@ -514,7 +507,7 @@ const OrderList = ({
                       {columns.map(
                         (col) =>
                           col.visible && (
-                            <td key={col.key} className="p-3">
+                            <td key={col.key} className="p-3 hover:bg-gray-50 transition ">
                               {renderCell(col.key, order)}
                             </td>
                           ),
@@ -528,24 +521,24 @@ const OrderList = ({
         )}
       </div>
 
-      {showDetails && selectedOrder && (
+      {showDetails && selectedUser && (
         <Modal
           onClose={() => {
-            setSelectedOrder(null);
+            setSelectedUser(null);
             setShowDetails(false);
           }}
           isOpen={showDetails}
           className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
         >
           <OrderDetailsModal
-            order={selectedOrder}
+            order={selectedUser}
             onClose={() => {
               setShowDetails(false);
-              setSelectedOrder({});
+              setSelectedUser({});
             }}
             isAdmin={isAdmin}
-            // onStatusUpdate={updateOrderStatus}
-            updateOrderStatus={updateOrderStatus}
+            // onStatusUpdate={updateUser}
+            updateUser={updateUser}
             loadingId={loadingId}
           />
         </Modal>
@@ -554,4 +547,4 @@ const OrderList = ({
   );
 };
 
-export default OrderList;
+export default UsersList;

@@ -23,6 +23,7 @@ import AddProduct from "../pages/PrivatePages/AddProduct";
 import Orders from "../pages/PrivatePages/Orders";
 import OrdersPage from "../pages/myOrders";
 import { OrderTrackingWrapper } from "../pages/OrderTrack";
+import Users from "../pages/PrivatePages/Users";
 
 const Myroute = () => {
   let { state } = useContext(GlobalContext);
@@ -47,6 +48,7 @@ const Myroute = () => {
           <Route path="/Dashboard" element={<Dash/>}/>
           <Route path="/Account" element={<Account/>}></Route>
           <Route path="/Orders" element={<Orders/>}></Route>
+          <Route path="/Users" element={<Users/>}></Route>
           <Route path="/orders/:id" element={<OrderTrackingWrapper />} />
           <Route path="/myOrders" element={<OrdersPage/>}></Route>
           <Route path="/Product" element={<Products />}></Route>
