@@ -22,7 +22,7 @@ const DiscountField = ({ originalPrice = 0, formik, loading }) => {
 
   return (
     <div className="space-y-3">
-      <span className="text-xl font-bold flex items-center gap-1">
+      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
         Discount
       </span>
 
@@ -95,7 +95,7 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
 
   return (
     <div className="relative">
-      <span className="text-xl font-bold flex items-center gap-1">
+      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
         Category
       </span>
 
@@ -415,7 +415,7 @@ const AddProductForm = ({
             onSubmit={addProjectFormik.handleSubmit}
             className=" px-4   flex flex-col gap-4 items-center overflow-hidden h-full w-full "
           >
-            <p className="jetBranis text-xl sm:text-2xl md:text-3xl font-medium sm:font-semibold mt-2   ">
+            <p className="jetBranis text-xl sm:text-2xl  font-medium sm:font-semibold mt-2   ">
               {productData?.product_id ? "Update" : "Add"} Product
             </p>
 
@@ -423,7 +423,7 @@ const AddProductForm = ({
               {/* productName */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
                     {/* <FolderKanban /> */}
                     Name
                   </span>
@@ -456,7 +456,7 @@ const AddProductForm = ({
               {/* productQuantity */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
                     {/* <ExternalLink />  */}
                     Quantity
                   </span>
@@ -489,7 +489,7 @@ const AddProductForm = ({
               {/* productPrice */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
                     Price
                   </span>
                 </label>
@@ -526,7 +526,7 @@ const AddProductForm = ({
               {/* Sizes */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
                     {/* <ExternalLink /> */}
                     Sizes
                   </span>
@@ -563,7 +563,7 @@ const AddProductForm = ({
               {/* productColor */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
                     {/* <ExternalLink />  */}
                     Color
                   </span>
@@ -607,7 +607,7 @@ const AddProductForm = ({
               {/* Description */}
               <div className="flex gap-3 flex-col justify-center">
                 <label>
-                  <span className="text-xl font-bold flex items-center gap-1">
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
                     {/* <AlignLeft />  */}
                     Description
                   </span>

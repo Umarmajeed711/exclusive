@@ -67,16 +67,16 @@ export const PaymentStatusDropdown = ({
   // }, []);
 
   const handleClickOutside = (e) => {
-  if (!dropdownRef.current) return;
+    if (!dropdownRef.current) return;
 
-  // Agar click dropdown ke andar hai → ignore
-  if (dropdownRef.current.contains(e.target)) return;
+    // Agar click dropdown ke andar hai → ignore
+    if (dropdownRef.current.contains(e.target)) return;
 
-  // Agar scrollbar pe click hai → ignore
-  if (e.target === document.documentElement) return;
+    // Agar scrollbar pe click hai → ignore
+    if (e.target === document.documentElement) return;
 
-  setOpen(false);
-};
+    setOpen(false);
+  };
 
   const handleSelect = (value) => {
     setOpen(false);
@@ -160,16 +160,16 @@ export const DeliveryStatusDropdown = ({
   // }, []);
 
   const handleClickOutside = (e) => {
-  if (!dropdownRef.current) return;
+    if (!dropdownRef.current) return;
 
-  // Agar click dropdown ke andar hai → ignore
-  if (dropdownRef.current.contains(e.target)) return;
+    // Agar click dropdown ke andar hai → ignore
+    if (dropdownRef.current.contains(e.target)) return;
 
-  // Agar scrollbar pe click hai → ignore
-  if (e.target === document.documentElement) return;
+    // Agar scrollbar pe click hai → ignore
+    if (e.target === document.documentElement) return;
 
-  setOpen(false);
-};
+    setOpen(false);
+  };
 
   const handleSelect = (value) => {
     setOpen(false);
@@ -200,7 +200,6 @@ export const DeliveryStatusDropdown = ({
 
       {/* Dropdown */}
       {open && (
-   
         <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow-lg overflow-hidden ">
           {DELIVERY_STATUS.map((opt) => (
             <div
@@ -222,6 +221,143 @@ export const DeliveryStatusDropdown = ({
               )}
             </div>
           ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const ActiveStatusDropdown = ({ user, updateUserStatus, loadingId }) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // ✅ Outside click handler
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelect = (value) => {
+    setOpen(false);
+
+    updateUserStatus({
+      userId: user.user_id,
+      field: "is_active",
+      value,
+      user:user
+    });
+  };
+
+  return (
+    <div className="relative w-32" ref={dropdownRef}>
+      {/* Button */}
+      <button
+        disabled={user?.user_role === 1 || loadingId === user?.user_id}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((prev) => !prev);
+        }}
+        className={`w-full px-3 py-1 text-sm border rounded flex justify-between items-center
+          ${user.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
+        ${
+          user.is_active
+            ? "bg-green-100 text-green-700"
+            : "bg-gray-200 text-gray-600"
+        }`}
+      >
+        {user.is_active ? "Active" : "Disabled"}
+        <span className="text-xs">▼</span>
+      </button>
+
+      {/* Dropdown */}
+      {open && (
+        <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow overflow-hidden">
+          <div
+            onClick={() => handleSelect(true)}
+            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+          >
+            Active
+          </div>
+
+          <div
+            onClick={() => handleSelect(false)}
+            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+          >
+            Disabled
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const BlockStatusDropdown = ({ user, updateUserStatus,loadingId }) => {
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSelect = (value) => {
+    setOpen(false);
+
+    updateUserStatus({
+      userId: user.user_id,
+      field: "is_blocked",
+      value,
+      user:user
+    });
+  };
+
+  return (
+    <div className="relative w-32" ref={dropdownRef}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((prev) => !prev);
+        }}
+        disabled={user?.user_role === 1 || loadingId === user?.user_id}
+        className={`w-full px-3 py-1 text-sm border rounded flex justify-between items-center
+          ${user.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
+        ${
+          user.is_blocked
+            ? "bg-red-100 text-red-700"
+            : "bg-blue-100 text-blue-700"
+        }`}
+      >
+        {user.is_blocked ? "Blocked" : "Not Blocked"}
+        <span className="text-xs">▼</span>
+      </button>
+
+      {open && (
+        <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow overflow-hidden">
+          <div
+            onClick={() => handleSelect(false)}
+            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+          >
+            Not Blocked
+          </div>
+
+          <div
+            onClick={() => handleSelect(true)}
+            className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer text-red-600"
+          >
+            Block User
+          </div>
         </div>
       )}
     </div>

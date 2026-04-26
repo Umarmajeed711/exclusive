@@ -5,22 +5,30 @@ import { GlobalContext } from "../context/Context";
 import useOutsideClick from "./outSideClick";
 import OrderDetailsModal from "./OrderDetailModal";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { formatText } from "./types";
-import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
+import { formatText, getInitials } from "./types";
+import {
+  ActiveStatusDropdown,
+  BlockStatusDropdown,
+  DeliveryStatusDropdown,
+  PaymentStatusDropdown,
+} from "./statusOptions";
 import Modal from "./modal";
 import { useNavigate } from "react-router-dom";
- import { FiEdit2 } from "react-icons/fi";
+import { FiEdit2 } from "react-icons/fi";
+import UserUpdateForm from "./updateUser";
 
 /* ==============================
    DEFAULT COLUMNS
 ================================ */
 const DEFAULT_COLUMNS = [
-  { key: "user_id", label: "User ID", visible: true },
-  { key: "name", label: "Name", visible: true },
+  // { key: "name", label: "Name", visible: true },
   { key: "phone", label: "Phone", visible: true },
   { key: "email_verified", label: "Email Verified", visible: true },
-  { key: "user_role", label: "Role", visible: true },
+  { key: "user_role", label: "Active", visible: true },
+  { key: "is_active", label: "Blocked", visible: true },
+  { key: "is_blocked", label: "Role", visible: true },
   { key: "created_at", label: "Date", visible: true },
+  { key: "user_id", label: "User ID", visible: true },
   { key: "actions", label: "Actions", visible: true },
 ];
 
@@ -32,7 +40,7 @@ const STORAGE_KEY = "user_table_columns";
 
 const UsersList = ({
   users = [],
-  updateUser = () => {},
+  updateUserStatus = () => {},
   loadingId = null,
   deleteUser = () => {},
   loading = true,
@@ -45,18 +53,19 @@ const UsersList = ({
   const [dragIndex, setDragIndex] = useState(null);
 
   const [selectedUser, setSelectedUser] = useState(null);
-  const [showDetails, setShowDetails] = useState(false);
-  const [Orders, setOrders] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+
+  const [Users, setUsers] = useState([]);
+
+  // useEffect(() => {
+  //   if (selectedUser) {
+  //     const select = users?.filter((p) => p?.user_id == selectedUser?.user_id);
+  //     setSelectedUser(select[0]);
+  //   }
+  // }, [users]);
 
   useEffect(() => {
-    if (selectedUser) {
-      const select = users?.filter((p) => p?.user_id == selectedUser?.user_id);
-      setSelectedUser(select[0]);
-    }
-  }, [users]);
-
-  useEffect(() => {
-    setOrders(users);
+    setUsers(users);
   }, [users]);
 
   const menuRef = useOutsideClick(() => {
@@ -105,203 +114,208 @@ const UsersList = ({
      CELL RENDER
   ================================ */
 
-
-const getInitials = (name) => {
-  if (!name) return "?";
-  const words = name.split(" ");
-  return words.length > 1
-    ? words[0][0] + words[1][0]
-    : words[0][0];
-};
-
-const renderCell = (key, user) => {
-  switch (key) {
-    case "user_id":
-      return (
-        <span className="font-semibold text-gray-700">
-          #{user.user_id}
-        </span>
-      );
-
-    case "name":
-      return (
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          {user.profile ? (
-            <img
-              src={user.profile}
-              alt={user.name}
-              className="w-10 h-10 rounded-full object-cover border"
-            />
-          ) : (
-            <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 font-semibold">
-              {getInitials(user.name)}
-            </div>
-          )}
-
-          {/* Name + Email */}
-          <div className="flex flex-col">
-            <span className="font-medium text-gray-800">
-              {user.name || "-"}
-            </span>
-            <span className="text-xs text-gray-500">
-              {user.email || "-"}
-            </span>
-          </div>
-        </div>
-      );
-
-    case "phone":
-      return (
-        <span className="text-gray-700 font-medium">
-          {user.phone || "-"}
-        </span>
-      );
-
-    case "email_verified":
-      return user.email_verified ? (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
-          Verified
-        </span>
+  const renderProductCell = (user) => (
+    <div className="flex items-center gap-3 min-w-[240px]">
+      {/* Avatar */}
+      {user.profile ? (
+        <img
+          src={user.profile}
+          alt={user.name}
+          className="w-10 h-10 rounded-full object-cover border"
+        />
       ) : (
-        <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-600">
-          Not Verified
-        </span>
-      );
-
-    case "user_role":
-      return (
-        <span
-          className={`px-2 py-1 text-xs font-medium rounded-full ${
-            user.user_role === 1
-              ? "bg-purple-100 text-purple-700"
-              : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {user.user_role === 1 ? "Admin" : "User"}
-        </span>
-      );
-
-    case "created_at":
-      return (
-        <span className="text-gray-500 text-sm">
-          {new Date(user.created_at).toLocaleDateString()}
-        </span>
-      );
-
-    case "actions":
-      return isAdmin ? (
-        <div className="flex items-center gap-3">
-          {/* Edit Icon */}
-          <button
-            title="Edit User"
-            onClick={() => {
-              setSelectedUser(user);
-              setShowDetails(true);
-            }}
-            className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
-          >
-            <FiEdit2 size={16} />
-          </button>
-
-          {/* Delete */}
-          <button
-            title="Delete"
-            disabled={loadingId === user.user_id}
-            className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-
-              Swal.fire({
-                title: "Delete this user?",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonText: "Delete",
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  deleteUser(user.user_id);
-                }
-              });
-            }}
-          >
-            <RiDeleteBin6Fill size={16} />
-          </button>
+        <div className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-700 font-semibold">
+          {getInitials(user.name)}
         </div>
-      ) : null;
+      )}
 
-    default:
-      return null;
-  }
-};
+      {/* Name + Email */}
+      <div className="flex flex-col">
+        <span className="font-medium text-gray-800">{user.name || "-"}</span>
+        <span className="text-xs text-gray-500">{user.email || "-"}</span>
+      </div>
+    </div>
+  );
 
-  const [selectedOrders, setSelectedOrders] = useState([]);
+  const renderCell = (key, user) => {
+    switch (key) {
+      case "user_id":
+        return (
+          <span className="font-semibold text-gray-700">#{user.user_id}</span>
+        );
 
-  const toggleSelectOrder = (id) => {
-    setSelectedOrders((prev) =>
-      prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id],
+      case "phone":
+        return (
+          <span className="text-gray-700 font-medium">{user.phone || "-"}</span>
+        );
+
+      case "is_active":
+        return isAdmin ? (
+          <ActiveStatusDropdown
+            user={user}
+            updateUserStatus={updateUserStatus}
+            loadingId={loadingId}
+          />
+        ) : (
+          <b>{formatText(user?.is_active)}</b>
+        );
+
+      case "is_blocked":
+        return isAdmin ? (
+          <BlockStatusDropdown
+            user={user}
+            updateUserStatus={updateUserStatus}
+            loadingId={loadingId}
+          />
+        ) : (
+          <b>{formatText(user.is_blocked)}</b>
+        );
+
+      case "email_verified":
+        return user.email_verified ? (
+          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+            Verified
+          </span>
+        ) : (
+          <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-600">
+            Not Verified
+          </span>
+        );
+
+      case "user_role":
+        return (
+          <span
+            className={`px-2 py-1 text-xs font-medium rounded-full ${
+              user.user_role === 1
+                ? "bg-purple-100 text-purple-700"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            {user.user_role === 1 ? "Admin" : "User"}
+          </span>
+        );
+
+      case "created_at":
+        return (
+          <span className="text-gray-500 text-sm">
+            {new Date(user.created_at).toLocaleDateString()}
+          </span>
+        );
+
+      case "actions":
+        return isAdmin ? (
+          <div className="flex items-center gap-3">
+            {/* Edit Icon */}
+            <button
+              title="Edit User"
+              onClick={() => {
+                setSelectedUser(user);
+                setShowModal(true);
+              }}
+              className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+            >
+              <FiEdit2 size={16} />
+            </button>
+
+            {/* Delete */}
+            <button
+              title="Delete"
+              disabled={loadingId === user.user_id}
+              className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                Swal.fire({
+                  title: "Delete this user?",
+                  icon: "warning",
+                  showCancelButton: true,
+                  confirmButtonText: "Delete",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    deleteUser(user.user_id);
+                  }
+                });
+              }}
+            >
+              <RiDeleteBin6Fill size={16} />
+            </button>
+          </div>
+        ) : null;
+
+      default:
+        return null;
+    }
+  };
+
+  const [selectedUsers, setSelectedUsers] = useState([]);
+
+  const toggleSelectOrder = (user) => {
+    setSelectedUsers((prev) =>
+      prev.includes(user?.user_id) ? prev.filter((o) => o?.user_id !== user?.user_id) : [...prev, user],
     );
   };
 
   const toggleSelectAll = () => {
-    if (selectedOrders.length === Orders?.length) {
-      setSelectedOrders([]);
+    if (selectedUsers.length === Users?.length) {
+      setSelectedUsers([]);
     } else {
-      setSelectedOrders(Orders?.map((o) => o.order_id));
+      setSelectedUsers(Users?.map((o) => o));
     }
   };
   const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
 
   const handleBulkUpdate = async (id, field, value) => {
-    if (selectedOrders.length === 1) {
-      // single API
-      await updateUser(selectedOrders[0], field, value);
-    } else {
+  
       setBulkUpdLoading(true);
 
-      // bulk API
-      const previosOrders = Orders;
+      const protectedUsers = selectedUsers.filter(
+  (u) => u.user_role === 1 || u.user_id === state?.user?.user_id
+);
 
-      setOrders((prev) =>
+if (protectedUsers.length > 0) {
+  alert("Some selected users cannot be modified (Super Admin / Yourself)");
+  return;
+}
+
+      // bulk API
+      const previosOrders = Users;
+
+      setUsers((prev) =>
         prev.map((o) =>
-          selectedOrders.includes(o.order_id) ? { ...o, [field]: value } : o,
+          selectedUsers.includes(o.user_id) ? { ...o, [field]: value } : o,
         ),
       );
       try {
-        console.log("Selected Orders", selectedOrders);
-        console.log("Selected Field and value", field, value);
-
-        await api.put("/orders/bulk-status", {
-          ids: selectedOrders,
-          [field]: value,
-        });
+        
+        await updateUserStatus(selectedUsers, field, value);
       } catch (error) {
-        setOrders(previosOrders);
+        setUsers(previosOrders);
       } finally {
         setBulkUpdLoading(false);
       }
 
       // optimistic update
-    }
-    setSelectedOrders([]);
+    
+    setSelectedUsers([]);
   };
 
   const handleBulkDelete = async () => {
-    if (selectedOrders.length === 1) {
-      await deleteUser(selectedOrders[0]);
+    if (selectedUsers.length === 1) {
+      await deleteUser(selectedUsers[0]);
     } else {
       setBulkDelLoading(true);
 
-      const previousOrders = Orders;
+      const previousOrders = Users;
 
-      setOrders((prev) =>
-        prev.filter((o) => !selectedOrders.includes(o.order_id)),
+      setUsers((prev) =>
+        prev.filter((o) => !selectedUsers.includes(o.order_id)),
       );
 
       try {
         await api.delete("/orders/bulk-delete", {
-          data: { ids: selectedOrders },
+          data: { ids: selectedUsers },
         });
 
         Swal.fire({
@@ -322,12 +336,12 @@ const renderCell = (key, user) => {
           timer: 3000,
           showConfirmButton: false,
         });
-        setOrders(previousOrders);
+        setUsers(previousOrders);
       } finally {
         setBulkDelLoading(false);
       }
     }
-    setSelectedOrders([]);
+    setSelectedUsers([]);
   };
 
   const navigate = useNavigate();
@@ -339,60 +353,34 @@ const renderCell = (key, user) => {
           <div className="flex justify-center items-center h-48 sm:h-96">
             <div className="loading"></div>
           </div>
-        ) : Orders?.length == 0 ? (
+        ) : Users?.length == 0 ? (
           <div className="flex justify-center items-center min-h-[500px] h-[50vh]">
-            <p className="text-lg font-medium">No Orders Found</p>
+            <p className="text-lg font-medium">No Users Found</p>
           </div>
         ) : (
           <>
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Orders</h2>
+              <h2 className="text-xl font-semibold">Users</h2>
 
-              {selectedOrders.length > 0 && isAdmin && (
+              {selectedUsers.length > 0 && isAdmin && (
                 <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
                   <span className="text-sm font-medium">
-                    {selectedOrders.length} selected
+                    {selectedUsers.length} selected
                   </span>
 
-                  {/* Delivery Status */}
-                  {/* <select
-      onChange={(e) =>
-        handleBulkUpdate("delivery_status", e.target.value)
-      }
-      className="border px-2 py-1 rounded text-sm"
-    >
-      <option value="">Delivery Status</option>
-      {DELIVERY_STATUS.map((s) => (
-        <option key={s} value={s}>
-          {formatText(s)}
-        </option>
-      ))}
-    </select> */}
-                  <DeliveryStatusDropdown
-                    order={Orders}
-                    updateUser={handleBulkUpdate}
+                 
+                  <ActiveStatusDropdown
+                    order={Users}
+                    updateUserStatus={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
                   />
 
-                  {/* Payment Status */}
-                  {/* <select
-      onChange={(e) =>
-        handleBulkUpdate("payment_status", e.target.value)
-      }
-      className="border px-2 py-1 rounded text-sm"
-    >
-      <option value="">Payment Status</option>
-      {PAYMENT_STATUS.map((s) => (
-        <option key={s} value={s}>
-          {formatText(s)}
-        </option>
-      ))}
-    </select> */}
-                  <PaymentStatusDropdown
-                    order={Orders}
-                    updateUser={handleBulkUpdate}
+
+                  <BlockStatusDropdown
+                    user={users}
+                    updateUserStatus={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
                   />
@@ -468,16 +456,20 @@ const renderCell = (key, user) => {
               <table className="w-full border-collapse">
                 <thead className="bg-gray-100 text-sm sticky top-0 z-20">
                   <tr>
-                    <th className="p-3">
+                    <th className="p-3 sticky left-0 z-10 ">
                       <input
                         type="checkbox"
                         checked={
-                          selectedOrders.length === Orders?.length &&
-                          Orders?.length > 0
+                          selectedUsers.length === Users?.length &&
+                          Users?.length > 0
                         }
                         onChange={toggleSelectAll}
                       />
                     </th>
+                    <th className="p-3 text-left sticky left-0 z-30 bg-gray-100 top-0 ">
+                      User
+                    </th>
+
                     {columns
                       .filter((c) => c.visible)
                       .map((col) => (
@@ -489,7 +481,7 @@ const renderCell = (key, user) => {
                 </thead>
 
                 <tbody>
-                  {Orders?.map((order) => (
+                  {Users?.map((order) => (
                     <tr
                       key={order.order_id}
                       className="border-b hover:bg-gray-50"
@@ -497,17 +489,24 @@ const renderCell = (key, user) => {
                       //   navigate(`/orders/${order.order_id}`);
                       // }}
                     >
-                      <td className="p-3">
+                      <td className="p-3 sticky left-0 z-10 bg-white">
                         <input
                           type="checkbox"
-                          checked={selectedOrders.includes(order.order_id)}
-                          onChange={() => toggleSelectOrder(order.order_id)}
+                          checked={selectedUsers.includes(order)}
+                          onChange={() => toggleSelectOrder(order)}
                         />
+                      </td>
+
+                      <td className="p-3 sticky left-0 z-10 bg-white">
+                        {renderProductCell(order)}
                       </td>
                       {columns.map(
                         (col) =>
                           col.visible && (
-                            <td key={col.key} className="p-3 hover:bg-gray-50 transition ">
+                            <td
+                              key={col.key}
+                              className="p-3 hover:bg-gray-50 transition "
+                            >
                               {renderCell(col.key, order)}
                             </td>
                           ),
@@ -521,25 +520,22 @@ const renderCell = (key, user) => {
         )}
       </div>
 
-      {showDetails && selectedUser && (
+      {showModal && selectedUser && (
         <Modal
           onClose={() => {
-            setSelectedUser(null);
-            setShowDetails(false);
+            setShowModal(false);
+            setSelectedUser({});
           }}
-          isOpen={showDetails}
-          className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
+          isOpen={showModal}
         >
-          <OrderDetailsModal
-            order={selectedUser}
-            onClose={() => {
-              setShowDetails(false);
+          <UserUpdateForm
+            onclose={() => {
+              setShowModal(false);
               setSelectedUser({});
             }}
-            isAdmin={isAdmin}
-            // onStatusUpdate={updateUser}
-            updateUser={updateUser}
-            loadingId={loadingId}
+            userData={selectedUser}
+            // OnSuccess={onSuccess}
+            // OnError={OnError}
           />
         </Modal>
       )}

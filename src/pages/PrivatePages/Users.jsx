@@ -73,21 +73,72 @@ const Users = () => {
 
   const [loadingId, setLoadingId] = useState(null);
 
-  const updateUser = async (order_id, field, value) => {
+  // const updateUser = async (order_id, field, value) => {
+  //   const prevOrders = Users;
+
+  //   setLoadingId(order_id);
+
+  //   setUsers((prev) =>
+  //     prev.map((o) => (o.order_id === order_id ? { ...o, [field]: value } : o)),
+  //   );
+
+  //   try {
+  //     await api.put(`/orders/${order_id}/status`, {
+  //       [field]: value,
+  //     });
+  //   } catch (error) {
+  //     setUsers(prevOrders);
+  //   } finally {
+  //     setLoadingId(null);
+  //   }
+  // };
+
+  const updateUserStatus = async ({ userId, field, value ,user = null}) => {
     const prevOrders = Users;
 
-    setLoadingId(order_id);
-
-    setUsers((prev) =>
-      prev.map((o) => (o.order_id === order_id ? { ...o, [field]: value } : o)),
-    );
+   
 
     try {
-      await api.put(`/orders/${order_id}/status`, {
+
+      
+
+      if (user.user_role === 1) {
+  return res.status(403).json({
+    message: "You cannot modify Super Admin",
+  });
+}
+     
+
+      // 🔥 CONFIRMATION (important)
+      const confirm = window.confirm(
+        `Are you sure you want to update ${field}?`,
+      );
+
+      if (!confirm) return;
+
+     
+
+
+      setLoadingId(userId);
+
+      setUsers((prev) =>
+        prev.map((o) => (o.userId === userId ? { ...o, [field]: value } : o)),
+      );
+
+      const res = await api.put(`/users/status`, {
+        ids: userId,
         [field]: value,
       });
+
+      console.log("Updated:", res.data);
+
+      // toast.success("User updated successfully");
+
+      return res.data;
     } catch (error) {
       setUsers(prevOrders);
+      console.log(error);
+      // toast.error(error?.response?.data?.message);
     } finally {
       setLoadingId(null);
     }
@@ -263,9 +314,7 @@ const Users = () => {
             <div className="flex items-center gap-2">
               {totalUsers > 100 ? (
                 <select
-                  defaultValue={
-                    limit == totalUsers ? "All Users" : limit || ""
-                  }
+                  defaultValue={limit == totalUsers ? "All Users" : limit || ""}
                   onChange={(e) => {
                     const newLimit =
                       e.target.value == "all"
@@ -312,14 +361,14 @@ const Users = () => {
         users={Users}
         loading={loading}
         loadingId={loadingId}
-        updateUser={updateUser}
+        updateUserStatus={updateUserStatus}
         deleteUser={deleteUser}
         isAdmin={isAdmin}
       />
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(totalUsers / (limit || 12 ))}
+        totalPages={Math.ceil(totalUsers / (limit || 12))}
         totalProducts={totalUsers}
         pageSize={limit || 12}
         isLoading={loading}

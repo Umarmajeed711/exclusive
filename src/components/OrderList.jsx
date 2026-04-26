@@ -212,11 +212,10 @@ const OrderList = ({
               View
             </button>
 
-            <button title="Delete" disabled={loadingId == order?.order_id}>
-              <RiDeleteBin6Fill
-                className={`text-red-500 cursor-pointer text-xl sm:text-2xl hover:text-red-600 hover:scale-105 hover:animate-spin
-                   duration-200 transition-all  ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}`}
-                onClick={(e) => {
+            <button title="Delete" 
+            disabled={loadingId == order?.order_id}
+             className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
+              onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   Swal.fire({
@@ -232,6 +231,12 @@ const OrderList = ({
                     }
                   });
                 }}
+            >
+              <RiDeleteBin6Fill size={16}
+                // className={`text-red-500 cursor-pointer text-xl sm:text-2xl hover:text-red-600 hover:scale-105 hover:animate-spin
+                //    duration-200 transition-all  ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}`}
+                
+               
               />
             </button>
           </div>
@@ -475,7 +480,7 @@ const OrderList = ({
               <table className="w-full border-collapse">
                 <thead className="bg-gray-100 text-sm sticky top-0 z-20">
                   <tr>
-                    <th className="p-3">
+                    <th className="p-3 sticky left-0 z-10 ">
                       <input
                         type="checkbox"
                         checked={
@@ -504,7 +509,7 @@ const OrderList = ({
                         navigate(`/orders/${order.order_id}`);
                       }}
                     >
-                      <td className="p-3">
+                      <td className="p-3 sticky left-0 z-10 bg-white">
                         <input
                           type="checkbox"
                           checked={selectedOrders.includes(order.order_id)}

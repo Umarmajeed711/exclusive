@@ -5,6 +5,8 @@ import AddProductForm from "./addProject";
 import api from "./api";
 import { GlobalContext } from "../context/Context";
 import useOutsideClick from "./outSideClick";
+import { FiEdit2 } from "react-icons/fi";
+import { RiDeleteBin6Fill } from "react-icons/ri";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -146,20 +148,41 @@ const ProductListView = ({
 
       case "actions":
         return (
-          <div className="flex gap-2 justify-center min-w-[120px]">
-            <button
-              onClick={() => editProduct(product)}
-              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => deleteProduct(product?.product_id)}
-              className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded"
-            >
-              Delete
-            </button>
-          </div>
+          // <div className="flex gap-2 justify-center min-w-[120px]">
+          //   <button
+          //     onClick={() => editProduct(product)}
+          //     className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
+          //   >
+          //     Edit
+          //   </button>
+          //   <button
+          //     onClick={() => deleteProduct(product?.product_id)}
+          //     className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded"
+          //   >
+          //     Delete
+          //   </button>
+          // </div>
+
+          <div className="flex items-center gap-3">
+                    {/* Edit Icon */}
+                    <button
+                      title="Edit Product"
+                      onClick={() => editProduct(product)}
+                      className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                    >
+                      <FiEdit2 size={16} />
+                    </button>
+          
+                    {/* Delete */}
+                    <button
+                      title="Delete"
+                      // disabled={loadingId === user.user_id}
+                      className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
+                      onClick={() => deleteProduct(product?.product_id)}
+                    >
+                      <RiDeleteBin6Fill size={16} />
+                    </button>
+                  </div>
         );
 
       default:
