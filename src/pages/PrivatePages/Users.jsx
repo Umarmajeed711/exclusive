@@ -121,8 +121,11 @@ const Users = () => {
 
       setLoadingId(userId);
 
+      
+      
+
       setUsers((prev) =>
-        prev.map((o) => (o.userId === userId ? { ...o, [field]: value } : o)),
+        prev.map((o) => (o.user_id === userId[0] ? { ...o, [field]: value } : o)),
       );
 
       const res = await api.put(`/users/status`, {

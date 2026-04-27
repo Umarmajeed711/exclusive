@@ -252,7 +252,9 @@ const UsersList = ({
 
   const toggleSelectOrder = (user) => {
     setSelectedUsers((prev) =>
-      prev.includes(user?.user_id) ? prev.filter((o) => o?.user_id !== user?.user_id) : [...prev, user],
+      prev.includes(user.user_id)
+        ? prev.filter((id) => id !== user.user_id)
+        : [...prev, user.user_id],
     );
   };
 
@@ -260,44 +262,56 @@ const UsersList = ({
     if (selectedUsers.length === Users?.length) {
       setSelectedUsers([]);
     } else {
-      setSelectedUsers(Users?.map((o) => o));
+      setSelectedUsers(Users?.map((u) => u.user_id));
     }
   };
   const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
 
   const handleBulkUpdate = async (id, field, value) => {
-  
-      setBulkUpdLoading(true);
+    setBulkUpdLoading(true);
 
-      const protectedUsers = selectedUsers.filter(
-  (u) => u.user_role === 1 || u.user_id === state?.user?.user_id
-);
+    //       const protectedUsers = selectedUsers.filter(
+    //   (u) => u.user_role === 1 || u.user_id === state?.user?.user_id
+    // );
 
-if (protectedUsers.length > 0) {
-  alert("Some selected users cannot be modified (Super Admin / Yourself)");
-  return;
-}
+    // if (protectedUsers.length > 0) {
+    //   alert("Some selected users cannot be modified (Super Admin / Yourself)");
+    //   return;
+    // }
 
-      // bulk API
-      const previosOrders = Users;
+    const selectedUserObjects = users?.filter((u) =>
+      selectedUsers?.includes(u.user_id),
+    );
 
-      setUsers((prev) =>
-        prev.map((o) =>
-          selectedUsers.includes(o.user_id) ? { ...o, [field]: value } : o,
-        ),
-      );
-      try {
-        
-        await updateUserStatus(selectedUsers, field, value);
-      } catch (error) {
-        setUsers(previosOrders);
-      } finally {
-        setBulkUpdLoading(false);
-      }
+    const protectedUsers = selectedUserObjects?.filter(
+      (u) => u.user_role === 1 || u.user_id === state?.user?.user_id,
+    );
 
-      // optimistic update
-    
+    if (protectedUsers.length > 0) {
+      alert("Some selected users cannot be modified (Super Admin / Yourself)");
+      return;
+    }
+
+    // bulk API
+    const previosOrders = Users;
+
+    setUsers((prev) =>
+      prev.map((o) =>
+        selectedUsers.includes(o.user_id) ? { ...o, [field]: value } : o,
+      ),
+    );
+
+    try {
+      await updateUserStatus(selectedUsers, field, value);
+    } catch (error) {
+      setUsers(previosOrders);
+    } finally {
+      setBulkUpdLoading(false);
+    }
+
+    // optimistic update
+
     setSelectedUsers([]);
   };
 
@@ -369,14 +383,12 @@ if (protectedUsers.length > 0) {
                     {selectedUsers.length} selected
                   </span>
 
-                 
                   <ActiveStatusDropdown
                     order={Users}
                     updateUserStatus={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
                   />
-
 
                   <BlockStatusDropdown
                     user={users}
@@ -472,8 +484,12 @@ if (protectedUsers.length > 0) {
 
                     {columns
                       .filter((c) => c.visible)
-                      .map((col) => (
-                        <th key={col.key} className="p-3 text-left">
+                      .map((col, i) => (
+                        <th
+                          key={col.key}
+                          className="p-3 text-left"
+                          key={`indx-${i}`}
+                        >
                           {col.label}
                         </th>
                       ))}
@@ -492,7 +508,7 @@ if (protectedUsers.length > 0) {
                       <td className="p-3 sticky left-0 z-10 bg-white">
                         <input
                           type="checkbox"
-                          checked={selectedUsers.includes(order)}
+                          checked={selectedUsers.includes(order.user_id)}
                           onChange={() => toggleSelectOrder(order)}
                         />
                       </td>

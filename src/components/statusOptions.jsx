@@ -247,7 +247,7 @@ export const ActiveStatusDropdown = ({ user, updateUserStatus, loadingId }) => {
     setOpen(false);
 
     updateUserStatus({
-      userId: user.user_id,
+      userId: [user?.user_id],
       field: "is_active",
       value,
       user:user
@@ -264,14 +264,14 @@ export const ActiveStatusDropdown = ({ user, updateUserStatus, loadingId }) => {
           setOpen((prev) => !prev);
         }}
         className={`w-full px-3 py-1 text-sm border rounded flex justify-between items-center
-          ${user.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
+          ${user?.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
         ${
-          user.is_active
+          user?.is_active
             ? "bg-green-100 text-green-700"
             : "bg-gray-200 text-gray-600"
         }`}
       >
-        {user.is_active ? "Active" : "Disabled"}
+        {user?.is_active ? "Active" : "Disabled"}
         <span className="text-xs">▼</span>
       </button>
 
@@ -316,7 +316,7 @@ export const BlockStatusDropdown = ({ user, updateUserStatus,loadingId }) => {
     setOpen(false);
 
     updateUserStatus({
-      userId: user.user_id,
+      userId: [user?.user_id],
       field: "is_blocked",
       value,
       user:user
@@ -332,14 +332,14 @@ export const BlockStatusDropdown = ({ user, updateUserStatus,loadingId }) => {
         }}
         disabled={user?.user_role === 1 || loadingId === user?.user_id}
         className={`w-full px-3 py-1 text-sm border rounded flex justify-between items-center
-          ${user.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
+          ${user?.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
         ${
-          user.is_blocked
+          user?.is_blocked
             ? "bg-red-100 text-red-700"
             : "bg-blue-100 text-blue-700"
         }`}
       >
-        {user.is_blocked ? "Blocked" : "Not Blocked"}
+        {user?.is_blocked ? "Blocked" : "Not Blocked"}
         <span className="text-xs">▼</span>
       </button>
 
