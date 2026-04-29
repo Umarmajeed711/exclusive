@@ -268,17 +268,8 @@ const UsersList = ({
   const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
 
-  const handleBulkUpdate = async (id, field, value) => {
+  const handleBulkUpdate = async ({ userId, field, value }) => {
     setBulkUpdLoading(true);
-
-    //       const protectedUsers = selectedUsers.filter(
-    //   (u) => u.user_role === 1 || u.user_id === state?.user?.user_id
-    // );
-
-    // if (protectedUsers.length > 0) {
-    //   alert("Some selected users cannot be modified (Super Admin / Yourself)");
-    //   return;
-    // }
 
     const selectedUserObjects = users?.filter((u) =>
       selectedUsers?.includes(u.user_id),
@@ -298,63 +289,84 @@ const UsersList = ({
 
     setUsers((prev) =>
       prev.map((o) =>
-        selectedUsers.includes(o.user_id) ? { ...o, [field]: value } : o,
+        selectedUsers?.includes(o.user_id) ? { ...o, [field]: value } : o,
       ),
     );
 
     try {
-      await updateUserStatus(selectedUsers, field, value);
+      // 🔥 CONFIRMATION (important)
+      const confirm = window.confirm(
+        `Are you sure you want to update ${field}?`,
+      );
+
+      if (!confirm) return;
+
+      const res = await api.put(`/users/status`, {
+        ids: selectedUsers,
+        [field]: value,
+      });
     } catch (error) {
       setUsers(previosOrders);
+      console.log(error);
+      // toast.error(error?.response?.data?.message);
     } finally {
       setBulkUpdLoading(false);
     }
-
-    // optimistic update
 
     setSelectedUsers([]);
   };
 
   const handleBulkDelete = async () => {
-    if (selectedUsers.length === 1) {
-      await deleteUser(selectedUsers[0]);
-    } else {
-      setBulkDelLoading(true);
+    setBulkDelLoading(true);
+    const selectedUserObjects = users?.filter((u) =>
+      selectedUsers?.includes(u.user_id),
+    );
 
-      const previousOrders = Users;
+    const protectedUsers = selectedUserObjects?.filter(
+      (u) => u.user_role === 1 || u.user_id === state?.user?.user_id,
+    );
 
-      setUsers((prev) =>
-        prev.filter((o) => !selectedUsers.includes(o.order_id)),
-      );
-
-      try {
-        await api.delete("/orders/bulk-delete", {
-          data: { ids: selectedUsers },
-        });
-
-        Swal.fire({
-          icon: "success",
-          title: "Deleted Successfully",
-          toast: true,
-          position: "bottom-left",
-          timer: 3000,
-          showConfirmButton: false,
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          timer: 3000,
-          showConfirmButton: false,
-        });
-        setUsers(previousOrders);
-      } finally {
-        setBulkDelLoading(false);
-      }
+    if (protectedUsers.length > 0) {
+      alert("Some selected users cannot be Delete (Super Admin / Yourself)");
+      return;
     }
+
+    const previousOrders = Users;
+
+    setUsers((prev) => prev.filter((o) => !selectedUsers.includes(o.user_id)));
+
+    try {
+      const confirm = window.confirm(`Are you sure you want to delete ?`);
+
+      if (!confirm) return;
+
+      await api.delete("/users/delete", {
+        ids: [ids],
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted Successfully",
+        toast: true,
+        position: "bottom-left",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Delete Failed",
+        text: "Something went wrong",
+        toast: true,
+        position: "bottom-left",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+      setUsers(previousOrders);
+    } finally {
+      setBulkDelLoading(false);
+    }
+
     setSelectedUsers([]);
   };
 

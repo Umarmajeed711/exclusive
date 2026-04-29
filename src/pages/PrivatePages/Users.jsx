@@ -93,21 +93,17 @@ const Users = () => {
   //   }
   // };
 
-  const updateUserStatus = async ({ userId, field, value ,user = null}) => {
+  const updateUserStatus = async ({ userId, field, value, user = null }) => {
     const prevOrders = Users;
 
-   
+    console.log("Indside", "IDs", userId, "field", field, "value", value);
 
     try {
-
-      
-
-      if (user.user_role === 1) {
-  return res.status(403).json({
-    message: "You cannot modify Super Admin",
-  });
-}
-     
+      if (user?.user_role === 1) {
+        return res.status(403).json({
+          message: "You cannot modify Super Admin",
+        });
+      }
 
       // 🔥 CONFIRMATION (important)
       const confirm = window.confirm(
@@ -116,16 +112,12 @@ const Users = () => {
 
       if (!confirm) return;
 
-     
-
-
       setLoadingId(userId);
 
-      
-      
-
       setUsers((prev) =>
-        prev.map((o) => (o.user_id === userId[0] ? { ...o, [field]: value } : o)),
+        prev.map((o) =>
+          o.user_id === userId[0] ? { ...o, [field]: value } : o,
+        ),
       );
 
       const res = await api.put(`/users/status`, {
@@ -147,15 +139,19 @@ const Users = () => {
     }
   };
 
-  const deleteUser = async (id) => {
+  const deleteUser = async (ids) => {
     const previousOrders = Users;
 
     setLoadingId(id);
 
-    setUsers((prev) => prev.filter((p) => p.order_id !== id));
+    setUsers((prev) => prev.filter((p) => p.user_id !== id));
 
     try {
-      await api.delete(`/order/${id}`);
+
+
+       await api.delete("/users/delete", {
+                ids: [ids] ,
+              });
 
       Swal.fire({
         icon: "success",
