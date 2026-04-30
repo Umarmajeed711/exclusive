@@ -100,9 +100,7 @@ const Users = () => {
 
     try {
       if (user?.user_role === 1) {
-        return res.status(403).json({
-          message: "You cannot modify Super Admin",
-        });
+        return  window.confirm(`You cannot modify Super Admin`);
       }
 
       // 🔥 CONFIRMATION (important)
@@ -139,12 +137,23 @@ const Users = () => {
     }
   };
 
-  const deleteUser = async (ids) => {
+  const deleteUser = async (ids,user=null) => {
+
+    if (user?.user_role === 1) {
+        return  window.confirm(`You cannot modify Super Admin`);
+      }
+
+      
+
+
     const previousOrders = Users;
 
-    setLoadingId(id);
+    setLoadingId(ids);
 
-    setUsers((prev) => prev.filter((p) => p.user_id !== id));
+    setUsers((prev) => prev.filter((p) => p.user_id !== ids));
+
+    console.log("ids delete",ids);
+    
 
     try {
 

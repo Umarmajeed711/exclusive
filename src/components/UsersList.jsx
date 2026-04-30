@@ -191,7 +191,7 @@ const UsersList = ({
                 : "bg-gray-100 text-gray-600"
             }`}
           >
-            {user.user_role === 1 ? "Admin" : "User"}
+            {user.user_role === 1 ? "Super Admin" :user.user_role === 2 ? "Admin" :user.user_role === 3 ? "Manager": "User"}
           </span>
         );
 
@@ -233,7 +233,7 @@ const UsersList = ({
                   confirmButtonText: "Delete",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    deleteUser(user.user_id);
+                    deleteUser(user.user_id,user);
                   }
                 });
               }}
@@ -317,7 +317,7 @@ const UsersList = ({
   };
 
   const handleBulkDelete = async () => {
-    setBulkDelLoading(true);
+    
     const selectedUserObjects = users?.filter((u) =>
       selectedUsers?.includes(u.user_id),
     );
@@ -331,17 +331,19 @@ const UsersList = ({
       return;
     }
 
+    setBulkDelLoading(true);
+
     const previousOrders = Users;
 
     setUsers((prev) => prev.filter((o) => !selectedUsers.includes(o.user_id)));
 
-    try {
-      const confirm = window.confirm(`Are you sure you want to delete ?`);
+    console.log("Bulk del ids", selectedUsers);
+    
 
-      if (!confirm) return;
+    try {
 
       await api.delete("/users/delete", {
-        ids: [ids],
+        ids: [selectedUsers],
       });
 
       Swal.fire({

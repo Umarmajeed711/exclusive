@@ -69,18 +69,16 @@ const UserUpdateForm = ({
       }
 
       try {
-        const res = await api.put(`/users/${userData?.user_id}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const res = await api.put(`/users/${userData?.user_id}`, formData );
 
         OnSuccess({
           icon: "success",
           message: res?.data?.message || "User updated successfully",
         });
+        
 
         userFormik.resetForm();
+        onClose()
       } catch (err) {
         OnError({
           icon: "error",
