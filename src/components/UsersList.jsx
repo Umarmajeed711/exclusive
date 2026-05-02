@@ -24,9 +24,9 @@ const DEFAULT_COLUMNS = [
   // { key: "name", label: "Name", visible: true },
   { key: "phone", label: "Phone", visible: true },
   { key: "email_verified", label: "Email Verified", visible: true },
-  { key: "user_role", label: "Active", visible: true },
-  { key: "is_active", label: "Blocked", visible: true },
-  { key: "is_blocked", label: "Role", visible: true },
+  { key: "user_role", label: "Role", visible: true },
+  { key: "is_active", label: "Active", visible: true },
+  { key: "is_blocked", label: "Blocked", visible: true },
   { key: "created_at", label: "Date", visible: true },
   { key: "user_id", label: "User ID", visible: true },
   { key: "actions", label: "Actions", visible: true },
@@ -40,9 +40,10 @@ const STORAGE_KEY = "user_table_columns";
 
 const UsersList = ({
   users = [],
-  updateUserStatus = () => {},
-  loadingId = null,
-  deleteUser = () => {},
+  // updateUserStatus = () => {},
+  updateUser = () => {},
+  // loadingId = null,
+  // deleteUser = () => {},
   loading = true,
   isAdmin = false,
 }) => {
@@ -191,7 +192,13 @@ const UsersList = ({
                 : "bg-gray-100 text-gray-600"
             }`}
           >
-            {user.user_role === 1 ? "Super Admin" :user.user_role === 2 ? "Admin" :user.user_role === 3 ? "Manager": "User"}
+            {user.user_role === 1
+              ? "Super Admin"
+              : user.user_role === 2
+                ? "Admin"
+                : user.user_role === 3
+                  ? "Manager"
+                  : "User"}
           </span>
         );
 
@@ -233,7 +240,7 @@ const UsersList = ({
                   confirmButtonText: "Delete",
                 }).then((result) => {
                   if (result.isConfirmed) {
-                    deleteUser(user.user_id,user);
+                    deleteUser(user.user_id, user);
                   }
                 });
               }}
@@ -268,10 +275,10 @@ const UsersList = ({
   const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
 
-  const handleBulkUpdate = async ({ userId, field, value }) => {
+  const handleBulkUpdate = async ({ field, value }) => {
     setBulkUpdLoading(true);
 
-    const selectedUserObjects = users?.filter((u) =>
+    const selectedUserObjects = Users?.filter((u) =>
       selectedUsers?.includes(u.user_id),
     );
 
@@ -287,9 +294,13 @@ const UsersList = ({
     // bulk API
     const previosOrders = Users;
 
+    const idsToUpdate = [...selectedUsers];
+
+    setSelectedUsers([]);
+
     setUsers((prev) =>
       prev.map((o) =>
-        selectedUsers?.includes(o.user_id) ? { ...o, [field]: value } : o,
+        idsToUpdate?.includes(o.user_id) ? { ...o, [field]: value } : o,
       ),
     );
 
@@ -302,7 +313,7 @@ const UsersList = ({
       if (!confirm) return;
 
       const res = await api.put(`/users/status`, {
-        ids: selectedUsers,
+        ids: idsToUpdate,
         [field]: value,
       });
     } catch (error) {
@@ -312,13 +323,10 @@ const UsersList = ({
     } finally {
       setBulkUpdLoading(false);
     }
-
-    setSelectedUsers([]);
   };
 
   const handleBulkDelete = async () => {
-    
-    const selectedUserObjects = users?.filter((u) =>
+    const selectedUserObjects = Users?.filter((u) =>
       selectedUsers?.includes(u.user_id),
     );
 
@@ -333,15 +341,13 @@ const UsersList = ({
 
     setBulkDelLoading(true);
 
-    const previousOrders = Users;
+    const previousOrders = [...Users];
 
     setUsers((prev) => prev.filter((o) => !selectedUsers.includes(o.user_id)));
 
     console.log("Bulk del ids", selectedUsers);
-    
 
     try {
-
       await api.delete("/users/delete", {
         ids: [selectedUsers],
       });
@@ -374,6 +380,132 @@ const UsersList = ({
 
   const navigate = useNavigate();
 
+  const onSuccess = ({ position, icon, message, user }) => {
+    console.log("user on SUccess", user);
+
+    updateUser(user);
+    setSelectedUser({});
+    setShowModal(false);
+    dynamicToast({ position, icon, message });
+  };
+
+  const OnError = ({ position, icon, message }) => {
+    dynamicToast({ position, icon, message });
+  };
+
+  const dynamicToast = ({
+    position = "bottom-left",
+    icon = "success",
+    message = "",
+  }) => {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: position,
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+
+      didOpen: (toast) => {
+        toast.onmouseenter = Swal.stopTimer;
+        toast.onmouseleave = Swal.resumeTimer;
+      },
+    });
+    Toast.fire({
+      icon: icon,
+      title: message,
+    });
+  };
+
+  const [loadingId, setLoadingId] = useState(null);
+
+  const updateUserStatus = async ({ userId, field, value, user = null }) => {
+    console.log("users in single", Users);
+    const prevOrders = Users;
+
+    console.log("Indside", "IDs", userId, "field", field, "value", value);
+
+    try {
+      if (user?.user_role === 1) {
+        return window.confirm(`You cannot modify Super Admin`);
+      }
+
+      // 🔥 CONFIRMATION (important)
+      const confirm = window.confirm(
+        `Are you sure you want to update ${field}?`,
+      );
+
+      if (!confirm) return;
+
+      setLoadingId(userId);
+
+      setUsers((prev) =>
+        prev.map((o) =>
+          o.user_id === userId[0] ? { ...o, [field]: value } : o,
+        ),
+      );
+
+      const res = await api.put(`/users/status`, {
+        ids: userId,
+        [field]: value,
+      });
+
+      console.log("Updated:", res.data);
+
+      // toast.success("User updated successfully");
+
+      return res.data;
+    } catch (error) {
+      setUsers(prevOrders);
+      console.log(error);
+      // toast.error(error?.response?.data?.message);
+    } finally {
+      setLoadingId(null);
+    }
+  };
+
+  const deleteUser = async (ids, user = null) => {
+    if (user?.user_role === 1) {
+      return window.confirm(`You cannot modify Super Admin`);
+    }
+
+    const previousOrders = Users;
+
+    setLoadingId(ids);
+
+    setUsers((prev) => prev.filter((p) => p.user_id !== ids));
+
+    console.log("ids delete", ids);
+
+    try {
+      await api.delete("/users/delete", {
+        ids: [ids],
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Deleted Successfully",
+        toast: true,
+        position: "bottom-left",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.log(error);
+
+      setUsers(previousOrders);
+
+      Swal.fire({
+        icon: "error",
+        title: "Delete Failed",
+        text: "Something went wrong",
+        toast: true,
+        position: "bottom-left",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
+  };
+
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
@@ -402,6 +534,7 @@ const UsersList = ({
                     updateUserStatus={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
+                    isBulk={true}
                   />
 
                   <BlockStatusDropdown
@@ -409,6 +542,7 @@ const UsersList = ({
                     updateUserStatus={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
+                    isBulk={true}
                   />
 
                   {/* Delete */}
@@ -564,8 +698,8 @@ const UsersList = ({
               setSelectedUser({});
             }}
             userData={selectedUser}
-            // OnSuccess={onSuccess}
-            // OnError={OnError}
+            OnSuccess={onSuccess}
+            OnError={OnError}
           />
         </Modal>
       )}

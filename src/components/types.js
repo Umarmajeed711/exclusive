@@ -9,6 +9,7 @@ export const FILTER_OPERATORS = {
 
 export const INPUT_TYPES = {
   TEXT: "text",
+  EMAIL:"email",
   NUMBER: "number",
   SELECT: "select",
   DATE: "date",

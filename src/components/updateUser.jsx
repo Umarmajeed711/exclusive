@@ -71,14 +71,17 @@ const UserUpdateForm = ({
       try {
         const res = await api.put(`/users/${userData?.user_id}`, formData );
 
+        console.log("res",res);
+        
+
         OnSuccess({
           icon: "success",
           message: res?.data?.message || "User updated successfully",
+          user: res?.data?.profile
         });
         
 
         userFormik.resetForm();
-        onClose()
       } catch (err) {
         OnError({
           icon: "error",

@@ -76,8 +76,6 @@ const App = () => {
       getCartProduct(response?.data?.user?.user_id);
       getWishlist(response?.data?.user?.user_id)
     } catch (error) {
-      // localStorage.removeItem("user");
-      // sessionStorage.removeItem("user");
       dispatch({ type: "USER_LOGOUT" });
     }
   };

@@ -63,192 +63,73 @@ const Users = () => {
     getUsers();
   }, []);
 
-  const updateProduct = (updated) => {
-    setUsers((prev) =>
-      prev.map((o) =>
-        o.order_id === updated.order_id ? { ...o, ...updated } : o,
-      ),
-    );
-  };
-
-  const [loadingId, setLoadingId] = useState(null);
-
-  // const updateUser = async (order_id, field, value) => {
-  //   const prevOrders = Users;
-
-  //   setLoadingId(order_id);
-
-  //   setUsers((prev) =>
-  //     prev.map((o) => (o.order_id === order_id ? { ...o, [field]: value } : o)),
-  //   );
-
-  //   try {
-  //     await api.put(`/orders/${order_id}/status`, {
-  //       [field]: value,
-  //     });
-  //   } catch (error) {
-  //     setUsers(prevOrders);
-  //   } finally {
-  //     setLoadingId(null);
-  //   }
-  // };
-
-  const updateUserStatus = async ({ userId, field, value, user = null }) => {
-    const prevOrders = Users;
-
-    console.log("Indside", "IDs", userId, "field", field, "value", value);
-
-    try {
-      if (user?.user_role === 1) {
-        return  window.confirm(`You cannot modify Super Admin`);
-      }
-
-      // 🔥 CONFIRMATION (important)
-      const confirm = window.confirm(
-        `Are you sure you want to update ${field}?`,
-      );
-
-      if (!confirm) return;
-
-      setLoadingId(userId);
-
-      setUsers((prev) =>
-        prev.map((o) =>
-          o.user_id === userId[0] ? { ...o, [field]: value } : o,
-        ),
-      );
-
-      const res = await api.put(`/users/status`, {
-        ids: userId,
-        [field]: value,
-      });
-
-      console.log("Updated:", res.data);
-
-      // toast.success("User updated successfully");
-
-      return res.data;
-    } catch (error) {
-      setUsers(prevOrders);
-      console.log(error);
-      // toast.error(error?.response?.data?.message);
-    } finally {
-      setLoadingId(null);
-    }
-  };
-
-  const deleteUser = async (ids,user=null) => {
-
-    if (user?.user_role === 1) {
-        return  window.confirm(`You cannot modify Super Admin`);
-      }
-
-      
-
-
-    const previousOrders = Users;
-
-    setLoadingId(ids);
-
-    setUsers((prev) => prev.filter((p) => p.user_id !== ids));
-
-    console.log("ids delete",ids);
-    
-
-    try {
-
-
-       await api.delete("/users/delete", {
-                ids: [ids] ,
-              });
-
-      Swal.fire({
-        icon: "success",
-        title: "Deleted Successfully",
-        toast: true,
-        position: "bottom-left",
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.log(error);
-
-      setUsers(previousOrders);
-
-      Swal.fire({
-        icon: "error",
-        title: "Delete Failed",
-        text: "Something went wrong",
-        toast: true,
-        position: "bottom-left",
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    }
-  };
-
   const orderFilters = [
-    // {
-    //   key: "product_name",
-    //   label: "Product Name",
-    //   operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
-    //   inputType: INPUT_TYPES.TEXT,
-    // },
     {
-      key: "order_id",
-      label: "Order ID",
+      key: "user_id",
+      label: "User ID",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.TEXT,
     },
 
     {
-      key: "shipping_name",
-      label: "Customer Name",
+      key: "name",
+      label: "Name",
       operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.TEXT,
     },
     {
-      key: "payment_status",
-      label: "Payment Status",
+      key: "email",
+      label: "Email",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.EMAIL,
+    },
+    {
+      key: "phone",
+      label: "Phone",
+      operators: [FILTER_OPERATORS.CONTAINS, FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.NUMBER,
+    },
+    {
+      key: "user_role",
+      label: "User Role",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
       options: [
-        { label: "Paid", value: "paid" },
-        { label: "Un Paid", value: "unpaid" },
-        { label: "Failed", value: "failed" },
-        { label: "Refunded", value: "refunded" },
-        { label: "Pending", value: "pending" },
+        { label: "Super Admin", value: 1 },
+        { label: "Admin", value: 2 },
+        { label: "Manager", value: 3 },
+        { label: "User", value: 4 },
       ],
     },
     {
-      key: "delivery_status",
-      label: "Delivery Status",
+      key: "is_active",
+      label: "Active",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
       options: [
-        { label: "Pending", value: "pending" },
-        { label: "Processing", value: "processing" },
-        { label: "shipped", value: "shipped" },
-        { label: "Out Of Delivery", value: "out_for_delivery" },
-        { label: "Delivered", value: "delivered" },
-        { label: "Cancelled", value: "cancelled" },
+        { label: "Active", value: true },
+        { label: "Disabled", value: false },
       ],
     },
     {
-      key: "payment_method",
-      label: "Payment Method",
+      key: "is_blocked",
+      label: "Blocked",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
       options: [
-        { label: "Online", value: "online" },
-        { label: "Cash on Delivery", value: "cod" },
+        { label: "Not Blocked", value: false },
+        { label: "Blocked Users", value: true },
       ],
     },
     {
-      key: "order_date",
-      label: "Order Date",
-      operators: [FILTER_OPERATORS.BETWEEN],
-      inputType: INPUT_TYPES.DATE,
+      key: "email_verified",
+      label: "Verified",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.SELECT,
+      options: [
+        { label: "Verified", value: true },
+        { label: "Not Verified", value: false },
+      ],
     },
   ];
 
@@ -294,6 +175,21 @@ const Users = () => {
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handleUserUpdate = (user) => {
+    setUsers((prev) => {
+      const exists = prev?.some((p) => p?.user_id == user?.user_id);
+
+      if (exists) {
+        // UPDATE
+        return prev?.map((p) => (p.user_id === user.user_id ? user : p));
+      }
+
+      // ADD
+      return [user, ...prev];
+    });
+  };
+
   return (
     <div className="mx-5  md:mx-8 lg:mx-14 py-4">
       <div>
@@ -368,9 +264,10 @@ const Users = () => {
       <UsersList
         users={Users}
         loading={loading}
-        loadingId={loadingId}
-        updateUserStatus={updateUserStatus}
-        deleteUser={deleteUser}
+        // loadingId={loadingId}
+        // updateUserStatus={updateUserStatus}
+        updateUser={handleUserUpdate}
+        // deleteUser={deleteUser}
         isAdmin={isAdmin}
       />
 
