@@ -153,7 +153,7 @@ const Cart = () => {
   const handleCheckout = () => {
     if (productCart.length > 0) {
       // If there are items in the cart, redirect to the checkout page
-      window.location.href = "/checkout";
+      window.location.href = "/Checkout";
     } else {
       // If the cart is empty, show an alert or message
       Swal.fire({
@@ -390,7 +390,7 @@ const Cart = () => {
               Must add items to the cart before you proceed to checkout
             </p>
             <Link
-              to={"/home"}
+              to={"/Shop"}
               // className=" bg-theme-primary text-white w-full sm:w-auto px-9 py-3 rounded-full text-base text-center font-normal
               //         hover:shadow-theme-secondary hover:shadow hover:scale-105 transition duration-300 mb-8 md:mb-10"
               className=" bg-theme-primary transition-all duration-200 rounded flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"

@@ -50,7 +50,7 @@ const HeroSection = () => {
                 : "opacity-0 translate-y-6"
             }`}
           >
-            <Link to="/shop" className="text-decoration-none">
+            <Link to="/Shop" className="text-decoration-none">
               <button className="bg-[#03A9F4] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0288d1] transition">
                 Shop Now
               </button>

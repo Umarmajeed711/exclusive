@@ -5,7 +5,7 @@ import { Login } from "../pages/login";
 import Home from "../pages/Home";
 import { GlobalContext } from "../context/Context";
 import Category from "./Category";
-import Products from "../pages/PrivatePages/Products";
+import Products from "../pages/admin/Products";
 import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
 import Checkout from "../pages/Checkout";
@@ -18,12 +18,12 @@ import Whishlist from "../pages/Whishlist";
 import OrderConfirmation from "../pages/OrderComplete";
 import Account from "../pages/Account";
 import Shop from "../pages/Shop";
-import Dash from "../pages/PrivatePages/Dash";
-import AddProduct from "../pages/PrivatePages/AddProduct";
-import Orders from "../pages/PrivatePages/Orders";
+import Dash from "../pages/admin/Dash";
+import AddProduct from "../pages/admin/AddProduct";
+import Orders from "../pages/admin/Orders";
 import OrdersPage from "../pages/myOrders";
 import { OrderTrackingWrapper } from "../pages/OrderTrack";
-import Users from "../pages/PrivatePages/Users";
+import Users from "../pages/admin/Users";
 
 const Myroute = () => {
   let { state } = useContext(GlobalContext);

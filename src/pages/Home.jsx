@@ -53,7 +53,7 @@ const Home = () => {
             laborum non praesentium atque omnis inventore delectus molestiae ut
             eveniet quis sapiente!
           </p>
-          <Link to="/shop" className="text-decoration-none">
+          <Link to="/Shop" className="text-decoration-none">
             <button
               className="font-bold  bg-white text-red-500  p-2 rounded outline-none transition-all duration-300 hover:text-white hover:bg-[#9D0A14] "
               style={{ boxShadow: "0 0 5px #fff" }}
@@ -88,7 +88,7 @@ const Home = () => {
           // <Link to="/" className="px-3 py-2 bg-red-600 text-white rounded">
           //   View ALL Products
           // </Link>
-          <Link to="/shop" className="text-decoration-none mt-3">
+          <Link to="/Shop" className="text-decoration-none mt-3">
               <button className="bg-[#03A9F4] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0288d1] transition">
                 Explore More
               </button>

@@ -32,7 +32,7 @@ const Navbar = () => {
     }, 500);
   };
 
-   useEffect(() => {
+  useEffect(() => {
     if (show) {
       document.body.style.overflow = "hidden";
     }
@@ -41,7 +41,6 @@ const Navbar = () => {
       document.body.style.overflow = "";
     };
   }, [show]);
-
 
   const logout = async () => {
     try {
@@ -95,31 +94,6 @@ const Navbar = () => {
           </div>
 
           <ul className="hidden md:flex space-x-6 text-black font-medium ">
-            {/* <li className={style?.navLink}>
-              <Link to="/">Home</Link>
-            </li>
-            <li className={style?.navLink}>
-              <Link to="/Shop">Shop</Link>
-            </li>
-            <li className={style?.navLink}>
-              <Link to="/Contact">Contact</Link>
-            </li>
-            {state?.isLogin ? (
-              <>
-                <li className={style?.navLink}>
-                  <Link to="/Account">My Account</Link>
-                </li>
-              </>
-            ) : (
-              <>
-                <li className={style?.navLink}>
-                  <Link to="/login">Login</Link>
-                </li>
-                <li className={style?.navLink}>
-                  <Link to="/signup">Sign Up</Link>
-                </li>
-              </>
-            )} */}
             <li>
               <NavLink
                 to="/"
@@ -173,16 +147,6 @@ const Navbar = () => {
                     Login
                   </NavLink>
                 </li>
-                {/* <li>
-                  <NavLink
-                    to="/signup"
-                    className={({ isActive }) =>
-                      `${style.navLink} ${isActive ? style.active : "after:w-0 hover:after:w-full"}`
-                    }
-                  >
-                    Sign Up
-                  </NavLink>
-                </li> */}
               </>
             )}
           </ul>
@@ -198,7 +162,7 @@ const Navbar = () => {
             {/* cart icons */}
             <div className="hidden md:flex  gap-4 items-center">
               <Link to="/wishlist" className="link">
-              <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
+                <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
                   <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
                   {state?.wishlist?.length > 0 && (
                     <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
@@ -220,71 +184,6 @@ const Navbar = () => {
                 </span>
               </Link>
 
-              {/* <div
-                className="relative !z-50"
-                onMouseEnter={() => {
-                  setShowDropdown(true);
-                }}
-                onMouseLeave={() => {
-                  setShowDropdown(false);
-                }}
-              >
-                <p>
-                  <Link to="/MyAccount" className="link text-xl">
-                    <FaRegUser />
-                  </Link>
-                </p>
-
-                {showDropdown ? (
-                  <div className="absolute right-0  p-3 w-52 rounded Dropdown flex flex-col gap-1 !z-50">
-                    <Link to="/Account" className="flex gap-2 items-center">
-                      {" "}
-                      <FaRegUser />{" "}
-                      <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-                        Manage My Account
-                      </span>
-                    </Link>
-                    <Link to="/Account" className="flex gap-2 items-center">
-                      <TbShoppingBagCheck />{" "}
-                      <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-                        {" "}
-                        My Orders
-                      </span>
-                    </Link>
-                    <Link to="/Account" className="flex gap-2 items-center">
-                      {" "}
-                      <ImCancelCircle />{" "}
-                      <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-                        {" "}
-                        My Cancellations
-                      </span>
-                    </Link>
-                    <Link to="/Account" className="flex gap-2 items-center">
-                      {" "}
-                      <IoStarOutline />{" "}
-                      <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-                        {" "}
-                        My reviews
-                      </span>
-                    </Link>
-
-                    <div>
-                      {" "}
-                      {state?.isLogin ? (
-                        <div className="flex gap-2 items-center hover:text-black">
-                          <HiOutlineArrowLeftStartOnRectangle />{" "}
-                          <button
-                            onClick={logout}
-                            className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full after:bg-gray-700 after:transition-all after:duration-300"
-                          >
-                            logout
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                ) : null}
-              </div> */}
               <div
                 className="relative !z-50"
                 ref={menuRef}
@@ -294,8 +193,9 @@ const Navbar = () => {
                 // onMouseLeave={() => {
                 //   setShowDropdown(false);
                 // }}
-                onClick={() => {setShowDropdown(!showDropdown)}}
-                
+                onClick={() => {
+                  setShowDropdown(!showDropdown);
+                }}
               >
                 <p className="text-xl cursor-pointer">
                   <FaRegUser />
@@ -314,7 +214,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/Account"
+                        to="/myOrders"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
                       >
                         <TbShoppingBagCheck className="text-lg text-gray-500" />
@@ -322,7 +222,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/Account"
+                        to="/myOrders"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
                       >
                         <ImCancelCircle className="text-lg text-gray-500" />
@@ -336,7 +236,19 @@ const Navbar = () => {
                         <IoStarOutline className="text-lg text-gray-500" />
                         <span className="font-medium">My Reviews</span>
                       </Link>
+
+                       {state?.isAdmin && state?.user?.user_role == 1 && (
+                      <Link
+                        to="/admin"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+                      >
+                        <IoStarOutline className="text-lg text-gray-500" />
+                        <span className="font-medium">Admin Panel</span>
+                      </Link>
+                    )}
                     </div>
+
+                   
 
                     {/* Divider */}
                     <div className="h-px bg-gray-100" />
@@ -359,149 +271,9 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        {/* md:hidden navbar px-4 pt-2 pb-4 shadow-md  bg-white sticky top-0  */}
       </div>
 
       {show ? (
-        // <nav className="navbar" id="hideSideBar">
-        //   <div className="flex flex-col  justify-between  h-screen p-3">
-        //     <div className="md:hidden">
-        //       <button onClick={HideSideBar}>
-        //         <MdOutlineClose className="text-2xl font-bold hover:text-red-500 mt-4" />
-        //       </button>
-        //     </div>
-
-        //     <div className="flex flex-col  gay-y-10 pl-0 ">
-        //       <div className="text-black text-xl flex justify-start font-medium">
-        //         Quick Links
-        //       </div>
-
-        //       <ul className="flex items-center flex-col gap-y-3 my-5">
-        //         <li onClick={HideSideBar}>
-        //           <Link
-        //             to="/"
-        //             className="text-md sm:text-xl hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300"
-        //           >
-        //             Home
-        //           </Link>
-        //         </li>
-        //         <li onClick={HideSideBar}>
-        //           <Link
-        //             to="/Contact"
-        //             className="text-md sm:text-xl hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300"
-        //           >
-        //             Contact
-        //           </Link>
-        //         </li>
-        //         <li onClick={HideSideBar}>
-        //           <Link
-        //             to="/"
-        //             className="text-md sm:text-xl hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300"
-        //           >
-        //             About
-        //           </Link>
-        //         </li>
-        //         <li onClick={HideSideBar}>
-        //           <Link
-        //             to="/"
-        //             className="text-md sm:text-xl hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300"
-        //           >
-        //             Sign Up
-        //           </Link>
-        //         </li>
-        //       </ul>
-
-        //       <div className="flex justify-center my-10 gap-5">
-        //         <div>
-        //           <Link to="/CheckOut">
-        //             <FaRegHeart className="text-xl sideIcons" />
-        //           </Link>
-        //         </div>
-        //         <div>
-        //           <Link to="/Cart" className="text-xl">
-        //             <span className="relative text-xl cursor-pointer">
-        //               <GrCart className="sideIcons" />
-        //               {state?.cart?.length > 0 && (
-        //                 <span className="absolute -top-1 -right-1 bg-red-500 text-black rounded px-1 py-2 text-xs ">
-        //                   {state?.cart?.length}
-        //                 </span>
-        //               )}
-        //             </span>
-        //           </Link>
-        //         </div>
-
-        //         <div>
-        //           <Link to="/MyAccount">
-        //             <FaRegUser className="text-xl sideIcons " />
-        //           </Link>
-        //         </div>
-        //       </div>
-
-        //       <div className="text-black text-xl flex justify-start font-medium">
-        //         Manage Account
-        //       </div>
-
-        //       <div className="flex flex-col justify-center items-center  gap-y-3  mt-5 ">
-        //         <Link to="/Account" className="flex gap-2 items-center">
-        //           <TbShoppingBagCheck />{" "}
-        //           <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-        //             {" "}
-        //             My Orders
-        //           </span>
-        //         </Link>
-        //         <Link to="/Account" className="flex gap-2 items-center">
-        //           {" "}
-        //           <ImCancelCircle />{" "}
-        //           <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-        //             {" "}
-        //             My Cancellations
-        //           </span>
-        //         </Link>
-        //         <Link to="/Account" className="flex gap-2 items-center">
-        //           {" "}
-        //           <IoStarOutline />{" "}
-        //           <span className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 hover:after:w-full after:bg-black after:transition-all after:duration-300">
-        //             {" "}
-        //             My reviews
-        //           </span>
-        //         </Link>
-
-        //         <div>
-        //           {" "}
-        //           {state?.isLogin ? (
-        //             <div className="flex gap-2 items-center hover:text-black">
-        //               <HiOutlineArrowLeftStartOnRectangle />{" "}
-        //               <button
-        //                 onClick={logout}
-        //                 className=" hover:text-black transition-colors duration-200 relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-0 hover:after:w-full after:bg-gray-700 after:transition-all after:duration-300"
-        //               >
-        //                 logout
-        //               </button>
-        //             </div>
-        //           ) : null}
-        //         </div>
-        //       </div>
-        //     </div>
-
-        //     <div>
-        //       <div className="flex flex-col items-center mt-5 py-5">
-        //         <p className="text-3xl font-medium ">Exclusive</p>
-        //       </div>
-
-        //       <div>
-        //         {" "}
-        //         {/* {state?.isLogin ? ( */}
-        //         <div className="flex gap-2 items-center justify-center text-black bg-gray-300 hover:bg-gray-600 hover:text-white p-3 rounded-xl  transition-colors duration-200  after:transition-all after:duration-300">
-        //           <HiOutlineArrowLeftStartOnRectangle />{" "}
-        //           <button onClick={logout} className="">
-        //             logout
-        //           </button>
-        //         </div>
-        //         {/* ) : null} */}
-        //       </div>
-        //     </div>
-        //   </div>
-        // </nav>
         <nav className="fixed inset-y-0 scroll-none navbar" id="hideSideBar">
           <div
             className="flex flex-col justify-between h-full px-5 py-6"
@@ -526,7 +298,7 @@ const Navbar = () => {
               </h3>
 
               <ul className="flex flex-col mb-8">
-                {["Home", "Shop","Contact", "Account",].map((item, idx) => (
+                {["Home", "Shop", "Contact", "Account"].map((item, idx) => (
                   <li
                     key={idx}
                     //  onClick={HideSideBar}
@@ -544,26 +316,26 @@ const Navbar = () => {
               {/* Icons */}
               <div className="flex justify-around py-4 border-t border-b border-gray-100 mb-6">
                 <Link to="/wishlist">
-                 <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
-                  <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
-                  {state?.wishlist?.length > 0 && (
-                    <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
-                      {state?.wishlist?.length}
-                    </span>
-                  )}
-                </span>
+                  <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
+                    <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" />
+                    {state?.wishlist?.length > 0 && (
+                      <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
+                        {state?.wishlist?.length}
+                      </span>
+                    )}
+                  </span>
                   {/* <FaRegHeart className="text-xl text-gray-600 hover:text-black transition" /> */}
                 </Link>
 
                 <Link to="/Cart" className="relative">
-                   <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
-                  <GrCart className="text-xl hover:scale-110 transition-all duration-200" />
-                  {state?.cart?.length > 0 && (
-                    <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
-                      {state?.cart?.length}
-                    </span>
-                  )}
-                </span>
+                  <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
+                    <GrCart className="text-xl hover:scale-110 transition-all duration-200" />
+                    {state?.cart?.length > 0 && (
+                      <span className="absolute -top-1 -right-1 group-hover:animate-bounce transition-all duration-200   bg-theme-primary text-white rounded px-1  text-xs">
+                        {state?.cart?.length}
+                      </span>
+                    )}
+                  </span>
                 </Link>
 
                 <Link to="/Account">
@@ -578,7 +350,7 @@ const Navbar = () => {
 
               <div className="flex flex-col">
                 <Link
-                  to="/Account"
+                  to="/myOrders"
                   className="flex items-center  !gap-3 w-full px-3 py-2 rounded-lg hover:bg-gray-100 transition"
                 >
                   <TbShoppingBagCheck className="text-gray-500" />
@@ -586,7 +358,7 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  to="/Account"
+                  to="/myOrders"
                   className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
                 >
                   <ImCancelCircle className="text-gray-500" />
@@ -607,6 +379,15 @@ const Navbar = () => {
             <button onClick={logout}>Logout</button>
           </div>
         ) : null} */}
+                {state?.isAdmin && state?.user?.user_role == 1 && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    <IoStarOutline className=" text-gray-500" />
+                    <span className="text-gray-700">Admin Panel</span>
+                  </Link>
+                )}
               </div>
             </div>
 
@@ -620,14 +401,19 @@ const Navbar = () => {
                   <HiOutlineArrowLeftStartOnRectangle />
                   <button onClick={logout}>Logout</button>
                 </div>
-              ) : 
-              <div className="flex items-center justify-center gap-2 bg-gray-900 text-white py-3 rounded-xl hover:bg-black transition">
+              ) : (
+                <div className="flex items-center justify-center gap-2 bg-gray-900 text-white py-3 rounded-xl hover:bg-black transition">
                   <IoLogIn />
-                  <Link to="/login"
+                  <Link
+                    to="/login"
                     className={({ isActive }) =>
                       `${style.navLink} ${isActive ? style.active : "after:w-0 hover:after:w-full"}`
-                    }>Login</Link>
-                </div>}
+                    }
+                  >
+                    Login
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </nav>

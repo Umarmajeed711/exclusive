@@ -203,8 +203,8 @@ const Account = () => {
             </div>
 
             <div className=" mx-12 flex flex-col gap-2 ">
-              <Link to="">My returns</Link>
-              <Link to="">My cancellations</Link>
+              <Link to="/myOrders">My returns</Link>
+              <Link to="/myOrders">My cancellations</Link>
             </div>
           </div>
 
@@ -218,7 +218,7 @@ const Account = () => {
               <p className="text-lg font-semibold text-gray-800">My Wishlist</p>
             </div>
             <div className=" mx-12 flex flex-col gap-2 ">
-              <Link to="">Check wishlist</Link>
+              <Link to="/wishlist">Check wishlist</Link>
             </div>
           </div>
         </div>

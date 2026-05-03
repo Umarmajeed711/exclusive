@@ -8,12 +8,19 @@ import { RiLockPasswordFill } from "react-icons/ri";
 import { GlobalContext } from "../context/Context";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../components/api";
 
 export const Login = () => {
-
   let { dispatch } = useContext(GlobalContext);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/";
+
+  console.log("From" , from);
+  
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -36,7 +43,7 @@ export const Login = () => {
     initialValues: {
       email: "",
       password: "",
-      rememberMe:rememberMe
+      rememberMe: rememberMe,
     },
     validationSchema: loginValidation,
 
@@ -47,13 +54,13 @@ export const Login = () => {
         let response = await api.post(`/login`, {
           email: values.email,
           password: values.password,
-          rememberMe: rememberMe
+          rememberMe: rememberMe,
         });
 
-        if(rememberMe){
-          localStorage.setItem("user",JSON.stringify(response?.data?.user))
-        }else{
-          sessionStorage.setItem("user",JSON.stringify(response?.data?.user))
+        if (rememberMe) {
+          localStorage.setItem("user", JSON.stringify(response?.data?.user));
+        } else {
+          sessionStorage.setItem("user", JSON.stringify(response?.data?.user));
         }
 
         setloading(false);
@@ -75,13 +82,22 @@ export const Login = () => {
 
         loginFormik.resetForm();
         let adminLogin =
-          response?.data.user.email === "umarmajeed711@gmail.com";
+          response?.data?.user.email === "umarmajeed711@gmail.com" &&
+          response?.data?.user.user_role == 1;
         if (adminLogin) {
           console.log("admin Login", adminLogin);
 
           dispatch({ type: "ADMIN_LOGIN", payload: response?.data.user });
         } else {
           dispatch({ type: "USER_LOGIN", payload: response?.data.user });
+        }
+
+        // navigate(from, { replace: true });
+
+        if (response?.data?.user?.user_role === 1) {
+          navigate("/admin");
+        } else {
+          navigate(from || "/", { replace: true });
         }
       } catch (error) {
         setloading(false);

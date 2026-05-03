@@ -194,6 +194,8 @@ const ProductDetail = () => {
         icon: "success",
         title: "Feedback Delete Successfully",
       });
+
+      getAverageRating(Product);
     } catch (error) {
       console.log(error);
     }
@@ -242,10 +244,6 @@ const ProductDetail = () => {
   // rate a product--------------------
 
   let newPrice = Number(Product.price) * (Product.discount / 100);
-
- 
-
-
 
   const scrollContainerRef = useRef(null);
 
@@ -763,13 +761,9 @@ const ProductDetail = () => {
                   )}
                 </div>
               </>
-            ) : (
-              
-              // {/* <p className="bg-gray-200 text-center">No reviews yet.</p> */}
-              
-              null
-              
-            )}
+            ) : // {/* <p className="bg-gray-200 text-center">No reviews yet.</p> */}
+
+            null}
           </>
         )}
       </div>
@@ -812,59 +806,63 @@ const ProductDetail = () => {
         </form>
       </div> */}
 
-      <div className="container mx-auto px-6 mt-10 flex flex-col items-center">
-        <p className="text-xl sm:text-2xl font-bold mb-4">Rate this product</p>
+      {state?.isLogin ? (
+        <div className="container mx-auto px-6 mt-10 flex flex-col items-center">
+          <p className="text-xl sm:text-2xl font-bold mb-4">
+            Rate this product
+          </p>
 
-        <form
-          onSubmit={handleSubmitReview}
-          className="w-full max-w-sm sm:max-w-md border rounded-3xl p-6 shadow-md flex flex-col gap-4 bg-white"
-        >
-          {/* Rating */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-600">
-              Your rating
-            </label>
-            <ReactStars
-              count={5}
-              value={userRating}
-              onChange={handleRatingChange}
-              size={28}
-              color2={"#ffd700"}
-            />
-          </div>
+          <form
+            onSubmit={handleSubmitReview}
+            className="w-full max-w-sm sm:max-w-md border rounded-3xl p-6 shadow-md flex flex-col gap-4 bg-white"
+          >
+            {/* Rating */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-600">
+                Your rating
+              </label>
+              <ReactStars
+                count={5}
+                value={userRating}
+                onChange={handleRatingChange}
+                size={28}
+                color2={"#ffd700"}
+              />
+            </div>
 
-          {/* Feedback */}
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-600">
-              Your review
-            </label>
-            <textarea
-              value={feedback}
-              onChange={handleFeedbackChange}
-              required
-              rows={4}
-              placeholder="Share your experience with this product…"
-              className="border rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-theme-primary"
-            />
-          </div>
+            {/* Feedback */}
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-gray-600">
+                Your review
+              </label>
+              <textarea
+                value={feedback}
+                onChange={handleFeedbackChange}
+                required
+                rows={4}
+                placeholder="Share your experience with this product…"
+                className="border rounded-lg p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-theme-primary"
+              />
+            </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-theme-primary text-white py-2 rounded-xl font-medium
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-theme-primary text-white py-2 rounded-xl font-medium
                  hover:shadow-lg hover:opacity-90 transition-all duration-300
                  disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Submitting..." : "Submit Review"}
-          </button>
-        </form>
-      </div>
+            >
+              {loading ? "Submitting..." : "Submit Review"}
+            </button>
+          </form>
+        </div>
+      ) : null}
 
       {/* map all related product?s */}
       {RelatedProduct?.length > 0 ? (
         <div className="md:container  mt-10">
-           {/* md:mx-auto  sm:px-4 md:px-8 lg:px-10 */}
+          {/* md:mx-auto  sm:px-4 md:px-8 lg:px-10 */}
           <div>
             <OurProducts
               products={RelatedProduct}

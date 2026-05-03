@@ -1,4 +1,4 @@
-import  { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
 import api from "../components/api";
@@ -6,10 +6,7 @@ import OurProducts from "../components/OurProducts";
 import Modal from "../components/modal";
 import AddProductForm from "../components/addProject";
 import { GlobalContext } from "../context/Context";
-import {
-  MdOutlineAdd,
-  MdOutlineFilterAlt,
-} from "react-icons/md";
+import { MdOutlineAdd, MdOutlineFilterAlt } from "react-icons/md";
 import SmartFilter from "../components/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES } from "../components/types";
 import { ActiveFilters } from "../components/ActiveFilters";
@@ -291,7 +288,9 @@ const Shop = () => {
 
               {totalProducts > 100 ? (
                 <select
-                  defaultValue={limit === totalProducts ? "All Products" : limit}
+                  defaultValue={
+                    limit === totalProducts ? "All Products" : limit
+                  }
                   onChange={(e) => {
                     const newLimit =
                       e.target.value === "all"
@@ -323,14 +322,16 @@ const Shop = () => {
               )}
             </div>
             <div className="flex gap-2 h-8">
-              <button
-                className="button   text-xl"
-                onClick={() => {
-                  setShowModal(true);
-                }}
-              >
-                <MdOutlineAdd />
-              </button>
+              {state?.isAdmin ? (
+                <button
+                  className="button   text-xl"
+                  onClick={() => {
+                    setShowModal(true);
+                  }}
+                >
+                  <MdOutlineAdd />
+                </button>
+              ) : null}
 
               {/* <div className="flex gap-[2px] text-xl  font-medium border border-theme-primary bg-theme-background p-[2px] rounded">
                 <button
