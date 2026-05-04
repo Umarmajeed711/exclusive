@@ -290,7 +290,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="mx-5  md:mx-8 lg:mx-14">
+    <div  className="mx-2">
       {/* Form Modal */}
       {/* <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
         Add your new project now...
@@ -304,7 +304,7 @@ const AddProduct = () => {
         </button>
       </div> */}
       <div>
-        <div className="flex flex-col  gap-5 my-5 sm:my-10">
+        <div className="flex flex-col  gap-5 my-2">
           <div className="flex flex-col gap-2 md:flex-row justify-between h-full md:items-center">
             <div className="flex gap-5 items-center">
               <p className="h-10 w-5 rounded bg-theme-primary"></p>
@@ -312,56 +312,7 @@ const AddProduct = () => {
                 Explore All products
               </p>
             </div>
-            <ActiveFilters
-              filters={filters}
-              onRemove={removeFilter}
-              onClear={clearAllFilters}
-              showFilterModal={() => {
-                setShowFilter(true);
-              }}
-            />
-          </div>
-          {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
-          <div className="flex justify-between items-center h-full">
-            {/* <div className="text-xl sm:text-4xl font-medium">
-              Explore All products
-            </div> */}
-            <div className="flex items-center gap-2">
-              {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
 
-              {totalProducts > 100 ? (
-                <select
-                  defaultValue={limit == totalProducts ? "All Products" : limit}
-                  onChange={(e) => {
-                    const newLimit =
-                      e.target.value == "all"
-                        ? Number(totalProducts)
-                        : Number(e.target.value);
-                    setLimit(newLimit);
-                    setCurrentPage(1);
-
-                    getProducts({
-                      filters: filterquery,
-                      page: 1,
-                      limit: newLimit,
-                    });
-                  }}
-                  disabled={loading}
-                  className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
-               focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
-               hover:border-gray-400 transition"
-                >
-                  <option value={100}>100 Products</option>
-                  <option value={200}>200 Products</option>
-                  <option value={500}>500 Products</option>
-                  <option value="all">All Products</option>
-                </select>
-              ) : (
-                <div className="text-xl sm:text-4xl font-medium py-1">
-                  Explore All products
-                </div>
-              )}
-            </div>
             <div className="flex gap-2">
               <button
                 className="button   text-xl"
@@ -403,6 +354,62 @@ const AddProduct = () => {
                 </button>
               </div>
             </div>
+
+
+            
+          </div>
+          {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
+          <div className="flex justify-between items-center h-full">
+            {/* <div className="text-xl sm:text-4xl font-medium">
+              Explore All products
+            </div> */}
+            <div className="flex items-center gap-2">
+              {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
+
+              {totalProducts > 100 ? (
+                <select
+                  defaultValue={limit == totalProducts ? "All Products" : limit}
+                  onChange={(e) => {
+                    const newLimit =
+                      e.target.value == "all"
+                        ? Number(totalProducts)
+                        : Number(e.target.value);
+                    setLimit(newLimit);
+                    setCurrentPage(1);
+
+                    getProducts({
+                      filters: filterquery,
+                      page: 1,
+                      limit: newLimit,
+                    });
+                  }}
+                  disabled={loading}
+                  className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
+               focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
+               hover:border-gray-400 transition"
+                >
+                  <option value={100}>100 Products</option>
+                  <option value={200}>200 Products</option>
+                  <option value={500}>500 Products</option>
+                  <option value="all">All Products</option>
+                </select>
+              ) : (
+                // <div className="text-xl sm:text-4xl font-medium py-1">
+                //   Explore All products
+                // </div>
+                null
+              )}
+            </div>
+
+            <ActiveFilters
+              filters={filters}
+              onRemove={removeFilter}
+              onClear={clearAllFilters}
+              showFilterModal={() => {
+                setShowFilter(true);
+              }}
+            />
+            
           </div>
         </div>
       </div>

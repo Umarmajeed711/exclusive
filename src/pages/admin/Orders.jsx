@@ -489,9 +489,9 @@ const Orders = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
-    <div className="mx-5  md:mx-8 lg:mx-14 py-4">
+    <div  className="mx-2">
       <div>
-        <div className="flex flex-col  gap-5 my-5 sm:my-10">
+        <div className="flex flex-col  gap-5 my-2">
           <div className="flex flex-row justify-between h-full md:items-center">
             <div className="flex gap-5 items-center">
               <p className="h-10 w-5 rounded bg-theme-primary"></p>

@@ -31,6 +31,7 @@ import { OrderTrackingWrapper } from "../../pages/OrderTrack";
 import OrderConfirmation from "../../pages/OrderComplete";
 import Whishlist from "../../pages/Whishlist";
 import Category from "../Category";
+import Dashboard from "../../pages/admin/Dashboard";
 
 const AppRoutes = () => {
   return (
@@ -73,10 +74,11 @@ const AppRoutes = () => {
       {/* ================= ADMIN ================= */}
       <Route element={<AdminRoute />}>
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dash />} />
+          {/* <Route index element={<Dash />} /> */}
+          <Route index element={<Dashboard/>} />
           <Route path="users" element={<Users />} />
           <Route path="orders" element={<Orders />} />
-          <Route path="products" element={<Products />} />
+          {/* <Route path="products" element={<Products />} /> */}
           <Route path="add-product" element={<AddProduct />} />
         </Route>
       </Route>
