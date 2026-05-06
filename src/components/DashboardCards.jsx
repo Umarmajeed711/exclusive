@@ -1,41 +1,79 @@
-import { ShoppingCart, Users, DollarSign, Package } from "lucide-react";
+import api from "./api";
+import { useEffect, useState } from "react";
+import { DollarSign, ShoppingCart, Users, Package } from "lucide-react";
 
-const cards = [
-  {
-    title: "Total Revenue",
-    value: "$12,500",
-    change: "+12.5%",
-    isIncrease: true,
-    icon: DollarSign,
-  },
-  {
-    title: "Orders",
-    value: "320",
-    change: "+8.2%",
-    isIncrease: true,
-    icon: ShoppingCart,
-  },
-  {
-    title: "Users",
-    value: "1,200",
-    change: "-3.1%",
-    isIncrease: false,
-    icon: Users,
-  },
-  {
-    title: "Products",
-    value: "85",
-    change: "+2.4%",
-    isIncrease: true,
-    icon: Package,
-  },
-];
+// const cards = [
+//   {
+//     title: "Total Revenue",
+//     value: "$12,500",
+//     change: "+12.5%",
+//     isIncrease: true,
+//     icon: DollarSign,
+//   },
+//   {
+//     title: "Orders",
+//     value: "320",
+//     change: "+8.2%",
+//     isIncrease: true,
+//     icon: ShoppingCart,
+//   },
+//   {
+//     title: "Users",
+//     value: "1,200",
+//     change: "-3.1%",
+//     isIncrease: false,
+//     icon: Users,
+//   },
+//   {
+//     title: "Products",
+//     value: "85",
+//     change: "+2.4%",
+//     isIncrease: true,
+//     icon: Package,
+//   },
+// ];
+
+
+const iconMap = {
+  DollarSign,
+  ShoppingCart,
+  Users,
+  Package,
+};
 
 const DashboardCards = () => {
+
+
+
+  const [cards,setCards] = useState([]);
+
+  const getCards = async () => {
+  try {
+    let response = await api("/dashboard-cards");
+
+    response = response?.data?.data;
+
+    setCards(response);
+
+    console.log("response", response);
+    
+    
+  } catch (error) {
+    
+  }
+
+}
+
+useEffect(() => {
+  getCards();
+
+},[])
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
       {cards.map((card, i) => {
-        const Icon = card.icon;
+
+        const Icon = iconMap[card.icon];
 
         return (
           <div
@@ -57,7 +95,7 @@ const DashboardCards = () => {
             </h2>
 
             {/* Growth */}
-            <div className="mt-2 flex items-center gap-2">
+            {/* <div className="mt-2 flex items-center gap-2">
               <span
                 className={`text-sm font-medium ${
                   card.isIncrease ? "text-green-600" : "text-red-500"
@@ -69,10 +107,10 @@ const DashboardCards = () => {
               <span className="text-xs text-gray-400">
                 vs last week
               </span>
-            </div>
+            </div> */}
 
             {/* Small progress bar */}
-            <div className="mt-3 w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            {/* <div className="mt-3 w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div
                 className={`h-full ${
                   card.isIncrease ? "bg-green-500" : "bg-red-500"
@@ -84,7 +122,7 @@ const DashboardCards = () => {
                   )}%`,
                 }}
               ></div>
-            </div>
+            </div> */}
           </div>
         );
       })}

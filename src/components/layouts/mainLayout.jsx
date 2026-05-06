@@ -8,17 +8,25 @@ const MainLayout = () => {
 
   const {state} = useContext(GlobalContext);
   
-  return state?.isLogin ? (
+  // return state?.isLogin ? (
+  //   <>
+  //     <Navbar />
+  //     <Outlet />
+  //     <Footer />
+  //   </>
+  // ) : (
+  //   <div className="flex justify-center items-center main">
+  //     <div className="loading"></div>
+  //   </div>
+  // );
+
+   return  (
     <>
       <Navbar />
       <Outlet />
       <Footer />
     </>
-  ) : (
-    <div className="flex justify-center items-center main">
-      <div className="loading"></div>
-    </div>
-  );
+  ) 
 };
 
 export default MainLayout;

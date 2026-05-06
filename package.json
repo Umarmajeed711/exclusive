@@ -16,6 +16,8 @@
     "dotenv": "^17.3.1",
     "formik": "^2.4.6",
     "framer-motion": "^12.23.12",
+    "highcharts": "^12.6.0",
+    "highcharts-react-official": "^3.2.3",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
