@@ -1,3 +1,5 @@
+import Swal from "sweetalert2";
+
 export const FILTER_OPERATORS = {
   IS: "is",
   CONTAINS: "contains",
@@ -63,3 +65,18 @@ export const getInitials = (name) => {
     : words[0][0];
 };
 
+
+export const showToast = ({
+  icon = "success",
+  title = "",
+}) => {
+  Swal.fire({
+    toast: true,
+    position: "bottom-end",
+    icon,
+    title,
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+  });
+};

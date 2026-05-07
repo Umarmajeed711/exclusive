@@ -125,56 +125,182 @@ import { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import api from "./api";
+import { showToast } from "./types";
 
-const salesData = [
-  { name: "Jan", sales: 400, orders: 40 },
-  { name: "Feb", sales: 800, orders: 65 },
-  { name: "Mar", sales: 600, orders: 50 },
-  { name: "Apr", sales: 1200, orders: 90 },
-  { name: "May", sales: 900, orders: 70 },
-];
+// const salesData = [
+//   { name: "Jan", sales: 400, orders: 40 },
+//   { name: "Feb", sales: 800, orders: 65 },
+//   { name: "Mar", sales: 600, orders: 50 },
+//   { name: "Apr", sales: 1200, orders: 90 },
+//   { name: "May", sales: 900, orders: 70 },
+// ];
 
-const orderStatusData = [
-  { name: "Delivered", value: 120 },
-  { name: "Pending", value: 40 },
-  { name: "Cancelled", value: 15 },
-  { name: "Shipped", value: 30 },
-];
+// const orderStatusData = [
+//   { name: "Delivered", value: 120 },
+//   { name: "Pending", value: 40 },
+//   { name: "Cancelled", value: 15 },
+//   { name: "Shipped", value: 30 },
+// ];
 
 const DashboardCharts = () => {
   const [filter, setFilter] = useState("30d");
 
+  // 🔥 states
+  const [salesData, setSalesData] = useState([]);
+  const [orderStatusData, setOrderStatusData] = useState([]);
 
+  // 🔥 loading states
+  const [salesLoading, setSalesLoading] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(false);
+
+  // 🔥 SALES API
+  const getSales = async () => {
+    try {
+      setSalesLoading(true);
+
+      const res = await api(
+        `/dashboard/sales-chart?range=${filter}`
+      );
+
+      if (res?.data?.success) {
+        setSalesData(res.data.data || []);
+      } else {
+        showToast({
+          icon: "error",
+          title:
+            res?.data?.message ||
+            "Failed to fetch sales data",
+        });
+      }
+
+    } catch (error) {
+      console.error(error);
+
+      showToast({
+        icon: "error",
+        title:
+          error?.response?.data?.message ||
+          "Something went wrong while fetching sales chart",
+      });
+
+    } finally {
+      setSalesLoading(false);
+    }
+  };
+
+  // 🔥 ORDER STATUS API
   const getOrderStatus = async () => {
     try {
-      let res = await api("/dashboard/order-status");
+      setStatusLoading(true);
 
-      console.log("res",res?.data);
-      
-      
+      const res = await api("/dashboard/order-status");
+
+      if (res?.data?.success) {
+        setOrderStatusData(res.data.data || []);
+      } else {
+        showToast({
+          icon: "error",
+          title:
+            res?.data?.message ||
+            "Failed to fetch order status data",
+        });
+      }
+
     } catch (error) {
-      
+      console.error(error);
+
+     
+       showToast({
+        icon: "error",
+        title:
+          error?.response?.data?.message ||
+          "Something went wrong while fetching order status",
+      });
+
+    } finally {
+      setStatusLoading(false);
     }
-  }
+  };
 
-   const getSales = async () => {
-    try {
-      let res = await api("/dashboard/sales-chart");
+  const [topProducts, setTopProducts] = useState([]);
+const [profitData, setProfitData] = useState([]);
 
-      console.log("res",res?.data);
-      
-      
-    } catch (error) {
-      
+const [loading, setLoading] = useState({
+  products: false,
+  profit: false,
+});
+
+
+const getTopProducts = async () => {
+  try {
+    setLoading((prev) => ({ ...prev, products: true }));
+
+    const res = await api("/dashboard/top-products?limit=5");
+
+    if (res?.data?.success) {
+      setTopProducts(res.data.data || []);
+    } else {
+      // toast.error(res?.data?.message || "Failed to load products");
     }
-  }
 
+  } catch (error) {
+   
+     showToast({
+        icon: "error",
+        title:
+          error?.response?.data?.message ||
+          "Something went wrong while fetching top products"
+      });
+  } finally {
+    setLoading((prev) => ({ ...prev, products: false }));
+  }
+};
+
+
+const getProfitData = async () => {
+  try {
+    setLoading((prev) => ({ ...prev, profit: true }));
+
+    const res = await api(
+      `/dashboard/profit-chart?range=${filter}`
+    );
+
+    if (res?.data?.success) {
+      setProfitData(res.data.data || []);
+    } else {
+      // toast.error(res?.data?.message || "Failed to load profit data");
+    }
+
+  } catch (error) {
+   
+     showToast({
+        icon: "error",
+        title:
+          error?.response?.data?.message ||
+          "Something went wrong while profit data",
+      });
+  } finally {
+    setLoading((prev) => ({ ...prev, profit: false }));
+  }
+};
+
+useEffect(() => {
+  getTopProducts();
+}, []);
+
+useEffect(() => {
+  getProfitData();
+}, [filter]);
+
+  // 🔥 Initial Load
   useEffect(() => {
-
     getOrderStatus();
-    getSales()
+  }, []);
 
-  },[])
+  // 🔥 Refetch when filter changes
+  useEffect(() => {
+    getSales();
+  }, [filter]);
 
 
   // 🔥 LINE CHART (Sales + Orders)
@@ -202,11 +328,11 @@ const DashboardCharts = () => {
     series: [
       {
         name: "Revenue",
-        data: salesData.map((d) => d.sales),
+        data: salesData.map((d) => Number(d.sales)),
       },
       {
         name: "Orders",
-        data: salesData.map((d) => d.orders),
+        data: salesData.map((d) => Number(d.orders)),
       },
     ],
     credits: { enabled: false },
@@ -243,7 +369,57 @@ const DashboardCharts = () => {
     credits: { enabled: false },
   };
 
+
+  const topProductsOptions = {
+  chart: {
+    type: "bar",
+    height: 350,
+  },
+  title: { text: "Top Products" },
+  xAxis: {
+    categories: topProducts.map((p) => p.name),
+  },
+  yAxis: {
+    title: { text: "Units Sold" },
+  },
+  series: [
+    {
+      name: "Sold",
+      data: topProducts.map((p) => Number(p.total_sold)),
+    },
+  ],
+  credits: { enabled: false },
+};
+
+const profitOptions = {
+  chart: {
+    type: "column",
+    height: 350,
+  },
+  title: { text: "Revenue vs Cost vs Profit" },
+  xAxis: {
+    categories: profitData.map((d) => d.label),
+  },
+  tooltip: { shared: true },
+  series: [
+    {
+      name: "Revenue",
+      data: profitData.map((d) => Number(d.revenue)),
+    },
+    {
+      name: "Cost",
+      data: profitData.map((d) => Number(d.cost)),
+    },
+    {
+      name: "Profit",
+      data: profitData.map((d) => Number(d.gross_profit)),
+    },
+  ],
+  credits: { enabled: false },
+};
+
   return (
+    <>
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
       {/* 🔥 SALES + ORDERS */}
@@ -282,6 +458,44 @@ const DashboardCharts = () => {
       </div>
 
     </div>
+
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+    {/* 🔥 TOP PRODUCTS */}
+    <div className="bg-white p-5 rounded-2xl border shadow-sm">
+      <h2 className="font-semibold mb-3">Top Products</h2>
+
+      {loading.products ? (
+        <p>Loading...</p>
+      ) : (
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={topProductsOptions}
+        />
+      )}
+    </div>
+
+    {/* 💰 PROFIT CHART */}
+    <div className="bg-white p-5 rounded-2xl border shadow-sm">
+      <h2 className="font-semibold mb-3">
+        Revenue vs Cost vs Profit
+      </h2>
+
+      {loading.profit ? (
+        <p>Loading...</p>
+      ) : (
+        <HighchartsReact
+          highcharts={Highcharts}
+          options={profitOptions}
+        />
+      )}
+    </div>
+
+  </div>
+    
+    
+    </>
   );
 };
 

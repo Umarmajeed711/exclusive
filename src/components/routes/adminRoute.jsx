@@ -6,6 +6,8 @@ import { GlobalContext } from "../../context/Context";
 const AdminRoute = () => {
   const { state } = useContext(GlobalContext);
 
+    console.log("adminROuteeeee is Login", state?.isLogin);
+
   if (!state?.isLogin) return <Navigate to="/login" />;
 
   if (state?.user?.user_role !== 1) {

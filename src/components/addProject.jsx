@@ -172,8 +172,10 @@ const AddProductForm = ({
       productData?.description,
     );
     addProjectFormik.setFieldValue("productPrice", productData?.price);
+     addProjectFormik.setFieldValue("productCostPrice", productData?.cost_price);
     addProjectFormik.setFieldValue("productQuantity", productData?.quantity);
     addProjectFormik.setFieldValue("productCategory", productData?.category_id);
+    
     addProjectFormik.setFieldValue("productSizes", sizes);
     addProjectFormik.setFieldValue("productColor", colors);
     addProjectFormik.setFieldValue("productDiscount", productData?.discount);
@@ -197,6 +199,7 @@ const AddProductForm = ({
     productName: yup.string().required("This field is required"),
     productDescription: yup.string().required("This field is required"),
     productPrice: yup.number().required("This field is required"),
+    productCostPrice: yup.number().required("This field is required"),
     productQuantity: yup.number().required("This field is required"),
     productCategory: yup.string().required("This field is required"),
     productSizes: yup.string().required("This field is required"),
@@ -208,6 +211,7 @@ const AddProductForm = ({
       productName: "",
       productDescription: "",
       productPrice: "",
+      productCostPrice:"",
       productQuantity: "",
       productDiscount: 0,
       productCategory: "",
@@ -229,6 +233,7 @@ const AddProductForm = ({
       formData.append("name", values.productName);
       formData.append("description", values.productDescription);
       formData.append("price", values.productPrice);
+      formData.append("cost_price", values.productCostPrice);
       formData.append("quantity", values.productQuantity);
       formData.append("discount", values.productDiscount);
       formData.append("category_id", values.productCategory);
@@ -486,11 +491,41 @@ const AddProductForm = ({
                 </div>
               </div>
 
-              {/* productPrice */}
+              {/* productCostPrice */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
                   <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    Price
+                  Cost Price
+                  </span>
+                </label>
+                <div>
+                  <input
+                    type="number"
+                    name="productCostPrice"
+                    value={addProjectFormik.values.productCostPrice}
+                    onChange={(e) => {
+                      addProjectFormik.handleChange(e);
+                      setApiError("");
+                    }}
+                    disabled={loading}
+                    className="inputField"
+                  />
+
+                  <div className="error-wrapper">
+                    {addProjectFormik.submitCount > 0 &&
+                      addProjectFormik.errors.productCostPrice && (
+                        <p className="requiredError">
+                          {addProjectFormik.errors.productCostPrice}
+                        </p>
+                      )}
+                  </div>
+                </div>
+              </div>
+
+               <div className="flex gap-3 flex-col justify-center ">
+                <label>
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                   Selling Price
                   </span>
                 </label>
                 <div>

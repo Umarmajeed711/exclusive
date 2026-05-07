@@ -88,7 +88,7 @@ const AddProduct = () => {
     setloading(true);
 
     try {
-      const result = await api.get("/products", {
+      const result = await api.get( isAdmin ?  "/admin/products":"/products", {
         params: {
           page,
           limit,
