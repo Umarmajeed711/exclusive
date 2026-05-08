@@ -80,3 +80,14 @@ export const showToast = ({
     timerProgressBar: true,
   });
 };
+
+export const Loader = ({className}) => 
+
+  {
+    return (
+      <div className={`flex justify-center items-center main ${className || ""}`}>
+              <div className="loading"></div>
+            </div>
+    )
+
+  }

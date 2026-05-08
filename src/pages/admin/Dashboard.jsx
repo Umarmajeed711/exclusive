@@ -1,8 +1,11 @@
 import DashboardCards from "../../components/DashboardCards";
 import DashboardCharts from "../../components/DashboardCharts";
+import OrderList from "../../components/OrderList";
 import RecentOrders from "../../components/RecentOrders";
 
 const Dashboard = () => {
+
+
   return (
     <div className="flex flex-col gap-6 mx-2">
       {/* <h1 className="text-2xl font-bold"></h1> */}
@@ -15,6 +18,8 @@ const Dashboard = () => {
       <DashboardCards />
       <DashboardCharts />
       <RecentOrders />
+
+       
     </div>
   );
 };

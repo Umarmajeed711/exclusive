@@ -7,6 +7,7 @@ import { GlobalContext } from "../context/Context";
 import useOutsideClick from "./outSideClick";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import { Loader } from "./types";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -290,9 +291,7 @@ const ProductListView = ({
     <>
       <div className="bg-white rounded-xl shadow p-4">
         {loading ? (
-          <div className="flex justify-center items-center main">
-            <div className="loading"></div>
-          </div>
+          <Loader/>
         ) : products.length === 0 ? (
           <div className="flex justify-center items-center h-[50vh]">
             <div className="text-md sm:text-xl font-medium  drop-shadow">

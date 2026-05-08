@@ -346,7 +346,7 @@ const Orders = () => {
     }
   };
 
-  const deleteProduct = async (id) => {
+  const deleteOrder = async (id) => {
     const previousOrders = Orders;
 
     setLoadingId(id);
@@ -567,7 +567,7 @@ const Orders = () => {
         loadingId={loadingId}
         isAdmin={isAdmin}
         updateOrderStatus={updateOrderStatus}
-        deleteProduct={deleteProduct}
+        deleteOrder={deleteOrder}
       />
 
       <Pagination

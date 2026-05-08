@@ -16,7 +16,16 @@ const App = () => {
 
   const checkLogin = async () => {
     try {
-      let response = await api.get(`/user-detail`);
+      let response = await api.get(`/user-detail` , {
+        
+  headers: {
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+    Expires: "0",
+  },
+      });
+
+       if (!response?.data?.user) return;
 
       let adminLogin =
         response.data.user.email === "umarmajeed711@gmail.com" &&

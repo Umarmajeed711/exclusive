@@ -33,9 +33,10 @@ const OrderList = ({
   products = [],
   updateOrderStatus = () => {},
   loadingId = null,
-  deleteProduct = () => {},
+  deleteOrder = () => {},
   loading = true,
   isAdmin = false,
+  title = ""
 }) => {
   let { state } = useContext(GlobalContext);
 
@@ -226,7 +227,7 @@ const OrderList = ({
                   }).then((result) => {
                     /* Read more about isConfirmed, isDenied below */
                     if (result.isConfirmed) {
-                      deleteProduct(order?.order_id);
+                      deleteOrder(order?.order_id);
                       // Swal.fire("Saved!", "", "success");
                     }
                   });
@@ -301,7 +302,7 @@ const OrderList = ({
 
   const handleBulkDelete = async () => {
     if (selectedOrders.length === 1) {
-      await deleteProduct(selectedOrders[0]);
+      await deleteOrder(selectedOrders[0]);
     } else {
       setBulkDelLoading(true);
 
@@ -359,7 +360,7 @@ const OrderList = ({
           <>
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Orders</h2>
+              <h2 className="text-xl font-semibold">{title  ?? "Orders" }</h2>
 
               {selectedOrders.length > 0 && isAdmin && (
                 <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">

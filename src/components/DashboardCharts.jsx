@@ -125,7 +125,7 @@ import { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import api from "./api";
-import { showToast } from "./types";
+import { Loader, showToast } from "./types";
 
 // const salesData = [
 //   { name: "Jan", sales: 400, orders: 40 },
@@ -257,12 +257,14 @@ const getTopProducts = async () => {
 };
 
 
+const [revenueFilter,setRevenueFilter] = useState("30d");
+
 const getProfitData = async () => {
   try {
     setLoading((prev) => ({ ...prev, profit: true }));
 
     const res = await api(
-      `/dashboard/profit-chart?range=${filter}`
+      `/dashboard/profit-chart?range=${revenueFilter}`
     );
 
     if (res?.data?.success) {
@@ -290,7 +292,7 @@ useEffect(() => {
 
 useEffect(() => {
   getProfitData();
-}, [filter]);
+}, [revenueFilter]);
 
   // 🔥 Initial Load
   useEffect(() => {
@@ -447,14 +449,28 @@ const profitOptions = {
           </div>
         </div>
 
+        {
+          salesLoading ?
+          <Loader className="!max-h-[300px]"/> :
+
         <HighchartsReact highcharts={Highcharts} options={lineOptions} />
+        }
+
+
       </div>
 
       {/* 🔥 ORDER STATUS PIE */}
       <div className="bg-white p-5 rounded-2xl shadow-sm border">
         <h3 className="font-semibold text-lg mb-4">Order Status</h3>
 
+
+        {
+          statusLoading ?
+          <Loader className="!max-h-[300px]" /> :
+
         <HighchartsReact highcharts={Highcharts} options={pieOptions} />
+        }
+
       </div>
 
     </div>
@@ -464,10 +480,10 @@ const profitOptions = {
 
     {/* 🔥 TOP PRODUCTS */}
     <div className="bg-white p-5 rounded-2xl border shadow-sm">
-      <h2 className="font-semibold mb-3">Top Products</h2>
+       <h3 className="font-semibold text-lg">Top Products</h3>
 
       {loading.products ? (
-        <p>Loading...</p>
+        <Loader className="!max-h-[300px]" />
       ) : (
         <HighchartsReact
           highcharts={Highcharts}
@@ -478,12 +494,30 @@ const profitOptions = {
 
     {/* 💰 PROFIT CHART */}
     <div className="bg-white p-5 rounded-2xl border shadow-sm">
-      <h2 className="font-semibold mb-3">
-        Revenue vs Cost vs Profit
-      </h2>
+      
+      <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-lg">Revenue vs Cost vs Profit</h3>
 
-      {loading.profit ? (
-        <p>Loading...</p>
+          {/* Filter */}
+          <div className="flex gap-2">
+            {["7d", "30d", "12m"].map((item) => (
+              <button
+                key={item}
+                onClick={() => setRevenueFilter(item)}
+                className={`px-3 py-1 text-sm rounded-lg border ${
+                  revenueFilter === item
+                    ? "bg-black text-white"
+                    : "bg-white text-gray-600"
+                }`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      {loading?.profit ? (
+        <Loader className="!max-h-[300px]" />
       ) : (
         <HighchartsReact
           highcharts={Highcharts}
