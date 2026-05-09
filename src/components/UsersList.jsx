@@ -17,6 +17,7 @@ import { useNavigate } from "react-router-dom";
 import { FiEdit2 } from "react-icons/fi";
 import UserUpdateForm from "./updateUser";
 import { X } from "lucide-react";
+import { exportToCSV } from "./exportToCSV";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -553,6 +554,45 @@ return
   }
   };
 
+  const exportData = users?.filter(
+  (user) =>
+    selectedUsers.includes(
+      user?.user_id
+    )
+);
+
+
+  const handleExportCSV = () => {
+  exportToCSV({
+    fileName: "users",
+
+    columns: [
+      {
+        label: "ID",
+        key: "user_id",
+      },
+      {
+        label: "Name",
+        key: "name",
+      },
+      {
+        label: "Email",
+        key: "email",
+      },
+      {
+        label: "Phone",
+        key: "phone",
+      },
+      {
+        label: "Status",
+        key: "is_active",
+      },
+    ],
+
+    data: exportData,
+  });
+};
+
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
@@ -603,6 +643,14 @@ return
                   >
                     Delete
                   </button>
+
+                  <button
+  color="success"
+  variant="shadow"
+  onClick={handleExportCSV}
+>
+  Export CSV
+</button>
 
                   <div
                     className="text-black bg-theme-background p-1 rounded cursor-pointer"
