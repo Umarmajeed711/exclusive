@@ -218,7 +218,7 @@ const Users = () => {
 
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-2">
-              {totalUsers > 100 ? (
+              {totalUsers > 50 ? (
                 <select
                   defaultValue={limit == totalUsers ? "All Users" : limit || ""}
                   onChange={(e) => {
@@ -243,9 +243,9 @@ const Users = () => {
                   <option value="" disabled selected>
                     - limit Users -
                   </option>
+                  <option value={50}>50 Users</option>
+                  <option value={75}>75 Users</option>
                   <option value={100}>100 Users</option>
-                  <option value={200}>200 Users</option>
-                  <option value={500}>500 Users</option>
                   <option value="all">All Users</option>
                 </select>
               ) : null}

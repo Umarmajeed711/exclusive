@@ -3,6 +3,8 @@ import { GlobalContext } from "../context/Context";
 import OrderList from "./OrderList";
 import api from "./api";
 import { showToast } from "./types";
+import { Link } from "react-router-dom";
+import Swal from "sweetalert2";
 
 // const orders = [
 //   { id: 1, name: "Ali", total: "$120", status: "Delivered" },
@@ -85,41 +87,46 @@ const RecentOrders = () => {
   };
 
   const deleteOrder = async (id) => {
-    const previousOrders = Orders;
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete  this Order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
 
-    setLoadingId(id);
+    if (result?.isConfirmed) {
+      const previousOrders = Orders;
 
-    setOrders((prev) => prev.filter((p) => p.order_id !== id));
+      setLoadingId(id);
 
-    try {
-      let res =  await api.delete(`/order/${id}`);
-      
-      showToast({
-                icon: "success",
-                title:
-                  res?.data?.message ||
-                  "Deleted Successfully",
-              });
+      setOrders((prev) => prev.filter((p) => p.order_id !== id));
 
-      
-    } catch (error) {
-      console.log(error);
+      try {
+        let res = await api.delete(`/order/${id}`);
 
-      setOrders(previousOrders);
+        showToast({
+          icon: "success",
+          title: res?.data?.message || "Deleted Successfully",
+        });
+      } catch (error) {
+        console.log(error);
 
-       showToast({
-                icon: "error",
-                title:
-                  error?.data?.message ||
-                  "Failed to delete Order",
-              });
+        setOrders(previousOrders);
 
-     
+        showToast({
+          icon: "error",
+          title: error?.data?.message || "Failed to delete Order",
+        });
+      }
     }
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow">
+    <div className="flex flex-col">
       {/* <h3 className="font-semibold mb-4"></h3> */}
 
       <OrderList
@@ -131,6 +138,17 @@ const RecentOrders = () => {
         updateOrderStatus={updateOrderStatus}
         deleteOrder={deleteOrder}
       />
+
+      {Orders?.length > 0 ? (
+        <Link
+          to="/admin/orders"
+          className="text-decoration-none mt-3 flex self-center"
+        >
+          <button className="bg-[#03A9F4] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#0288d1] transition">
+            Explore All
+          </button>
+        </Link>
+      ) : null}
 
       {/* <table className="w-full text-sm">
         <thead>

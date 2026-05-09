@@ -17,10 +17,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || "/";
-
-  console.log("From" , from);
-  
+  const from = location.state?.from?.pathname || "/";  
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -120,7 +117,7 @@ export const Login = () => {
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl hover: w-[220px]",
   };
   return (
-    <div className="flex justify-center  items-center main">
+    <div className="flex justify-center  items-center h-screen">
       <div className=" flex items-center  gap-20 sm:p-10 bg-theme-background min-w-[320px]">
         {/* Image div */}
         <div className="hidden md:flex flex-col ">

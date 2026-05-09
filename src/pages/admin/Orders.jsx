@@ -3,7 +3,11 @@ import { GlobalContext } from "../../context/Context";
 import ProductListView from "../../components/ProductList";
 import Pagination from "../../components/Pagination";
 import OrderList from "../../components/OrderList";
-import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
+import {
+  FILTER_OPERATORS,
+  INPUT_TYPES,
+  showToast,
+} from "../../components/types";
 import api from "../../components/api";
 import SmartFilter from "../../components/SmartFilters";
 import { ActiveFilters } from "../../components/ActiveFilters";
@@ -339,7 +343,16 @@ const Orders = () => {
       await api.put(`/orders/${order_id}/status`, {
         [field]: value,
       });
+
+      showToast({
+        icon: "success",
+        title: "Update Successfully",
+      });
     } catch (error) {
+      showToast({
+        icon: "error",
+        title: error?.data?.message || "Something went wrong",
+      });
       setOrders(prevOrders);
     } finally {
       setLoadingId(null);
@@ -347,37 +360,39 @@ const Orders = () => {
   };
 
   const deleteOrder = async (id) => {
-    const previousOrders = Orders;
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this Order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
 
-    setLoadingId(id);
+    if (result?.isConfirmed) {
+      const previousOrders = Orders;
 
-    setOrders((prev) => prev.filter((p) => p.order_id !== id));
+      setLoadingId(id);
 
-    try {
-      await api.delete(`/order/${id}`);
+      setOrders((prev) => prev.filter((p) => p.order_id !== id));
 
-      Swal.fire({
-        icon: "success",
-        title: "Deleted Successfully",
-        toast: true,
-        position: "bottom-left",
-        timer: 3000,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.log(error);
+      try {
+        await api.delete(`/order/${id}`);
 
-      setOrders(previousOrders);
+        showToast({
+          icon: "success",
+          title: "Deleted Successfully",
+        });
+      } catch (error) {
+        setOrders(previousOrders);
 
-      Swal.fire({
-        icon: "error",
-        title: "Delete Failed",
-        text: "Something went wrong",
-        toast: true,
-        position: "bottom-left",
-        timer: 3000,
-        showConfirmButton: false,
-      });
+        showToast({
+          icon: "error",
+          title: error?.data?.message || "Something went wrong",
+        });
+      }
     }
   };
 
@@ -489,7 +504,7 @@ const Orders = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
-    <div  className="mx-2">
+    <div className="mx-2">
       <div>
         <div className="flex flex-col  gap-5 my-2">
           <div className="flex flex-row justify-between h-full md:items-center">
@@ -514,7 +529,7 @@ const Orders = () => {
 
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-2">
-              {totalOrders > 100 ? (
+              {totalOrders > 50 ? (
                 <select
                   defaultValue={
                     limit == totalOrders ? "All Orders" : limit || ""
@@ -541,9 +556,9 @@ const Orders = () => {
                   <option value="" disabled selected>
                     - limit Orders -
                   </option>
+                  <option value={50}>50 Orders</option>
+                  <option value={75}>75 Orders</option>
                   <option value={100}>100 Orders</option>
-                  <option value={200}>200 Orders</option>
-                  <option value={500}>500 Orders</option>
                   <option value="all">All Orders</option>
                 </select>
               ) : null}
@@ -572,7 +587,7 @@ const Orders = () => {
 
       <Pagination
         currentPage={currentPage}
-        totalPages={Math.ceil(totalOrders / (limit || 12 ))}
+        totalPages={Math.ceil(totalOrders / (limit || 12))}
         totalProducts={totalOrders}
         pageSize={limit || 12}
         isLoading={loading}

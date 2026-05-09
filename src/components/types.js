@@ -1,3 +1,4 @@
+import { Children } from "react";
 import Swal from "sweetalert2";
 
 export const FILTER_OPERATORS = {
@@ -91,3 +92,21 @@ export const Loader = ({className}) =>
     )
 
   }
+
+export const TableCard = ({ children, className = "" }) => {
+  return (
+    <div
+      className={`bg-white p-5 rounded-2xl shadow-sm border ${className}`}
+    >
+      {children}
+    </div>
+  );
+};
+
+export const formatStatus = (status = "") => {
+  return status
+    ?.replace(/[_-]/g, " ") // replace _ and - with space
+    ?.replace(/\s+/g, " ") // remove extra spaces
+    ?.trim()
+    ?.toUpperCase(); // convert uppercase
+};

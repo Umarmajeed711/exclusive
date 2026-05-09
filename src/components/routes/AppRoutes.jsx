@@ -34,6 +34,9 @@ import Category from "../Category";
 import Dashboard from "../../pages/admin/Dashboard";
 
 const AppRoutes = () => {
+
+  console.log("App Routes CAlllllllllllllllll");
+  
   return (
     <Routes>
       {/* ================= USER SIDE ================= */}

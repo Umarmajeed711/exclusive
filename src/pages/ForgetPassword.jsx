@@ -92,7 +92,7 @@ const ForgetPassword = () => {
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl hover: w-[220px]",
   };
   return (
-    <div className="flex justify-center  items-center main">
+    <div className="flex justify-center  items-center h-screen">
       <div className=" flex items-center  gap-20 p-10 bg-slate-100">
         {/* Image div */}
         <div className="hidden md:flex flex-col ">

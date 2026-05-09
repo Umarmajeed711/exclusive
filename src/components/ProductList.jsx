@@ -7,7 +7,7 @@ import { GlobalContext } from "../context/Context";
 import useOutsideClick from "./outSideClick";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { Loader } from "./types";
+import { Loader, showToast } from "./types";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -217,29 +217,20 @@ const ProductListView = ({
         console.log("response", response);
 
         // Success toast
-        Swal.fire({
-          icon: "success",
-          title: "Product deleted successfully",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
+        showToast({
+            icon: "success",
+            title: response?.data?.message || "Product deleted successfully",
+          });
         delProduct(id);
       } catch (error) {
         console.log("eror", error);
 
-        // Error toast
-        Swal.fire({
-          icon: "error",
-          title: error?.response?.data?.message || "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
+        showToast({
+            icon: "error",
+            title:  error?.response?.data?.message || "Something went wrong",
+          });
+
+       
       }
     }
   };
@@ -248,35 +239,21 @@ const ProductListView = ({
     updateProduct(product);
     setProjectData({});
     setShowModal(false);
-    dynamicToast({ position, icon, message });
+     showToast({
+            icon: icon,
+            title: message,
+          });
   };
 
   const OnError = ({ position, icon, message }) => {
-    dynamicToast({ position, icon, message });
+   
+    showToast({
+            icon: icon,
+            title: message,
+          });
   };
 
-  const dynamicToast = ({
-    position = "bottom-left",
-    icon = "success",
-    message = "",
-  }) => {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: position,
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
 
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
-      icon: icon,
-      title: message,
-    });
-  };
 
   
 

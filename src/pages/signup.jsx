@@ -109,7 +109,7 @@ export const Signup = () => {
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl w-[220px]",
   };
   return (
-    <div className="flex justify-center items-center main">
+    <div className="flex justify-center items-center h-screen">
       <div className="flex justify-center items-center  gap-20 sm:p-10 bg-slate-100 min-w-[320px]">
         {/* Image div */}
         

@@ -19,7 +19,7 @@ import {
 } from "react-icons/md";
 import ProductListView from "../../components/ProductList";
 import SmartFilter from "../../components/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
+import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../../components/types";
 import { ActiveFilters } from "../../components/ActiveFilters";
 import Pagination from "../../components/Pagination";
 
@@ -88,7 +88,7 @@ const AddProduct = () => {
     setloading(true);
 
     try {
-      const result = await api.get( isAdmin ?  "/admin/products":"/products", {
+      const result = await api.get(isAdmin ? "/admin/products" : "/products", {
         params: {
           page,
           limit,
@@ -142,35 +142,42 @@ const AddProduct = () => {
     getProducts();
     setProjectData({});
     setShowModal(false);
-    dynamicToast({ position, icon, message });
-  };
 
-  const OnError = ({ position, icon, message }) => {
-    dynamicToast({ position, icon, message });
-  };
-
-  const dynamicToast = ({
-    position = "bottom-left",
-    icon = "success",
-    message = "",
-  }) => {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: position,
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
+    showToast({
       icon: icon,
       title: message,
     });
   };
+
+  const OnError = ({ position, icon, message }) => {
+    showToast({
+      icon: icon,
+      title: message,
+    });
+  };
+
+  // const dynamicToast = ({
+  //   position = "bottom-left",
+  //   icon = "success",
+  //   message = "",
+  // }) => {
+  //   const Toast = Swal.mixin({
+  //     toast: true,
+  //     position: position,
+  //     showConfirmButton: false,
+  //     timer: 3000,
+  //     timerProgressBar: true,
+
+  //     didOpen: (toast) => {
+  //       toast.onmouseenter = Swal.stopTimer;
+  //       toast.onmouseleave = Swal.resumeTimer;
+  //     },
+  //   });
+  //   Toast.fire({
+  //     icon: icon,
+  //     title: message,
+  //   });
+  // };
 
   const productFilters = [
     {
@@ -290,7 +297,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div  className="mx-2">
+    <div className="mx-2">
       {/* Form Modal */}
       {/* <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
         Add your new project now...
@@ -344,7 +351,7 @@ const AddProduct = () => {
 
               <div className="flex justify-center cursor-pointer">
                 <button
-                 className={`button   text-xl ${filters?.length > 0 ? "active" : ""}`}
+                  className={`button   text-xl ${filters?.length > 0 ? "active" : ""}`}
                   onClick={() => {
                     setShowFilter(!showFilter);
                     console.log("show filter", showFilter);
@@ -354,9 +361,6 @@ const AddProduct = () => {
                 </button>
               </div>
             </div>
-
-
-            
           </div>
           {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
           <div className="flex justify-between items-center h-full">
@@ -366,7 +370,7 @@ const AddProduct = () => {
             <div className="flex items-center gap-2">
               {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
 
-              {totalProducts > 100 ? (
+              {totalProducts > 50 ? (
                 <select
                   defaultValue={limit == totalProducts ? "All Products" : limit}
                   onChange={(e) => {
@@ -388,17 +392,15 @@ const AddProduct = () => {
                focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
                hover:border-gray-400 transition"
                 >
+                  <option value={50}>50 Products</option>
+                  <option value={75}>75 Products</option>
                   <option value={100}>100 Products</option>
-                  <option value={200}>200 Products</option>
-                  <option value={500}>500 Products</option>
                   <option value="all">All Products</option>
                 </select>
-              ) : (
-                // <div className="text-xl sm:text-4xl font-medium py-1">
-                //   Explore All products
-                // </div>
-                null
-              )}
+              ) : // <div className="text-xl sm:text-4xl font-medium py-1">
+              //   Explore All products
+              // </div>
+              null}
             </div>
 
             <ActiveFilters
@@ -409,7 +411,6 @@ const AddProduct = () => {
                 setShowFilter(true);
               }}
             />
-            
           </div>
         </div>
       </div>

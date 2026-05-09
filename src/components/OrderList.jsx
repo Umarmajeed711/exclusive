@@ -5,10 +5,11 @@ import { GlobalContext } from "../context/Context";
 import useOutsideClick from "./outSideClick";
 import OrderDetailsModal from "./OrderDetailModal";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { formatText } from "./types";
+import { formatText, showToast } from "./types";
 import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
 import Modal from "./modal";
 import { useNavigate } from "react-router-dom";
+import { X } from "lucide-react";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -36,7 +37,7 @@ const OrderList = ({
   deleteOrder = () => {},
   loading = true,
   isAdmin = false,
-  title = ""
+  title = "",
 }) => {
   let { state } = useContext(GlobalContext);
 
@@ -137,9 +138,6 @@ const OrderList = ({
   //   }
   // };
 
-  /* ==============================
-     CELL RENDER
-  ================================ */
   const renderCell = (key, order) => {
     switch (key) {
       case "order_id":
@@ -204,7 +202,9 @@ const OrderList = ({
         return isAdmin ? (
           <div className="flex items-center gap-2 ">
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 setSelectedOrder(order);
                 setShowDetails(true);
               }}
@@ -213,32 +213,13 @@ const OrderList = ({
               View
             </button>
 
-            <button title="Delete" 
-            disabled={loadingId == order?.order_id}
-             className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
-              onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  Swal.fire({
-                    title: "Do you want delete this Order?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Delete",
-                  }).then((result) => {
-                    /* Read more about isConfirmed, isDenied below */
-                    if (result.isConfirmed) {
-                      deleteOrder(order?.order_id);
-                      // Swal.fire("Saved!", "", "success");
-                    }
-                  });
-                }}
+            <button
+              title="Delete"
+              disabled={loadingId == order?.order_id}
+              className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
+              onClick={() => deleteOrder(order?.order_id)}
             >
-              <RiDeleteBin6Fill size={16}
-                // className={`text-red-500 cursor-pointer text-xl sm:text-2xl hover:text-red-600 hover:scale-105 hover:animate-spin
-                //    duration-200 transition-all  ${loadingId === order.order_id ? "opacity-50 cursor-not-allowed" : ""}`}
-                
-               
-              />
+              <RiDeleteBin6Fill size={16} />
             </button>
           </div>
         ) : null;
@@ -271,28 +252,50 @@ const OrderList = ({
       // single API
       await updateOrderStatus(selectedOrders[0], field, value);
     } else {
-      setBulkUpdLoading(true);
+      const result = await Swal.fire({
+        title: "Are You Sure?",
+        text: "Do you want to update the status?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Update",
+        cancelButtonText: "Cancel",
+      });
 
-      // bulk API
-      const previosOrders = Orders;
+      if (result?.isConfirmed) {
+        setBulkUpdLoading(true);
 
-      setOrders((prev) =>
-        prev.map((o) =>
-          selectedOrders.includes(o.order_id) ? { ...o, [field]: value } : o,
-        ),
-      );
-      try {
-        console.log("Selected Orders", selectedOrders);
-        console.log("Selected Field and value", field, value);
+        // bulk API
+        const previosOrders = Orders;
 
-        await api.put("/orders/bulk-status", {
-          ids: selectedOrders,
-          [field]: value,
-        });
-      } catch (error) {
-        setOrders(previosOrders);
-      } finally {
-        setBulkUpdLoading(false);
+        setOrders((prev) =>
+          prev.map((o) =>
+            selectedOrders.includes(o.order_id) ? { ...o, [field]: value } : o,
+          ),
+        );
+        try {
+          console.log("Selected Orders", selectedOrders);
+          console.log("Selected Field and value", field, value);
+
+          await api.put("/orders/bulk-status", {
+            ids: selectedOrders,
+            [field]: value,
+          });
+
+          showToast({
+            icon: "success",
+            title: "Update Successfully",
+          });
+        } catch (error) {
+          showToast({
+            icon: "error",
+            title: error?.response?.data?.message || "Something went wrong",
+          });
+          setOrders(previosOrders);
+        } finally {
+          setBulkUpdLoading(false);
+        }
       }
 
       // optimistic update
@@ -301,43 +304,47 @@ const OrderList = ({
   };
 
   const handleBulkDelete = async () => {
-    if (selectedOrders.length === 1) {
+    if (selectedOrders?.length === 1) {
       await deleteOrder(selectedOrders[0]);
     } else {
-      setBulkDelLoading(true);
+      const result = await Swal.fire({
+        title: "Are You Sure?",
+        text: "Do you want to delete All this Order?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel",
+      });
 
-      const previousOrders = Orders;
+      if (result?.isConfirmed) {
+        setBulkDelLoading(true);
 
-      setOrders((prev) =>
-        prev.filter((o) => !selectedOrders.includes(o.order_id)),
-      );
+        const previousOrders = Orders;
 
-      try {
-        await api.delete("/orders/bulk-delete", {
-          data: { ids: selectedOrders },
-        });
+        setOrders((prev) =>
+          prev.filter((o) => !selectedOrders.includes(o.order_id)),
+        );
 
-        Swal.fire({
-          icon: "success",
-          title: "Deleted Successfully",
-          toast: true,
-          position: "bottom-left",
-          timer: 3000,
-          showConfirmButton: false,
-        });
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Delete Failed",
-          text: "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          timer: 3000,
-          showConfirmButton: false,
-        });
-        setOrders(previousOrders);
-      } finally {
-        setBulkDelLoading(false);
+        try {
+          await api.delete("/orders/bulk-delete", {
+            data: { ids: selectedOrders },
+          });
+
+          showToast({
+            icon: "success",
+            title: "Deleted Successfully",
+          });
+        } catch (error) {
+          showToast({
+            icon: "error",
+            title: error?.data?.message || "Something went wrong",
+          });
+          setOrders(previousOrders);
+        } finally {
+          setBulkDelLoading(false);
+        }
       }
     }
     setSelectedOrders([]);
@@ -360,7 +367,7 @@ const OrderList = ({
           <>
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{title  ?? "Orders" }</h2>
+              <h2 className="text-xl font-semibold">{title ?? "Orders"}</h2>
 
               {selectedOrders.length > 0 && isAdmin && (
                 <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
@@ -368,20 +375,6 @@ const OrderList = ({
                     {selectedOrders.length} selected
                   </span>
 
-                  {/* Delivery Status */}
-                  {/* <select
-      onChange={(e) =>
-        handleBulkUpdate("delivery_status", e.target.value)
-      }
-      className="border px-2 py-1 rounded text-sm"
-    >
-      <option value="">Delivery Status</option>
-      {DELIVERY_STATUS.map((s) => (
-        <option key={s} value={s}>
-          {formatText(s)}
-        </option>
-      ))}
-    </select> */}
                   <DeliveryStatusDropdown
                     order={Orders}
                     updateOrderStatus={handleBulkUpdate}
@@ -389,20 +382,6 @@ const OrderList = ({
                     isDisabled={bulkUpdLoading}
                   />
 
-                  {/* Payment Status */}
-                  {/* <select
-      onChange={(e) =>
-        handleBulkUpdate("payment_status", e.target.value)
-      }
-      className="border px-2 py-1 rounded text-sm"
-    >
-      <option value="">Payment Status</option>
-      {PAYMENT_STATUS.map((s) => (
-        <option key={s} value={s}>
-          {formatText(s)}
-        </option>
-      ))}
-    </select> */}
                   <PaymentStatusDropdown
                     order={Orders}
                     updateOrderStatus={handleBulkUpdate}
@@ -414,23 +393,22 @@ const OrderList = ({
                   <button
                     disabled={bulkDelLoading}
                     onClick={() => {
-                      Swal.fire({
-                        title: "Do you want delete this Order?",
-                        icon: "warning",
-                        showCancelButton: true,
-                        confirmButtonText: "Delete",
-                      }).then((result) => {
-                        /* Read more about isConfirmed, isDenied below */
-                        if (result.isConfirmed) {
-                          handleBulkDelete();
-                        }
-                      });
+                      handleBulkDelete();
                     }}
                     className={`text-red-500 cursor-pointer px-3 py-1 hover:text-red-600 hover:scale-105 hover:animate-spin
                    duration-200 transition-all  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     Delete
                   </button>
+
+                  <div
+                    className="text-black bg-theme-background p-1 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                    onClick={() => {
+                      setSelectedOrders("");
+                    }}
+                  >
+                    <X size={20} />
+                  </div>
                 </div>
               )}
 
@@ -506,15 +484,21 @@ const OrderList = ({
                     <tr
                       key={order.order_id}
                       className="border-b hover:bg-gray-50 cursor-pointer  transition"
-                      onClick={() => {
-                        navigate(`/orders/${order.order_id}`);
-                      }}
+                      // onClick={() => {
+                      //   navigate(`/orders/${order.order_id}`);
+                      // }}
                     >
-                      <td className="p-3 sticky left-0 z-10 bg-white">
+                      <td
+                        className="p-3 sticky left-0 z-10 bg-white cursor-pointer"
+                        // onClick={(e) => {e.preventDefault();
+                        //   e.stopPropagation();}}
+                      >
                         <input
                           type="checkbox"
                           checked={selectedOrders.includes(order.order_id)}
-                          onChange={() => toggleSelectOrder(order.order_id)}
+                          onChange={(e) => {
+                            toggleSelectOrder(order.order_id);
+                          }}
                         />
                       </td>
                       {columns.map(
