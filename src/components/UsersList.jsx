@@ -271,147 +271,143 @@ const UsersList = ({
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
 
   const handleBulkUpdate = async ({ field, value }) => {
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to update the Users?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
 
-         const result = await Swal.fire({
+    if (result?.isConfirmed) {
+      setBulkUpdLoading(true);
+
+      const selectedUserObjects = Users?.filter((u) =>
+        selectedUsers?.includes(u.user_id),
+      );
+
+      const protectedUsers = selectedUserObjects?.filter(
+        (u) => u.user_role === 1 || u.user_id === state?.user?.user_id,
+      );
+
+      if (protectedUsers.length > 0) {
+        showToast({
+          icon: "warning",
+          message: "Some selected users are protected and cannot be deleted.",
+        });
+        return;
+      }
+
+      // bulk API
+      const previosOrders = Users;
+
+      const idsToUpdate = [...selectedUsers];
+
+      setSelectedUsers([]);
+
+      setUsers((prev) =>
+        prev.map((o) =>
+          idsToUpdate?.includes(o.user_id) ? { ...o, [field]: value } : o,
+        ),
+      );
+
+      try {
+        // 🔥 CONFIRMATION (important)
+        const confirm = await Swal.fire({
           title: "Are You Sure?",
-          text: "Do you want to update the Users?",
+          text: `Do you want to update ${field}?`,
           icon: "warning",
           showCancelButton: true,
           confirmButtonColor: "#d33",
           cancelButtonColor: "#3085d6",
-          confirmButtonText: "Delete",
+          confirmButtonText: "Yes",
           cancelButtonText: "Cancel",
         });
 
-    if(result?.isConfirmed) { 
-    setBulkUpdLoading(true);
+        if (!confirm) return;
 
-    const selectedUserObjects = Users?.filter((u) =>
-      selectedUsers?.includes(u.user_id),
-    );
+        const res = await api.put(`/users/status`, {
+          ids: idsToUpdate,
+          [field]: value,
+        });
 
-    const protectedUsers = selectedUserObjects?.filter(
-      (u) => u.user_role === 1 || u.user_id === state?.user?.user_id,
-    );
-
-    if (protectedUsers.length > 0) {
-      showToast({
-        icon:"warning",
-        message:"Some selected users are protected and cannot be deleted."
-      })
-      return;
+        showToast({
+          icon: "success",
+          title: res?.data?.message || "Update Successfully",
+        });
+      } catch (error) {
+        setUsers(previosOrders);
+        console.log(error);
+        showToast({
+          icon: "error",
+          title: error?.data?.message || "Failed to Delete",
+        });
+      } finally {
+        setBulkUpdLoading(false);
+      }
     }
-    
-
-    // bulk API
-    const previosOrders = Users;
-
-    const idsToUpdate = [...selectedUsers];
-
-    setSelectedUsers([]);
-
-    setUsers((prev) =>
-      prev.map((o) =>
-        idsToUpdate?.includes(o.user_id) ? { ...o, [field]: value } : o,
-      ),
-    );
-
-    try {
-      // 🔥 CONFIRMATION (important)
-          const confirm = await Swal.fire({
-              title: "Are You Sure?",
-              text:   `Do you want to update ${field}?`,
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#d33",
-              cancelButtonColor: "#3085d6",
-              confirmButtonText: "Yes",
-              cancelButtonText: "Cancel",
-            });
-
-      if (!confirm) return;
-
-      const res = await api.put(`/users/status`, {
-        ids: idsToUpdate,
-        [field]: value,
-      });
-
-      showToast({
-        icon: "success",
-        title: res?.data?.message || "Update Successfully",
-      });
-    } catch (error) {
-      setUsers(previosOrders);
-      console.log(error);
-      showToast({
-        icon: "error",
-        title: error?.data?.message || "Failed to Delete",
-      });
-    } finally {
-      setBulkUpdLoading(false);
-    }
-  }
   };
 
   const handleBulkDelete = async () => {
-   
-     const result = await Swal.fire({
-          title: "Are You Sure?",
-          text: "Do you want to delete this Users?",
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this Users?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result?.isConfirmed) {
+      const selectedUserObjects = Users?.filter((u) =>
+        selectedUsers?.includes(u.user_id),
+      );
+
+      const protectedUsers = selectedUserObjects?.filter(
+        (u) => u.user_role === 1 || u.user_id === state?.user?.user_id,
+      );
+
+      if (protectedUsers.length > 0) {
+        showToast({
           icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Delete",
-          cancelButtonText: "Cancel",
+          message: "Some selected users are protected and cannot be deleted.",
+        });
+        return;
+      }
+
+      setBulkDelLoading(true);
+
+      const previousOrders = [...Users];
+
+      setUsers((prev) =>
+        prev.filter((o) => !selectedUsers.includes(o.user_id)),
+      );
+
+      try {
+        await api.delete("/users/delete", {
+          ids: [selectedUsers],
         });
 
-    if(result?.isConfirmed) {  
+        showToast({
+          icon: "success",
+          title: "Deleted Successfully",
+        });
+      } catch (error) {
+        showToast({
+          icon: "error",
+          title: error?.data?.message || "Failed to Delete",
+        });
 
-    const selectedUserObjects = Users?.filter((u) =>
-      selectedUsers?.includes(u.user_id),
-    );
-
-    const protectedUsers = selectedUserObjects?.filter(
-      (u) => u.user_role === 1 || u.user_id === state?.user?.user_id,
-    );
-
-    if (protectedUsers.length > 0) {
-      showToast({
-        icon:"warning",
-        message:"Some selected users are protected and cannot be deleted."
-      })
-      return;
+        setUsers(previousOrders);
+      } finally {
+        setBulkDelLoading(false);
+      }
     }
-
-    setBulkDelLoading(true);
-
-    const previousOrders = [...Users];
-
-    setUsers((prev) => prev.filter((o) => !selectedUsers.includes(o.user_id)));
-
-    
-    try {
-      await api.delete("/users/delete", {
-        ids: [selectedUsers],
-      });
-
-     
-      showToast({
-        icon: "success",
-        title: "Deleted Successfully",
-      });
-    } catch (error) {
-      showToast({
-        icon: "error",
-        title: error?.data?.message || "Failed to Delete",
-      });
-    
-      setUsers(previousOrders);
-    } finally {
-      setBulkDelLoading(false);
-    }
-  }
 
     setSelectedUsers([]);
   };
@@ -423,16 +419,16 @@ const UsersList = ({
     setSelectedUser({});
     setShowModal(false);
     showToast({
-        icon: icon,
-        title: message || "",
-      });
+      icon: icon,
+      title: message || "",
+    });
   };
 
   const OnError = ({ position, icon, message }) => {
-      showToast({
-        icon: icon,
-        title: message || "",
-      });
+    showToast({
+      icon: icon,
+      title: message || "",
+    });
   };
 
   const [loadingId, setLoadingId] = useState(null);
@@ -445,29 +441,27 @@ const UsersList = ({
 
     try {
       if (user?.user_role === 1) {
-
         Swal.fire({
-  title: "You cannot modify Super Admin!",
-  icon: "warning",
-  draggable: true
-});
+          title: "You cannot modify Super Admin!",
+          icon: "warning",
+          draggable: true,
+        });
 
-        return  ;
+        return;
       }
 
       // 🔥 CONFIRMATION (important)
-      
 
       const confirm = await Swal.fire({
-              title: "Are You Sure?",
-              text:   `Do you want to update ${field}?`,
-              icon: "warning",
-              showCancelButton: true,
-              confirmButtonColor: "#d33",
-              cancelButtonColor: "#3085d6",
-              confirmButtonText: "Yes",
-              cancelButtonText: "Cancel",
-            });
+        title: "Are You Sure?",
+        text: `Do you want to update ${field}?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes",
+        cancelButtonText: "Cancel",
+      });
 
       if (!confirm) return;
 
@@ -503,95 +497,169 @@ const UsersList = ({
   };
 
   const deleteUser = async (ids, user = null) => {
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this Order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
 
-     const result = await Swal.fire({
-          title: "Are You Sure?",
-          text: "Do you want to delete this Order?",
+    if (result?.isConfirmed) {
+      if (user?.user_role === 1) {
+        Swal.fire({
+          title: "You cannot modify Super Admin!",
           icon: "warning",
-          showCancelButton: true,
-          confirmButtonColor: "#d33",
-          cancelButtonColor: "#3085d6",
-          confirmButtonText: "Delete",
-          cancelButtonText: "Cancel",
+          draggable: true,
+        });
+        return;
+      }
+
+      const previousOrders = Users;
+
+      setLoadingId(ids);
+
+      setUsers((prev) => prev.filter((p) => p.user_id !== ids));
+
+      try {
+        await api.delete("/users/delete", {
+          ids: [ids],
         });
 
+        showToast({
+          icon: "success",
+          title: "Deleted Successfully",
+        });
+      } catch (error) {
+        console.log(error);
 
-   if(result?.isConfirmed){
-    if (user?.user_role === 1) {
-         Swal.fire({
-  title: "You cannot modify Super Admin!",
-  icon: "warning",
-  draggable: true
-});
-return
+        setUsers(previousOrders);
+
+        showToast({
+          icon: "error",
+          title: error?.data?.message || "Failed to Delete",
+        });
+      }
     }
-
-    const previousOrders = Users;
-
-    setLoadingId(ids);
-
-    setUsers((prev) => prev.filter((p) => p.user_id !== ids));
-
-    try {
-      await api.delete("/users/delete", {
-        ids: [ids],
-      });
-
-      showToast({
-        icon: "success",
-        title:  "Deleted Successfully",
-      });
-    } catch (error) {
-      console.log(error);
-
-      setUsers(previousOrders);
-
-      showToast({
-        icon: "error",
-        title: error?.data?.message || "Failed to Delete",
-      });
-    }
-  }
   };
 
-  const exportData = users?.filter(
-  (user) =>
-    selectedUsers.includes(
-      user?.user_id
-    )
-);
+  const exportData = users?.filter((user) =>
+    selectedUsers.includes(user?.user_id),
+  );
 
+  const [exportLoading, setExportLoading] = useState(false);
 
   const handleExportCSV = () => {
-  exportToCSV({
-    fileName: "users",
+    setExportLoading(true);
 
-    columns: [
-      {
-        label: "ID",
-        key: "user_id",
-      },
-      {
-        label: "Name",
-        key: "name",
-      },
-      {
-        label: "Email",
-        key: "email",
-      },
-      {
-        label: "Phone",
-        key: "phone",
-      },
-      {
-        label: "Status",
-        key: "is_active",
-      },
-    ],
+    try {
+       if (!selectedUsers.length) {
+      showToast({
+        icon: "warning",
+        message: "please select ther user first",
+      });
+      return;
+    }
 
-    data: exportData,
-  });
-};
+    if (!users?.length) {
+      showToast({
+        icon: "warning",
+        message: "No users available to export",
+      });
+
+      return;
+    }
+
+    const date = new Date().toISOString();
+
+    // const  columns = [
+    //     {
+    //       label: "ID",
+    //       key: "user_id",
+    //     },
+    //     {
+    //       label: "Name",
+    //       key: "name",
+    //     },
+    //     {
+    //       label: "Email",
+    //       key: "email",
+    //     },
+    //     {
+    //       label: "Phone",
+    //       key: "phone",
+    //     },
+    //     {
+    //       label: "Email Verified",
+    //       key: "email_verified",
+    //     },
+    //     {
+    //       label: "Role",
+    //       key: "user_role",
+    //     },
+    //     {
+    //       label: "Status",
+    //       key: "is_active",
+    //     },
+    //     {
+    //       label: "Blocked",
+    //       key: "is_blocked",
+    //     },
+    //   ]
+
+    
+    
+   const fixedColumns = [
+  {
+    key: "name",
+    label: "Name",
+  },
+  {
+    key: "email",
+    label: "Email",
+  },
+];
+    const visibleColumns = columns?.filter((col) => col.visible);
+
+   
+
+    
+    const finalColumns = [
+      ...fixedColumns,
+      ...visibleColumns,
+    ];
+    const exportColumns = finalColumns?.filter((col) => col.key !== "actions");
+    exportToCSV({
+      fileName: `users-${date}`,
+
+     
+      columns: exportColumns,
+      data: exportData,
+    });
+
+     showToast({
+        icon: "success",
+        message:`${users?.length} users exported successfully`
+      });
+
+    
+    
+      
+    } catch (error) {
+       showToast({
+        icon: "error",
+        message: "Failed to export users",
+      });
+      
+    }
+    finally{
+      setExportLoading(false);
+    }
+   
+  };
 
   return (
     <>
@@ -645,12 +713,14 @@ return
                   </button>
 
                   <button
-  color="success"
-  variant="shadow"
-  onClick={handleExportCSV}
->
-  Export CSV
-</button>
+                    color="success"
+                    variant="shadow"
+                    isLoading={exportLoading}
+                    disabled={exportLoading}
+                    onClick={handleExportCSV}
+                  >
+                    Export CSV
+                  </button>
 
                   <div
                     className="text-black bg-theme-background p-1 rounded cursor-pointer"
