@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import api from "./api";
 import { GlobalContext } from "../context/Context";
@@ -10,6 +10,8 @@ import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
 import Modal from "./modal";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
+import { exportToCSV } from "./exportToCSV";
+import ExportDropdown from "./exportDrop";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -17,11 +19,11 @@ import { X } from "lucide-react";
 const DEFAULT_COLUMNS = [
   { key: "order_id", label: "Order ID", visible: true },
   { key: "customer", label: "Customer", visible: true },
-  { key: "total", label: "Total", visible: true },
+  { key: "total_price", label: "Total", visible: true },
   { key: "payment_method", label: "Payment Method", visible: true },
   { key: "payment_status", label: "Payment", visible: true },
   { key: "delivery_status", label: "Delivery", visible: true },
-  { key: "date", label: "Date", visible: true },
+  { key: "order_date", label: "Date", visible: true },
   { key: "actions", label: "Actions", visible: true },
 ];
 
@@ -32,6 +34,7 @@ const STORAGE_KEY = "order_table_columns";
 ================================ */
 const OrderList = ({
   products = [],
+  filters = [],
   updateOrderStatus = () => {},
   loadingId = null,
   deleteOrder = () => {},
@@ -151,7 +154,7 @@ const OrderList = ({
           </div>
         );
 
-      case "total":
+      case "total_price":
         return <span className="font-semibold">${order.total_price}</span>;
 
       case "payment_method":
@@ -195,7 +198,7 @@ const OrderList = ({
           <b>{formatText(order.delivery_status)}</b>
         );
 
-      case "date":
+      case "order_date":
         return new Date(order.order_date).toLocaleDateString();
 
       case "actions":
@@ -352,6 +355,101 @@ const OrderList = ({
 
   const navigate = useNavigate();
 
+  const fixedColumns = [
+    {
+      key: "shipping_name",
+      label: "Name",
+    },
+    {
+      key: "shipping_phone",
+      label: "phone",
+    },
+    {
+      key: "shipping_address",
+      label: "Address",
+    },
+  ];
+
+  const exportColumns = useMemo(() => {
+    const visibleColumns = columns?.filter((col) => col.visible);
+
+    const finalColumns = [...fixedColumns, ...visibleColumns];
+
+    return finalColumns?.filter(
+      (col) => col.key !== "actions" ,
+    )?.filter((col) =>  col.key !== "customer");
+  }, [columns, fixedColumns]);
+
+  const exportData = Orders?.filter((order) =>
+    selectedOrders?.includes(order?.order_id),
+  );
+
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const handleExportCSV = () => {
+    setExportLoading(true);
+
+    try {
+      if (!selectedOrders?.length) {
+        showToast({
+          icon: "warning",
+          title: "please select ther order first",
+        });
+        return;
+      }
+
+      if (!Orders?.length) {
+        showToast({
+          icon: "warning",
+          title: "No orders available to export",
+        });
+
+        return;
+      }
+
+      const date = new Date().toISOString();
+
+      exportToCSV({
+        fileName: `orders-${date}`,
+        columns: exportColumns,
+        data: exportData,
+      });
+
+      showToast({
+        icon: "success",
+        title: `${Orders?.length} orders exported successfully`,
+      });
+    } catch (error) {
+      showToast({
+        icon: "error",
+        title: "Failed to export orders",
+      });
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const exportOptions = [
+    {
+      type: "current-page-orders",
+      icon: "FileSpreadsheet",
+      label: "Current Page",
+      description: "Visible orders only",
+    },
+    {
+      type: "filtered-orders",
+      icon: "Filter",
+      label: "Filtered Orders",
+      description: "Based on applied filters",
+    },
+    {
+      type: "all-orders",
+      icon: "Database",
+      label: "All Orders",
+      description: "Complete database export",
+    },
+  ];
+
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
@@ -389,13 +487,35 @@ const OrderList = ({
                     isDisabled={bulkUpdLoading}
                   />
 
+                  {/* Export  */}
+
+                  <button
+                    className="
+          flex items-center gap-2
+          rounded-xl
+          bg-emerald-600
+          px-4 py-1.5
+          text-sm font-medium text-white
+          shadow-lg shadow-emerald-500/20
+          transition-all
+          hover:scale-[1.02]
+          hover:bg-emerald-700
+        "
+                    isLoading={exportLoading}
+                    disabled={exportLoading}
+                    onClick={handleExportCSV}
+                  >
+                    Export CSV
+                  </button>
+
                   {/* Delete */}
                   <button
                     disabled={bulkDelLoading}
                     onClick={() => {
                       handleBulkDelete();
                     }}
-                    className={`text-red-500 cursor-pointer px-3 py-1 hover:text-red-600 hover:scale-105 hover:animate-spin
+                    className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
+                       hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
                    duration-200 transition-all  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     Delete
@@ -412,45 +532,57 @@ const OrderList = ({
                 </div>
               )}
 
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setOpen(!open)}
-                  className="px-4 py-2 bg-gray-100 rounded"
-                >
-                  Columns ⚙
-                </button>
+              <div className="flex gap-1">
+                <div>
+                  <ExportDropdown
+                    exportOptions={exportOptions}
+                    paginatedUsers={Orders}
+                    exportColumns={exportColumns}
+                    exportToCSV={exportToCSV}
+                    filters={filters}
+                  />
+                </div>
 
-                {open && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
-                    {columns.map((col, index) => (
-                      <div
-                        key={col.key}
-                        draggable
-                        onDragStart={() => onDragStart(index)}
-                        onDragOver={onDragOver}
-                        onDrop={() => onDrop(index)}
-                        className="flex justify-between items-center py-1 px-2 hover:bg-gray-100"
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setOpen(!open)}
+                    className="px-4 py-2 bg-gray-100 rounded"
+                  >
+                    Columns ⚙
+                  </button>
+
+                  {open && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
+                      {columns.map((col, index) => (
+                        <div
+                          key={col.key}
+                          draggable
+                          onDragStart={() => onDragStart(index)}
+                          onDragOver={onDragOver}
+                          onDrop={() => onDrop(index)}
+                          className="flex justify-between items-center py-1 px-2 hover:bg-gray-100"
+                        >
+                          <label className="flex gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={col.visible}
+                              onChange={() => toggleColumn(col.key)}
+                            />
+                            {col.label}
+                          </label>
+                          <span>⋮⋮</span>
+                        </div>
+                      ))}
+
+                      <button
+                        onClick={resetColumns}
+                        className="mt-2 text-red-600 text-sm"
                       >
-                        <label className="flex gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={col.visible}
-                            onChange={() => toggleColumn(col.key)}
-                          />
-                          {col.label}
-                        </label>
-                        <span>⋮⋮</span>
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={resetColumns}
-                      className="mt-2 text-red-600 text-sm"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                )}
+                        Reset
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

@@ -275,7 +275,7 @@ const AddProductForm = ({
 
         OnSuccess({
           icon: "success",
-          message: response?.data?.message || "Add Product Successfully",
+          title: response?.data?.message || "Add Product Successfully",
         });
       } catch (error) {
         setloading(false);

@@ -64,7 +64,7 @@ const Users = () => {
     getUsers();
   }, []);
 
-  const orderFilters = [
+  const userFilters = [
     {
       key: "user_id",
       label: "User ID",
@@ -266,6 +266,7 @@ const Users = () => {
       <UsersList
         users={Users}
         loading={loading}
+        filters={filters}
         // loadingId={loadingId}
         // updateUserStatus={updateUserStatus}
         updateUser={handleUserUpdate}
@@ -285,7 +286,7 @@ const Users = () => {
       {showFilter && (
         <SmartFilter
           showFilterModal={showFilter}
-          filters={orderFilters}
+          filters={userFilters}
           onChange={handleFilterApply}
           value={filters}
           onClose={() => {

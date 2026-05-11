@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import api from "./api";
 import { GlobalContext } from "../context/Context";
@@ -18,6 +18,7 @@ import { FiEdit2 } from "react-icons/fi";
 import UserUpdateForm from "./updateUser";
 import { X } from "lucide-react";
 import { exportToCSV } from "./exportToCSV";
+import ExportDropdown from "./exportDrop";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -46,6 +47,7 @@ const UsersList = ({
   updateUser = () => {},
   // loadingId = null,
   // deleteUser = () => {},
+  filters = [],
   loading = true,
   isAdmin = false,
 }) => {
@@ -74,6 +76,25 @@ const UsersList = ({
   const menuRef = useOutsideClick(() => {
     setOpen(false); // close when clicked outside
   });
+
+  const fixedColumns = [
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "email",
+      label: "Email",
+    },
+  ];
+
+  const exportColumns = useMemo(() => {
+    const visibleColumns = columns?.filter((col) => col.visible);
+
+    const finalColumns = [...fixedColumns, ...visibleColumns];
+
+    return finalColumns.filter((col) => col.key !== "actions");
+  }, [columns, fixedColumns]);
 
   /* ==============================
      LOAD / SAVE COLUMNS
@@ -296,7 +317,7 @@ const UsersList = ({
       if (protectedUsers.length > 0) {
         showToast({
           icon: "warning",
-          message: "Some selected users are protected and cannot be deleted.",
+          title: "Some selected users are protected and cannot be deleted.",
         });
         return;
       }
@@ -375,7 +396,7 @@ const UsersList = ({
       if (protectedUsers.length > 0) {
         showToast({
           icon: "warning",
-          message: "Some selected users are protected and cannot be deleted.",
+          title: "Some selected users are protected and cannot be deleted.",
         });
         return;
       }
@@ -556,111 +577,116 @@ const UsersList = ({
     setExportLoading(true);
 
     try {
-       if (!selectedUsers.length) {
-      showToast({
-        icon: "warning",
-        message: "please select ther user first",
+      if (!selectedUsers.length) {
+        showToast({
+          icon: "warning",
+          title: "please select ther user first",
+        });
+        return;
+      }
+
+      if (!users?.length) {
+        showToast({
+          icon: "warning",
+          title: "No users available to export",
+        });
+
+        return;
+      }
+
+      const date = new Date().toISOString();
+
+      // const  columns = [
+      //     {
+      //       label: "ID",
+      //       key: "user_id",
+      //     },
+      //     {
+      //       label: "Name",
+      //       key: "name",
+      //     },
+      //     {
+      //       label: "Email",
+      //       key: "email",
+      //     },
+      //     {
+      //       label: "Phone",
+      //       key: "phone",
+      //     },
+      //     {
+      //       label: "Email Verified",
+      //       key: "email_verified",
+      //     },
+      //     {
+      //       label: "Role",
+      //       key: "user_role",
+      //     },
+      //     {
+      //       label: "Status",
+      //       key: "is_active",
+      //     },
+      //     {
+      //       label: "Blocked",
+      //       key: "is_blocked",
+      //     },
+      //   ]
+
+      // const fixedColumns = [
+      //   {
+      //     key: "name",
+      //     label: "Name",
+      //   },
+      //   {
+      //     key: "email",
+      //     label: "Email",
+      //   },
+      // ];
+      // const visibleColumns = columns?.filter((col) => col.visible);
+
+      // const finalColumns = [...fixedColumns, ...visibleColumns];
+      // const exportColumns = finalColumns?.filter(
+      //   (col) => col.key !== "actions",
+      // );
+      exportToCSV({
+        fileName: `users-${date}`,
+        columns: exportColumns,
+        data: exportData,
       });
-      return;
-    }
 
-    if (!users?.length) {
       showToast({
-        icon: "warning",
-        message: "No users available to export",
-      });
-
-      return;
-    }
-
-    const date = new Date().toISOString();
-
-    // const  columns = [
-    //     {
-    //       label: "ID",
-    //       key: "user_id",
-    //     },
-    //     {
-    //       label: "Name",
-    //       key: "name",
-    //     },
-    //     {
-    //       label: "Email",
-    //       key: "email",
-    //     },
-    //     {
-    //       label: "Phone",
-    //       key: "phone",
-    //     },
-    //     {
-    //       label: "Email Verified",
-    //       key: "email_verified",
-    //     },
-    //     {
-    //       label: "Role",
-    //       key: "user_role",
-    //     },
-    //     {
-    //       label: "Status",
-    //       key: "is_active",
-    //     },
-    //     {
-    //       label: "Blocked",
-    //       key: "is_blocked",
-    //     },
-    //   ]
-
-    
-    
-   const fixedColumns = [
-  {
-    key: "name",
-    label: "Name",
-  },
-  {
-    key: "email",
-    label: "Email",
-  },
-];
-    const visibleColumns = columns?.filter((col) => col.visible);
-
-   
-
-    
-    const finalColumns = [
-      ...fixedColumns,
-      ...visibleColumns,
-    ];
-    const exportColumns = finalColumns?.filter((col) => col.key !== "actions");
-    exportToCSV({
-      fileName: `users-${date}`,
-
-     
-      columns: exportColumns,
-      data: exportData,
-    });
-
-     showToast({
         icon: "success",
-        message:`${users?.length} users exported successfully`
+        title: `${users?.length} users exported successfully`,
       });
-
-    
-    
-      
     } catch (error) {
-       showToast({
+      showToast({
         icon: "error",
-        message: "Failed to export users",
+        title: "Failed to export users",
       });
-      
-    }
-    finally{
+    } finally {
       setExportLoading(false);
     }
-   
   };
 
+   const exportOptions = [
+    {
+      type:'current-page',
+      icon:"FileSpreadsheet",
+      label:"Current Page",
+      description:"Visible users only"
+    },
+    {
+     type:'filtered-users',
+     icon:"Filter",
+     label:"Filtered Users",
+     description:"Based on applied filters"
+   },
+     {
+      type:"all-users",
+      icon:"Database",
+      label:"All Users",
+      description:"Complete database export"
+    }
+   ]
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
@@ -679,9 +705,12 @@ const UsersList = ({
               <h2 className="text-xl font-semibold">Users</h2>
 
               {selectedUsers.length > 0 && isAdmin && (
-                <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
+                <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-4 items-center z-50">
                   <span className="text-sm font-medium">
-                    {selectedUsers.length} selected
+                    {selectedUsers.length + 1 == users?.length
+                      ? "All"
+                      : selectedUsers?.length}{" "}
+                    selected
                   </span>
 
                   <ActiveStatusDropdown
@@ -700,21 +729,20 @@ const UsersList = ({
                     isBulk={true}
                   />
 
-                  {/* Delete */}
-                  <button
-                    disabled={bulkDelLoading}
-                    onClick={() => {
-                      handleBulkDelete();
-                    }}
-                    className={`text-red-500 cursor-pointer px-3 py-1 hover:text-red-600 hover:scale-105 hover:animate-spin
-                   duration-200 transition-all  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                  >
-                    Delete
-                  </button>
+                   {/* Export  */}
 
                   <button
-                    color="success"
-                    variant="shadow"
+                    className="
+          flex items-center gap-2
+          rounded-xl
+          bg-emerald-600
+          px-4 py-1.5
+          text-sm font-medium text-white
+          shadow-lg shadow-emerald-500/20
+          transition-all
+          hover:scale-[1.02]
+          hover:bg-emerald-700
+        "
                     isLoading={exportLoading}
                     disabled={exportLoading}
                     onClick={handleExportCSV}
@@ -722,8 +750,24 @@ const UsersList = ({
                     Export CSV
                   </button>
 
+                  {/* Delete */}
+                  <button
+                    disabled={bulkDelLoading}
+                    onClick={() => {
+                      handleBulkDelete();
+                    }}
+                    className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
+                       hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
+                   duration-200 transition-all  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    Delete
+                  </button>
+
+                 
+
                   <div
-                    className="text-black bg-theme-background p-1 rounded cursor-pointer"
+                    className="text-black bg-theme-background  hover:bg-gray-200 transition-all p-1 rounded cursor-pointer"
+                    title="close"
                     onClick={() => {
                       setSelectedUsers("");
                     }}
@@ -733,45 +777,57 @@ const UsersList = ({
                 </div>
               )}
 
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setOpen(!open)}
-                  className="px-4 py-2 bg-gray-100 rounded"
-                >
-                  Columns ⚙
-                </button>
+              <div className="flex gap-1">
+                <div>
+                  <ExportDropdown
+                    exportOptions={exportOptions}
+                    paginatedUsers={users}
+                    exportColumns={exportColumns}
+                    exportToCSV={exportToCSV}
+                    filters={filters}
+                  />
+                </div>
 
-                {open && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
-                    {columns.map((col, index) => (
-                      <div
-                        key={col.key}
-                        draggable
-                        onDragStart={() => onDragStart(index)}
-                        onDragOver={onDragOver}
-                        onDrop={() => onDrop(index)}
-                        className="flex justify-between items-center py-1 px-2 hover:bg-gray-100"
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setOpen(!open)}
+                    className="px-4 py-2 bg-gray-100 rounded"
+                  >
+                    Columns ⚙
+                  </button>
+
+                  {open && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
+                      {columns.map((col, index) => (
+                        <div
+                          key={col.key}
+                          draggable
+                          onDragStart={() => onDragStart(index)}
+                          onDragOver={onDragOver}
+                          onDrop={() => onDrop(index)}
+                          className="flex justify-between items-center py-1 px-2 hover:bg-gray-100"
+                        >
+                          <label className="flex gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={col.visible}
+                              onChange={() => toggleColumn(col.key)}
+                            />
+                            {col.label}
+                          </label>
+                          <span>⋮⋮</span>
+                        </div>
+                      ))}
+
+                      <button
+                        onClick={resetColumns}
+                        className="mt-2 text-red-600 text-sm"
                       >
-                        <label className="flex gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={col.visible}
-                            onChange={() => toggleColumn(col.key)}
-                          />
-                          {col.label}
-                        </label>
-                        <span>⋮⋮</span>
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={resetColumns}
-                      className="mt-2 text-red-600 text-sm"
-                    >
-                      Reset
-                    </button>
-                  </div>
-                )}
+                        Reset
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

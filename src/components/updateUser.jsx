@@ -76,7 +76,7 @@ const UserUpdateForm = ({
 
         OnSuccess({
           icon: "success",
-          message: res?.data?.message || "User updated successfully",
+          title: res?.data?.message || "User updated successfully",
           user: res?.data?.profile
         });
         

@@ -37,7 +37,7 @@ const Contact = () => {
     initialValues: {
       name: "",
       email: "",
-      message: "",
+      title: "",
       phone: undefined,
     },
     validationSchema: contactValidation,

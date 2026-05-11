@@ -583,6 +583,7 @@ const Orders = () => {
         isAdmin={isAdmin}
         updateOrderStatus={updateOrderStatus}
         deleteOrder={deleteOrder}
+        filters={orderFilters}
       />
 
       <Pagination

@@ -291,7 +291,7 @@ const AddProductForm = ({
 
         OnSuccess({
           icon: "success",
-          message: response?.data?.message || "Add Product Successfully",
+          title: response?.data?.message || "Add Product Successfully",
           product:response?.data?.product || {}
         });
       } catch (error) {
