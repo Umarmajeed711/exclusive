@@ -428,6 +428,7 @@ const AddProduct = () => {
           loading={loading}
           updateProduct={handleProductUpdate}
           delProduct={handleProductDelete}
+          filters={filters}
         />
       )}
 

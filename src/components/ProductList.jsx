@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import Modal from "./modal";
 import AddProductForm from "./addProject";
@@ -8,6 +8,9 @@ import useOutsideClick from "./outSideClick";
 import { FiEdit2 } from "react-icons/fi";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { Loader, showToast } from "./types";
+import { exportToCSV } from "./exportToCSV";
+import ExportDropdown from "./exportDrop";
+import { X } from "lucide-react";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -17,6 +20,7 @@ import { Loader, showToast } from "./types";
 const DEFAULT_COLUMNS = [
   { key: "category", label: "Category", visible: true },
   { key: "price", label: "Price", visible: true },
+  { key: "cost_price", label: "Cost Price", visible: true },
   { key: "discount", label: "Discount", visible: true },
   { key: "stock", label: "Stock", visible: true },
   { key: "status", label: "Status", visible: true },
@@ -34,9 +38,10 @@ const ProductListView = ({
   updateProduct,
   delProduct,
   loading = true,
+  filters = [],
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
-  let Admin = state?.isAdmin;
+  let isAdmin = state?.isAdmin;
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
   const [open, setOpen] = useState(false);
   const [dragIndex, setDragIndex] = useState(null);
@@ -120,6 +125,9 @@ const ProductListView = ({
 
       case "price":
         return <span className="font-medium">${product.price}</span>;
+
+      case "cost_price":
+        return <span className="font-medium">${product?.cost_price}</span>;
 
       case "discount":
         return product.discount ? (
@@ -262,6 +270,108 @@ const ProductListView = ({
   });
 
 
+  const fixedColumns = [
+      {
+        key: "name",
+        label: "Name",
+      },
+      {
+        key: "product_id",
+        label: "Product ID",
+      },
+      {
+        key: "sizes",
+        label: "Sizes",
+      },
+      {
+        key: "description",
+        label: "Description",
+      }
+    ];
+
+    const [selectedOrders,setSelectedOrders] = useState([]);
+  
+    const exportColumns = useMemo(() => {
+      const visibleColumns = columns?.filter((col) => col.visible);
+  
+      const finalColumns = [...fixedColumns, ...visibleColumns];
+  
+      return finalColumns?.filter(
+        (col) => col.key !== "actions" ,
+      )?.filter((col) =>  col.key !== "customer");
+    }, [columns, fixedColumns]);
+  
+    const exportData = products?.filter((product) =>
+      selectedOrders?.includes(product?.product_id),
+    );
+  
+    const [exportLoading, setExportLoading] = useState(false);
+  
+    const handleExportCSV = () => {
+      setExportLoading(true);
+  
+      try {
+        if (!selectedOrders?.length) {
+          showToast({
+            icon: "warning",
+            title: "please select ther product first",
+          });
+          return;
+        }
+  
+        if (!products?.length) {
+          showToast({
+            icon: "warning",
+            title: "No products available to export",
+          });
+  
+          return;
+        }
+  
+        const date = new Date().toISOString();
+  
+        exportToCSV({
+          fileName: `products-${date}`,
+          columns: exportColumns,
+          data: exportData,
+        });
+  
+        showToast({
+          icon: "success",
+          title: `${products?.length} products exported successfully`,
+        });
+      } catch (error) {
+        showToast({
+          icon: "error",
+          title: "Failed to export products",
+        });
+      } finally {
+        setExportLoading(false);
+      }
+    };
+  
+    const exportOptions = [
+      {
+        type: "current-page-products",
+        icon: "FileSpreadsheet",
+        label: "Current Page",
+        description: "Visible products only",
+      },
+      {
+        type: "filtered-products",
+        icon: "Filter",
+        label: "Filtered Products",
+        description: "Based on applied filters",
+      },
+      {
+        type: "all-products",
+        icon: "Database",
+        label: "All Products",
+        description: "Complete database export",
+      },
+    ];
+
+
 
   // Render
   return (
@@ -281,7 +391,73 @@ const ProductListView = ({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Products</h2>
 
-              {/* COLUMN OPTIONS (PRODUCT NOT INCLUDED) */}
+              {selectedOrders.length > 0 && isAdmin && (
+                              <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
+                                <span className="text-sm font-medium">
+                                  {selectedOrders.length == products?.length ? "All" : selectedOrders?.length} selected
+                                </span>
+              
+                               
+              
+                                {/* Export  */}
+              
+                                <button
+                                  className="
+                        flex items-center gap-2
+                        rounded-xl
+                        bg-emerald-600
+                        px-4 py-1.5
+                        text-sm font-medium text-white
+                        shadow-lg shadow-emerald-500/20
+                        transition-all
+                        hover:scale-[1.02]
+                        hover:bg-emerald-700
+                      "
+                                  isLoading={exportLoading}
+                                  disabled={exportLoading}
+                                  onClick={handleExportCSV}
+                                >
+                                  Export CSV
+                                </button>
+              
+                                {/* Delete */}
+                                <button
+                                  // disabled={bulkDelLoading}
+                                  onClick={() => {
+                                    // handleBulkDelete();
+                                  }}
+                                  className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
+                                     hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
+                                 duration-200 transition-all  
+                                 }`}
+                                  // ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""
+                                 >
+                                  Delete
+                                </button>
+              
+                                <div
+                                  className="text-black bg-theme-background p-1 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                                  onClick={() => {
+                                    setSelectedOrders("");
+                                  }}
+                                >
+                                  <X size={20} />
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="flex gap-1">
+                                            <div>
+                                              <ExportDropdown
+                                                exportOptions={exportOptions}
+                                                paginatedUsers={products}
+                                                exportColumns={exportColumns}
+                                                exportToCSV={exportToCSV}
+                                                filters={filters}
+                                              />
+                                            </div>
+
+             
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setOpen(!open)}
@@ -325,6 +501,7 @@ const ProductListView = ({
                     </button>
                   </div>
                 )}
+              </div>
               </div>
             </div>
 

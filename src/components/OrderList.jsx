@@ -470,7 +470,7 @@ const OrderList = ({
               {selectedOrders.length > 0 && isAdmin && (
                 <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
                   <span className="text-sm font-medium">
-                    {selectedOrders.length} selected
+                    {selectedOrders.length == Orders?.length ? "All" : selectedOrders?.length} selected
                   </span>
 
                   <DeliveryStatusDropdown
