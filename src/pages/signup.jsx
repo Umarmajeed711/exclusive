@@ -96,7 +96,6 @@ export const Signup = () => {
 
         navigate("/login");
       } catch (error) {
-        console.log(error);
         setloading(false);
 
         setApiError(error?.response.data.message || "Something went wrong");

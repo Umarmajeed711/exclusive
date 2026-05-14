@@ -29,7 +29,10 @@ const Whishlist = () => {
       // setProducts(result.data.products);
       // console.log(result.data)
     } catch (error) {
-      console.log(error);
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setLoading(false);
     }
@@ -41,7 +44,10 @@ const Whishlist = () => {
       let result = await api.get(`/wishlist?user_id=${state?.user.user_id}`);
       setWishlist(result.data.products);
     } catch (error) {
-      console.log(error);
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setLoadWhishlist(false);
     }

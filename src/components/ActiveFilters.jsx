@@ -58,7 +58,6 @@ export const ActiveFilters = ({
             key={index}
             onClick={() => {
               showFilterModal();
-              console.log("Touch filter");
             }}
             className="group flex cursor-pointer items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-3 py-1.5 text-sm text-gray-800 transition hover:border-blue-400 hover:bg-blue-50"
           >

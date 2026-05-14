@@ -8,6 +8,7 @@ import Title from "../components/Title";
 import Swal from "sweetalert2";
 import { ActiveFilters } from "../components/ActiveFilters";
 import TopOffers from "../components/TopOffers";
+import { showToast } from "../components/types";
 
 const Whishlist = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -31,9 +32,11 @@ const Whishlist = () => {
     try {
       setLoading(true);
       // setProducts(result.data.products);
-      // console.log(result.data)
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setLoading(false);
     }
@@ -45,7 +48,10 @@ const Whishlist = () => {
       let result = await api.get(`/wishlist?user_id=${state?.user.user_id}`);
       setWishlist(result.data.products);
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setLoadWhishlist(false);
     }

@@ -7,7 +7,6 @@ const ProtectedRoute = () => {
   const { state } = useContext(GlobalContext);
   const location = useLocation();
 
-  console.log("ProtectedRouteProtectedRoute is Login", state?.isLogin);
   return (
 
     state?.isLogin  ? <Outlet /> : state?.isLogin == false  ? <Loader/> : <Navigate to="/login" state={{ from: location }} replace />

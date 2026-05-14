@@ -12,6 +12,7 @@ import {
   HorizontalReviewSkeleton,
   ProductDetailSkeleton,
 } from "./productCardSkeleton";
+import { showToast } from "./types";
 
 const ProductDetail = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -36,14 +37,16 @@ const ProductDetail = () => {
     setProductLoading(true);
     try {
       let result = await api.get(`/product-details/${id}`);
-      console.log(result.data.products);
 
       setSelectedImage(result?.data?.products?.main_image);
       setProduct(result?.data.products);
       relatedProducts(result?.data.products);
       getAverageRating(result?.data.products);
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setProductLoading(false);
     }
@@ -64,7 +67,10 @@ const ProductDetail = () => {
       // const filteredProduct = get_related_products.data.products.filter((product) => product.product_id != Product.product_id)
       setRelatedProduct(get_related_products.data.products);
     } catch (error) {
-      console.log(error);
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 
@@ -155,7 +161,6 @@ const ProductDetail = () => {
       let response = await api.get(
         `/reviews?product_id=${Product?.product_id}`,
       );
-      console.log(response.data);
       let reviews = response?.data?.reviews;
       if (reviews?.length === 0) return 0; // avoid divide by zero
       const avgRating =
@@ -164,7 +169,10 @@ const ProductDetail = () => {
       setAverageRating(avgRating);
       setRatings(response?.data?.reviews);
     } catch (error) {
-      console.log(error);
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setRatingLoading(false);
     }
@@ -197,7 +205,10 @@ const ProductDetail = () => {
 
       getAverageRating(Product);
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 

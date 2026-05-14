@@ -118,8 +118,6 @@ export default function ExportDropdown({
         title: "Export completed successfully",
       });
     } catch (err) {
-      console.log(err);
-
       showToast({
         icon: "error",
         title: "Export failed",

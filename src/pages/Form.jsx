@@ -6,6 +6,7 @@ import { GlobalContext } from "../context/Context";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Link } from "react-router";
+import { showToast } from "../components/types";
 const stripePromise = loadStripe("pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf");
 
 function Form() {
@@ -43,7 +44,6 @@ function Form() {
     validationSchema: billingValidation,
 
     onSubmit: async (values) => {
-      console.log(values);
       // billingFormik.resetForm();
 
       // checkout start
@@ -115,10 +115,12 @@ function Form() {
       try {
         let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
         setProductCart(cart_products.data.products);
-        console.log(cart_products.data.products);
         
       } catch (error) {
-        console.log(error);
+         showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
       }
     };
   

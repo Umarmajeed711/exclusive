@@ -44,7 +44,6 @@ const Contact = () => {
 
     onSubmit: async (values) => {
       setloading(true);
-      console.log(values);
 
       formRef.current.submit();
 

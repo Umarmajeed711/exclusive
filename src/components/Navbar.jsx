@@ -14,6 +14,7 @@ import { ImCancelCircle } from "react-icons/im";
 import { HiOutlineArrowLeftStartOnRectangle } from "react-icons/hi2";
 import { IoLogIn, IoStarOutline } from "react-icons/io5";
 import useOutsideClick from "./outSideClick";
+import { showToast } from "./types";
 
 const Navbar = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -45,12 +46,14 @@ const Navbar = () => {
   const logout = async () => {
     try {
       let user_logout = await api.get("/logout");
-      console.log("user logout", user_logout);
       localStorage.removeItem("user");
       sessionStorage.removeItem("user");
       dispatch({ type: "USER_LOGOUT" });
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 

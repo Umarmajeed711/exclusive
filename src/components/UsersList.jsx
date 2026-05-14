@@ -361,7 +361,6 @@ const UsersList = ({
         });
       } catch (error) {
         setUsers(previosOrders);
-        console.log(error);
         showToast({
           icon: "error",
           title: error?.data?.message || "Failed to Delete",
@@ -455,10 +454,8 @@ const UsersList = ({
   const [loadingId, setLoadingId] = useState(null);
 
   const updateUserStatus = async ({ userId, field, value, user = null }) => {
-    console.log("users in single", Users);
     const prevOrders = Users;
 
-    console.log("Indside", "IDs", userId, "field", field, "value", value);
 
     try {
       if (user?.user_role === 1) {
@@ -507,7 +504,7 @@ const UsersList = ({
       return res.data;
     } catch (error) {
       setUsers(prevOrders);
-      console.log(error);
+      
       showToast({
         icon: "error",
         title: error?.data?.message || "Failed to Update Status",
@@ -555,7 +552,7 @@ const UsersList = ({
           title: "Deleted Successfully",
         });
       } catch (error) {
-        console.log(error);
+        
 
         setUsers(previousOrders);
 

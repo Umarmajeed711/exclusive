@@ -3,7 +3,7 @@ import { GlobalContext } from "../../context/Context";
 import ProductListView from "../../components/ProductList";
 import Pagination from "../../components/Pagination";
 import OrderList from "../../components/OrderList";
-import { FILTER_OPERATORS, INPUT_TYPES } from "../../components/types";
+import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../../components/types";
 import api from "../../components/api";
 import SmartFilter from "../../components/SmartFilters";
 import { ActiveFilters } from "../../components/ActiveFilters";
@@ -50,11 +50,11 @@ const Users = () => {
         ...prev,
         [page]: result?.data?.data,
       }));
-
-      console.log("total Users", result?.data?.totalUsers);
-      console.log("total Users", result?.data);
     } catch (error) {
-      console.error(error);
+     showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setloading(false);
     }
@@ -142,8 +142,6 @@ const Users = () => {
     setUsersByPage({});
     setCurrentPage(1);
     setFilterQuery(query);
-    console.log("Filters", filters);
-    console.log("query", query);
     getUsers({ filters: query, page: 1, limit });
   };
 

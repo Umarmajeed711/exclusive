@@ -9,7 +9,7 @@ import { ActiveFilters } from "../components/ActiveFilters";
 import { MdOutlineFilterAlt } from "react-icons/md";
 import Pagination from "../components/Pagination";
 import SmartFilter from "../components/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES } from "../components/types";
+import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../components/types";
 import { generateInvoice } from "../components/generateInvoice";
 import Modal from "../components/modal";
 import { useNavigate } from "react-router-dom";
@@ -156,7 +156,6 @@ const OrdersPage = () => {
   const handleReorder = async (order) => {
     try {
       for (let item of order?.items) {
-        console.log("item", item);
 
         await api.post("/add-cart", {
           productId: item.product_id,
@@ -182,7 +181,10 @@ const OrdersPage = () => {
         timer: 2000,
       });
     } catch (error) {
-      console.log(error);
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 
@@ -196,7 +198,6 @@ const OrdersPage = () => {
   };
 
   const handleCancel = async () => {
-    console.log("selectedCancelOrder", selectedCancelOrder);
 
     try {
       await api.put(`/orders/${selectedCancelOrder?.order_id}/cancel`, {

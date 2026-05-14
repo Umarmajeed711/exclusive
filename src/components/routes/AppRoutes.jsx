@@ -35,7 +35,7 @@ import Dashboard from "../../pages/admin/Dashboard";
 
 const AppRoutes = () => {
 
-  console.log("App Routes CAlllllllllllllllll");
+
   
   return (
     <Routes>

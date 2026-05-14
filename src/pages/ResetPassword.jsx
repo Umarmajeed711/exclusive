@@ -60,8 +60,6 @@ const ResetPassword = () => {
       onSubmit: async (values) => {
         setloading(true);
 
-         console.log("USER Data :" ,  state?.userData) 
-
          let {email,otp} = state.userData;
   
         try {

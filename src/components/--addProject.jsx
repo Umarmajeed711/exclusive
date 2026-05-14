@@ -181,7 +181,6 @@ const AddProductForm = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("project Data", productData);
     let sizes = productData.sizes.join(",");
     let colors = productData.colors.join(",");
 
@@ -224,8 +223,6 @@ const AddProductForm = ({
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
-      console.log("values", values);
-      console.log("removedImages", removedImages);
 
       setloading(true);
 
@@ -275,14 +272,12 @@ const AddProductForm = ({
         return;
       }
 
-      console.log("Form dAta", formData);
 
       try {
         let response = productData.product_id
           ? await api.put(`/products/${productData?.product_id}`, formData)
           : await api.post(`/products`, formData);
 
-        console.log(response);
 
         setloading(false);
         // navigate("/dashbaord")
@@ -296,7 +291,6 @@ const AddProductForm = ({
         });
       } catch (error) {
         setloading(false);
-        console.log(error?.response.data?.message);
         OnError({
           icon: "warning",
           title: error?.response.data?.message || "Something went wrong",

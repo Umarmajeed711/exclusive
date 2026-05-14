@@ -14,7 +14,6 @@ const Verify_email = () => {
 
     const verify_email = async () => {
 
-        console.log("TOken for email" , token);
         
 
         try {
@@ -30,7 +29,6 @@ const Verify_email = () => {
         
 
     } catch (error) {
-        console.log(error);
         
 
         Swal.fire(

@@ -6,6 +6,7 @@ import { GlobalContext } from "./context/Context";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import api from "./components/api";
+import { showToast } from "./types";
 
 const App = () => {
   // data store in a context api
@@ -72,11 +73,14 @@ const App = () => {
       } else {
         dispatch({ type: "USER_LOGIN", payload: response.data.user });
       }
-      console.log(response);
       getCartProduct(response?.data?.user?.user_id);
       getWishlist(response?.data?.user?.user_id)
     } catch (error) {
       dispatch({ type: "USER_LOGOUT" });
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 
@@ -86,7 +90,6 @@ useEffect(() => {
   //   JSON.parse(localStorage.getItem("user")) ||
   //   JSON.parse(sessionStorage.getItem("user"));
 
-  //   console.log("user FRom storage",user)
 
   // if (user) {
   //   if (user.email === "umarmajeed711@gmail.com") {
@@ -109,8 +112,6 @@ useEffect(() => {
 
 useEffect(() => {
   if (state?.user?.user_id) {
-    console.log("Whishlsit load");
-    
     getWishlist(state.user.user_id);
   }
 }, [state?.isWishlistReload]);
@@ -121,11 +122,13 @@ useEffect(() => {
     dispatch({ type: "LODING_CART",payload:true });
     try {
       let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
-      // console.log(cart_products.data.products);
       dispatch({ type: "UPDATE_CART", payload: cart_products?.data?.products });
      
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
     finally{
        dispatch({ type: "LODING_CART",payload:false});
@@ -138,7 +141,10 @@ useEffect(() => {
       let result = await api.get(`/wishlist?user_id=${user_id}`);
       dispatch({ type: "WISHLIST_CART", payload: result.data.products });
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       dispatch({ type: "WISHLIST_LODING_CART",payload:false});
     }

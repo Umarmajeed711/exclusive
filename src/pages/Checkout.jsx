@@ -69,7 +69,6 @@ const Checkout = () => {
     validationSchema: billingValidation,
 
     onSubmit: async (values) => {
-      console.log(values);
 
       if (productCart?.length >= 1) {
         setloading(true);
@@ -88,7 +87,6 @@ const Checkout = () => {
             cartItems: productCart,
           });
 
-          console.log(response);
 
           // If Online Payment, redirect to Stripe Checkout
           if (paymentMethod === "online" && response?.data?.id) {
@@ -96,13 +94,11 @@ const Checkout = () => {
             await stripe.redirectToCheckout({ sessionId: response?.data?.id });
           } else {
             // COD or Offline Order Success
-            console.log("Order placed successfully", response?.data);
             // Optionally redirect to success page
             dispatch({ type: "UPDATE_CART", payload: null });
             navigate("/OrderComplete");
           }
         } catch (error) {
-          console.log(error);
           Swal.fire("Error!", "Something went wrong", "error");
         }
         finally{
@@ -116,9 +112,6 @@ const Checkout = () => {
     const response = await api.post("/create-checkout-session", {
       items: productCart,
     });
-
-    console.log("response.id", response?.data.id);
-    console.log("response.session", response?.data.session);
     const stripe = await stripePromise;
     await stripe.redirectToCheckout({ sessionId: response?.data.id });
   };
@@ -136,7 +129,6 @@ const Checkout = () => {
   //     let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
   //     setProductCart(cart_products.data.products);
   //   } catch (error) {
-  //     console.log(error);
   //   } finally {
   //     setProductLoading(false);
   //   }

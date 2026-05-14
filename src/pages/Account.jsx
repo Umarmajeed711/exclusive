@@ -123,7 +123,7 @@ const Account = () => {
           confirmPassword: values.confirmPassword,
         });
 
-        console.log(response);
+       
 
         dispatch({ type: "USER_LOGIN", payload: response.data.profile });
 
@@ -148,7 +148,6 @@ const Account = () => {
       } catch (error) {
         setloading(false);
         setApiError(error?.response.data.message || "Something went wrong");
-        console.log(error?.response.data.message);
       }
     },
   });

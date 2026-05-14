@@ -1,6 +1,7 @@
 import api from "./api";
 import { useEffect, useState } from "react";
 import { DollarSign, ShoppingCart, Users, Package } from "lucide-react";
+import { showToast } from "./types";
 
 // const cards = [
 //   {
@@ -83,11 +84,13 @@ const DashboardCards = () => {
     response = response?.data?.data;
 
     setCards(response);
-
-    console.log("response", response);
     
     
   } catch (error) {
+    showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     
   }
   finally{

@@ -11,6 +11,7 @@ import { Loader, showToast } from "./types";
 import { exportToCSV } from "./exportToCSV";
 import ExportDropdown from "./exportDrop";
 import { X } from "lucide-react";
+import { ProductDetailSkeleton } from "./productCardSkeleton";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -45,6 +46,7 @@ const ProductListView = ({
   const [columns, setColumns] = useState(DEFAULT_COLUMNS);
   const [open, setOpen] = useState(false);
   const [dragIndex, setDragIndex] = useState(null);
+  const [Products, setProducts] = useState([]);
 
   const [projectData, setProjectData] = useState({});
 
@@ -57,6 +59,10 @@ const ProductListView = ({
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) setColumns(JSON.parse(saved));
   }, []);
+
+  useEffect(() => {
+    setProducts(products);
+  }, [products]);
 
   /* ==============================
      SAVE TO LOCALSTORAGE
@@ -173,25 +179,25 @@ const ProductListView = ({
           // </div>
 
           <div className="flex items-center gap-3">
-                    {/* Edit Icon */}
-                    <button
-                      title="Edit Product"
-                      onClick={() => editProduct(product)}
-                      className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
-                    >
-                      <FiEdit2 size={16} />
-                    </button>
-          
-                    {/* Delete */}
-                    <button
-                      title="Delete"
-                      // disabled={loadingId === user.user_id}
-                      className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
-                      onClick={() => deleteProduct(product?.product_id)}
-                    >
-                      <RiDeleteBin6Fill size={16} />
-                    </button>
-                  </div>
+            {/* Edit Icon */}
+            <button
+              title="Edit Product"
+              onClick={() => editProduct(product)}
+              className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+            >
+              <FiEdit2 size={16} />
+            </button>
+
+            {/* Delete */}
+            <button
+              title="Delete"
+              // disabled={loadingId === user.user_id}
+              className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
+              onClick={() => deleteProduct(product?.product_id)}
+            >
+              <RiDeleteBin6Fill size={16} />
+            </button>
+          </div>
         );
 
       default:
@@ -220,166 +226,217 @@ const ProductListView = ({
     // ✅ If user confirms
     if (result?.isConfirmed) {
       try {
-        let response = await api.delete(`/product/${id}`);
-
-        console.log("response", response);
+        let response = await api.delete(`/products/delete`, {
+          data: {
+            ids: [id],
+          },
+        });
 
         // Success toast
         showToast({
-            icon: "success",
-            title: response?.data?.message || "Product deleted successfully",
-          });
+          icon: "success",
+          title: response?.data?.message || "Product deleted successfully",
+        });
         delProduct(id);
       } catch (error) {
-        console.log("eror", error);
 
         showToast({
-            icon: "error",
-            title:  error?.response?.data?.message || "Something went wrong",
-          });
-
-       
+          icon: "error",
+          title: error?.response?.data?.message || "Something went wrong",
+        });
       }
     }
+  };
+
+  const [bulkDelLoading, setBulkDelLoading] = useState(false);
+
+  const handleBulkDelete = async () => {
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete All this product?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result?.isConfirmed) {
+      setBulkDelLoading(true);
+
+      const previousOrders = Products;
+
+      setProducts((prev) =>
+        prev.filter((o) => !selectedProducts.includes(o.product_id)),
+      );   
+
+      try {
+        await api.delete("/products/delete", {
+          data: { ids: selectedProducts },
+        });
+
+        showToast({
+          icon: "success",
+          title: "Deleted Successfully",
+        });
+      } catch (error) {
+        showToast({
+          icon: "error",
+          title: error?.data?.message || "Something went wrong",
+        });
+        setProducts(previousOrders);
+      } finally {
+        setBulkDelLoading(false);
+      }
+    }
+
+    setSelectedProducts([]);
   };
 
   const onSuccess = ({ position, icon, message, product }) => {
     updateProduct(product);
     setProjectData({});
     setShowModal(false);
-     showToast({
-            icon: icon,
-            title: message,
-          });
+    showToast({
+      icon: icon,
+      title: message,
+    });
   };
 
   const OnError = ({ position, icon, message }) => {
-   
     showToast({
-            icon: icon,
-            title: message,
-          });
+      icon: icon,
+      title: message,
+    });
   };
-
-
-
-  
 
   const menuRef = useOutsideClick(() => {
     setOpen(false); // close when clicked outside
   });
 
-
   const fixedColumns = [
-      {
-        key: "name",
-        label: "Name",
-      },
-      {
-        key: "product_id",
-        label: "Product ID",
-      },
-      {
-        key: "sizes",
-        label: "Sizes",
-      },
-      {
-        key: "description",
-        label: "Description",
-      }
-    ];
+    {
+      key: "name",
+      label: "Name",
+    },
+    {
+      key: "product_id",
+      label: "Product ID",
+    },
+    {
+      key: "sizes",
+      label: "Sizes",
+    },
+    {
+      key: "description",
+      label: "Description",
+    },
+  ];
 
-    const [selectedOrders,setSelectedOrders] = useState([]);
-  
-    const exportColumns = useMemo(() => {
-      const visibleColumns = columns?.filter((col) => col.visible);
-  
-      const finalColumns = [...fixedColumns, ...visibleColumns];
-  
-      return finalColumns?.filter(
-        (col) => col.key !== "actions" ,
-      )?.filter((col) =>  col.key !== "customer");
-    }, [columns, fixedColumns]);
-  
-    const exportData = products?.filter((product) =>
-      selectedOrders?.includes(product?.product_id),
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const toggleSelectOrder = (id) => {
+    setSelectedProducts((prev) =>
+      prev.includes(id) ? prev.filter((o) => o !== id) : [...prev, id],
     );
-  
-    const [exportLoading, setExportLoading] = useState(false);
-  
-    const handleExportCSV = () => {
-      setExportLoading(true);
-  
-      try {
-        if (!selectedOrders?.length) {
-          showToast({
-            icon: "warning",
-            title: "please select ther product first",
-          });
-          return;
-        }
-  
-        if (!products?.length) {
-          showToast({
-            icon: "warning",
-            title: "No products available to export",
-          });
-  
-          return;
-        }
-  
-        const date = new Date().toISOString();
-  
-        exportToCSV({
-          fileName: `products-${date}`,
-          columns: exportColumns,
-          data: exportData,
-        });
-  
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedProducts?.length === Products?.length) {
+      setSelectedProducts([]);
+    } else {
+      setSelectedProducts(Products?.map((o) => o?.product_id));
+    }
+  };
+
+  const exportColumns = useMemo(() => {
+    const visibleColumns = columns?.filter((col) => col.visible);
+
+    const finalColumns = [...fixedColumns, ...visibleColumns];
+
+    return finalColumns
+      ?.filter((col) => col.key !== "actions")
+      ?.filter((col) => col.key !== "customer");
+  }, [columns, fixedColumns]);
+
+  const exportData = Products?.filter((product) =>
+    selectedProducts?.includes(product?.product_id),
+  );
+
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const handleExportCSV = () => {
+    setExportLoading(true);
+
+    try {
+      if (!selectedProducts?.length) {
         showToast({
-          icon: "success",
-          title: `${products?.length} products exported successfully`,
+          icon: "warning",
+          title: "please select ther product first",
         });
-      } catch (error) {
-        showToast({
-          icon: "error",
-          title: "Failed to export products",
-        });
-      } finally {
-        setExportLoading(false);
+        return;
       }
-    };
-  
-    const exportOptions = [
-      {
-        type: "current-page-products",
-        icon: "FileSpreadsheet",
-        label: "Current Page",
-        description: "Visible products only",
-      },
-      {
-        type: "filtered-products",
-        icon: "Filter",
-        label: "Filtered Products",
-        description: "Based on applied filters",
-      },
-      {
-        type: "all-products",
-        icon: "Database",
-        label: "All Products",
-        description: "Complete database export",
-      },
-    ];
 
+      if (!Products?.length) {
+        showToast({
+          icon: "warning",
+          title: "No products available to export",
+        });
 
+        return;
+      }
+
+      const date = new Date().toISOString();
+
+      exportToCSV({
+        fileName: `products-${date}`,
+        columns: exportColumns,
+        data: exportData,
+      });
+
+      showToast({
+        icon: "success",
+        title: `${Products?.length} products exported successfully`,
+      });
+    } catch (error) {
+      showToast({
+        icon: "error",
+        title: "Failed to export products",
+      });
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const exportOptions = [
+    {
+      type: "current-page-products",
+      icon: "FileSpreadsheet",
+      label: "Current Page",
+      description: "Visible products only",
+    },
+    {
+      type: "filtered-products",
+      icon: "Filter",
+      label: "Filtered Products",
+      description: "Based on applied filters",
+    },
+    {
+      type: "all-products",
+      icon: "Database",
+      label: "All Products",
+      description: "Complete database export",
+    },
+  ];
 
   // Render
   return (
     <>
       <div className="bg-white rounded-xl shadow p-4">
         {loading ? (
-          <Loader/>
-        ) : products.length === 0 ? (
+          <Loader />
+        ) : Products.length === 0 ? (
           <div className="flex justify-center items-center h-[50vh]">
             <div className="text-md sm:text-xl font-medium  drop-shadow">
               No products found
@@ -391,18 +448,19 @@ const ProductListView = ({
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Products</h2>
 
-              {selectedOrders.length > 0 && isAdmin && (
-                              <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
-                                <span className="text-sm font-medium">
-                                  {selectedOrders.length == products?.length ? "All" : selectedOrders?.length} selected
-                                </span>
-              
-                               
-              
-                                {/* Export  */}
-              
-                                <button
-                                  className="
+              {selectedProducts.length > 0 && isAdmin && (
+                <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
+                  <span className="text-sm font-medium">
+                    {selectedProducts.length == Products?.length
+                      ? "All"
+                      : selectedProducts?.length}{" "}
+                    selected
+                  </span>
+
+                  {/* Export  */}
+
+                  <button
+                    className="
                         flex items-center gap-2
                         rounded-xl
                         bg-emerald-600
@@ -413,95 +471,94 @@ const ProductListView = ({
                         hover:scale-[1.02]
                         hover:bg-emerald-700
                       "
-                                  isLoading={exportLoading}
-                                  disabled={exportLoading}
-                                  onClick={handleExportCSV}
-                                >
-                                  Export CSV
-                                </button>
-              
-                                {/* Delete */}
-                                <button
-                                  // disabled={bulkDelLoading}
-                                  onClick={() => {
-                                    // handleBulkDelete();
-                                  }}
-                                  className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
+                    isLoading={exportLoading}
+                    disabled={exportLoading}
+                    onClick={handleExportCSV}
+                  >
+                    Export CSV
+                  </button>
+
+                  {/* Delete */}
+                  <button
+                    disabled={bulkDelLoading}
+                    onClick={() => {
+                      handleBulkDelete();
+                    }}
+                    className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
                                      hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
                                  duration-200 transition-all  
+                                 ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""
                                  }`}
-                                  // ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""
-                                 >
-                                  Delete
-                                </button>
-              
-                                <div
-                                  className="text-black bg-theme-background p-1 rounded cursor-pointer hover:bg-gray-200 transition-all"
-                                  onClick={() => {
-                                    setSelectedOrders("");
-                                  }}
-                                >
-                                  <X size={20} />
-                                </div>
-                              </div>
-                            )}
+                  >
+                    Delete
+                  </button>
 
-                            <div className="flex gap-1">
-                                            <div>
-                                              <ExportDropdown
-                                                exportOptions={exportOptions}
-                                                paginatedUsers={products}
-                                                exportColumns={exportColumns}
-                                                exportToCSV={exportToCSV}
-                                                filters={filters}
-                                              />
-                                            </div>
-
-             
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setOpen(!open)}
-                  className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
-                >
-                  Columns ⚙
-                </button>
-
-                {open && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
-                    <p className="text-xs text-gray-500 mb-2">
-                      Drag to reorder columns
-                    </p>
-
-                    {columns.map((col, index) => (
-                      <div
-                        key={col.key}
-                        draggable
-                        onDragStart={() => onDragStart(index)}
-                        onDragOver={onDragOver}
-                        onDrop={() => onDrop(index)}
-                        className="flex items-center justify-between gap-2 py-1 px-2 rounded cursor-move hover:bg-gray-100"
-                      >
-                        <label className="flex items-center gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={col.visible}
-                            onChange={() => toggleColumn(col.key)}
-                          />
-                          {col.label}
-                        </label>
-                        <span className="text-gray-400">⋮⋮</span>
-                      </div>
-                    ))}
-
-                    <button
-                      onClick={resetColumns}
-                      className="mt-3 w-full text-sm text-red-600 hover:underline"
-                    >
-                      Reset to Default
-                    </button>
+                  <div
+                    className="text-black bg-theme-background p-1 rounded cursor-pointer hover:bg-gray-200 transition-all"
+                    onClick={() => {
+                      setSelectedProducts("");
+                    }}
+                  >
+                    <X size={20} />
                   </div>
-                )}
-              </div>
+                </div>
+              )}
+
+              <div className="flex gap-1">
+                <div>
+                  <ExportDropdown
+                    exportOptions={exportOptions}
+                    paginatedUsers={Products}
+                    exportColumns={exportColumns}
+                    exportToCSV={exportToCSV}
+                    filters={filters}
+                  />
+                </div>
+
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setOpen(!open)}
+                    className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                  >
+                    Columns ⚙
+                  </button>
+
+                  {open && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white shadow-lg rounded p-3 z-30">
+                      <p className="text-xs text-gray-500 mb-2">
+                        Drag to reorder columns
+                      </p>
+
+                      {columns.map((col, index) => (
+                        <div
+                          key={col.key}
+                          draggable
+                          onDragStart={() => onDragStart(index)}
+                          onDragOver={onDragOver}
+                          onDrop={() => onDrop(index)}
+                          className="flex items-center justify-between gap-2 py-1 px-2 rounded cursor-move hover:bg-gray-100"
+                        >
+                          <label className="flex items-center gap-2 text-sm">
+                            <input
+                              type="checkbox"
+                              checked={col.visible}
+                              onChange={() => toggleColumn(col.key)}
+                            />
+                            {col.label}
+                          </label>
+                          <span className="text-gray-400">⋮⋮</span>
+                        </div>
+                      ))}
+
+                      <button
+                        onClick={resetColumns}
+                        className="mt-3 w-full text-sm text-red-600 hover:underline"
+                      >
+                        Reset to Default
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -511,6 +568,17 @@ const ProductListView = ({
                 <thead className="bg-gray-100 text-sm">
                   <tr>
                     {/* FIXED PRODUCT COLUMN */}
+                    <th className="p-3 sticky left-0 z-10 ">
+                      <input
+                        type="checkbox"
+                        checked={
+                          selectedProducts?.length === Products?.length &&
+                          Products?.length > 0
+                        }
+                        onChange={toggleSelectAll}
+                      />
+                    </th>
+
                     <th className="p-3 text-left sticky left-0 z-30 bg-gray-100 top-0 w-full">
                       Product
                     </th>
@@ -518,7 +586,10 @@ const ProductListView = ({
                     {columns
                       .filter((c) => c.visible)
                       .map((col) => (
-                        <th key={col.key} className="p-3 text-left z-20 sticky top-0 bg-gray-100">
+                        <th
+                          key={col.key}
+                          className="p-3 text-left z-20 sticky top-0 bg-gray-100"
+                        >
                           {col.label}
                         </th>
                       ))}
@@ -526,11 +597,22 @@ const ProductListView = ({
                 </thead>
 
                 <tbody>
-                  {products?.map((product) => (
+                  {Products?.map((product) => (
                     <tr
                       key={product.product_id}
-                      className="border-b hover:bg-gray-50"
+                      className="border-b hover:bg-gray-50 transition-all"
                     >
+                      <td className="p-3 sticky left-0 z-10 bg-white cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedProducts?.includes(
+                            product.product_id,
+                          )}
+                          onChange={(e) => {
+                            toggleSelectOrder(product.product_id);
+                          }}
+                        />
+                      </td>
                       {/* FIXED PRODUCT CELL */}
                       <td className="p-3 sticky left-0 z-10 bg-white">
                         {renderProductCell(product)}

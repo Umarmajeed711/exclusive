@@ -278,8 +278,6 @@ const OrderList = ({
           ),
         );
         try {
-          console.log("Selected Orders", selectedOrders);
-          console.log("Selected Field and value", field, value);
 
           await api.put("/orders/bulk-status", {
             ids: selectedOrders,
@@ -307,9 +305,7 @@ const OrderList = ({
   };
 
   const handleBulkDelete = async () => {
-    if (selectedOrders?.length === 1) {
-      await deleteOrder(selectedOrders[0]);
-    } else {
+     
       const result = await Swal.fire({
         title: "Are You Sure?",
         text: "Do you want to delete All this Order?",
@@ -349,8 +345,8 @@ const OrderList = ({
           setBulkDelLoading(false);
         }
       }
-    }
-    setSelectedOrders([]);
+    
+      setSelectedOrders([]);
   };
 
   const navigate = useNavigate();

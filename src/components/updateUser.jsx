@@ -54,7 +54,6 @@ const UserUpdateForm = ({
 
     onSubmit: async (values) => {
 
-      console.log("User update");
       
       setLoading(true);
 
@@ -71,7 +70,7 @@ const UserUpdateForm = ({
       try {
         const res = await api.put(`/users/${userData?.user_id}`, formData );
 
-        console.log("res",res);
+      
         
 
         OnSuccess({

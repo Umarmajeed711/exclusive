@@ -57,7 +57,6 @@ api.interceptors.response.use(
         await refreshApi.post("/refresh-token"); // 🔥 FIX
         return api(originalRequest); // retry original request
       } catch (refreshError) {
-        console.log("Refresh token failed", refreshError);
 
         // Logout + redirect
         LogoutFunction();
@@ -67,7 +66,6 @@ api.interceptors.response.use(
 
     // 🔹 Other 401 errors → Unauthorized, logout
     if (error.response?.status === 401) {
-      console.log("Unauthorized, logging out");
       LogoutFunction();
     }
 

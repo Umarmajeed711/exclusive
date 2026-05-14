@@ -25,7 +25,7 @@ export const OrderTrackingWrapper = () => {
       const res = await api.get(`/orders/${id}`);
       setOrder(res.data.order);
     } catch (err) {
-      console.log(err);
+      
 
       if (err.response?.status === 403) {
         setAccessDenied(true);

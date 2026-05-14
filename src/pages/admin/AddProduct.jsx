@@ -59,7 +59,6 @@ const AddProduct = () => {
   //     let result = await api.get(`/products`);
 
   //     setProducts(result.data.products);
-  //     console.log(result.data);
   //   } catch (error) {
   //   } finally {
   //     setloading(false);
@@ -105,9 +104,11 @@ const AddProduct = () => {
         [page]: result?.data.products,
       }));
 
-      console.log("total PRoducts", result?.data?.totalProducts);
     } catch (error) {
-      console.error(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setloading(false);
     }
@@ -249,7 +250,6 @@ const AddProduct = () => {
   const [filterquery, setFilterQuery] = useState([]);
 
   // useEffect(() => {
-  //   console.log("Current FIlters", filterquery);
 
   //   getProducts({ filters:filterquery, page: currentPage, limit });
   // }, [currentPage]);
@@ -261,8 +261,6 @@ const AddProduct = () => {
     setFilterQuery(query);
     // getProducts(query);
 
-    console.log("Filters", filters);
-    console.log("query", query);
     getProducts({ filters: query, page: 1, limit });
   };
 
@@ -354,7 +352,6 @@ const AddProduct = () => {
                   className={`button   text-xl ${filters?.length > 0 ? "active" : ""}`}
                   onClick={() => {
                     setShowFilter(!showFilter);
-                    console.log("show filter", showFilter);
                   }}
                 >
                   <MdOutlineFilterAlt />

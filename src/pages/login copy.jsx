@@ -79,7 +79,6 @@ export const Login = () => {
         let adminLogin =
           response?.data.user.email === "umarmajeed711@gmail.com";
         if (adminLogin) {
-          console.log("admin Login", adminLogin);
 
           dispatch({ type: "ADMIN_LOGIN", payload: response?.data.user });
         } else {

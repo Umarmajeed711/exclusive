@@ -58,7 +58,6 @@ const ForgetPassword = () => {
           setIsOtpSent(true)
           dispatch({ type: "RESET_PASSWORD", payload: response.data });
 
-          console.log(response.data)
         } else {
 
            let response = await api.post("/verify-otp", {

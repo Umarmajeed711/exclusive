@@ -51,10 +51,11 @@ const RecentOrders = () => {
         [page]: result?.data?.data,
       }));
 
-      console.log("total Orders", result?.data?.totalOrders);
-      console.log("total Orders", result?.data);
     } catch (error) {
-      console.error(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setloading(false);
     }
@@ -113,8 +114,6 @@ const RecentOrders = () => {
           title: res?.data?.message || "Deleted Successfully",
         });
       } catch (error) {
-        console.log(error);
-
         setOrders(previousOrders);
 
         showToast({

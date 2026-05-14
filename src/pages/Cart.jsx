@@ -85,8 +85,6 @@ const Cart = () => {
         user_id: user_id,
         cart_id: cart_id,
       });
-
-      console.log(response.data);
       // setToggleCart(!toggleCart);
       Swal.fire("Deleted!", "Product removed successfully", "success");
       dispatch({ type: "TOGGLE_CART" });
@@ -138,7 +136,6 @@ const Cart = () => {
           : cartItem.quantity - 1,
     });
   } catch (error) {
-    console.log(error);
 
     // ❌ rollback
     dispatch({

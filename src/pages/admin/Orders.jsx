@@ -306,9 +306,6 @@ const Orders = () => {
         ...prev,
         [page]: result?.data?.data,
       }));
-
-      console.log("total Orders", result?.data?.totalOrders);
-      console.log("total Orders", result?.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -469,8 +466,6 @@ const Orders = () => {
     setOrdersByPage({});
     setCurrentPage(1);
     setFilterQuery(query);
-    console.log("Filters", filters);
-    console.log("query", query);
     getOrders({ filters: query, page: 1, limit });
   };
 

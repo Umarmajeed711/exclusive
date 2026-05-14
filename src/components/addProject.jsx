@@ -162,7 +162,6 @@ const AddProductForm = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("project Data", productData);
     let sizes = productData?.sizes?.join(",");
     let colors = productData?.colors?.join(",");
 
@@ -221,9 +220,6 @@ const AddProductForm = ({
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
-      console.log("values", values);
-      console.log("mainImage", mainImage);
-
       setloading(true);
 
       let productSizes = values.productSizes.split(",");
@@ -258,7 +254,6 @@ const AddProductForm = ({
         return;
       }
 
-      console.log("Form dAta", formData);
 
       try {
         let response = productData.product_id
@@ -269,7 +264,6 @@ const AddProductForm = ({
               },
             });
 
-        // console.log(response);
 
         setloading(false);
 
@@ -282,7 +276,6 @@ const AddProductForm = ({
         });
       } catch (error) {
         setloading(false);
-        console.log(error);
         OnError({
           icon: "warning",
           title: error?.response.data?.message || "Something went wrong",

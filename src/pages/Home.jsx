@@ -7,6 +7,7 @@ import OurProducts from "../components/OurProducts";
 import TopOffers from "../components/TopOffers";
 import HeroCarousel from "../components/HeroCarousal";
 import HeroSection from "../components/heroSection";
+import { showToast } from "../components/types";
 
 const Home = () => {
   // let { state, dispatch } = useContext(GlobalContext);
@@ -19,8 +20,11 @@ const Home = () => {
       let result = await api.get(`/products`);
 
       setProducts(result?.data?.products);
-      console.log(result.data);
     } catch (error) {
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setLoading(false);
     }

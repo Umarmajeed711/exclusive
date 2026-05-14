@@ -2,6 +2,7 @@ import api from "./api";
 import { useState } from "react";
 import { useEffect } from "react";
 import OurProducts from "./OurProducts";
+import { showToast } from "./types";
 
 const TopOffers = ({onAdd = () => {}}) => {
   const [DiscountProducts, setDiscountProducts] = useState([]);
@@ -12,7 +13,10 @@ const TopOffers = ({onAdd = () => {}}) => {
       let result = await api.get("/discounted-products");
       setDiscountProducts(result?.data?.products);
     } catch (error) {
-      console.log(error);
+       showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     } finally {
       setLoading(false);
     }

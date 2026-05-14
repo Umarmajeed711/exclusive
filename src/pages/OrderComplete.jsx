@@ -3,13 +3,11 @@ import { motion } from "framer-motion";
 import { Link } from "react-router";
 import { GlobalContext } from "../context/Context";
 import api from "../components/api";
+import { showToast } from "../components/types";
 
 const OrderConfirmation = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
-  useEffect(() => {
-    console.log("Cart Items", state?.cart);
-  });
 
   const OrderComplete = async () => {
     const params = new URLSearchParams(window.location.search);
@@ -20,11 +18,13 @@ const OrderConfirmation = () => {
         let response = await api.get(`/verify-payment/${session_id}`);
 
         if (response?.data.success) {
-          console.log("Order saved with ID:", response?.data.order_id);
           dispatch({type: "UPDATE_CART", payload: null})
         }
       } catch (error) {
-        console.log(error);
+         showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
       }
     }
   };

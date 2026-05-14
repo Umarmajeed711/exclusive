@@ -6,9 +6,6 @@ import { Loader } from "../types";
 
 const AdminRoute = () => {
   const { state } = useContext(GlobalContext);
-
-    console.log("adminROuteeeee is Login", state?.isLogin);
-
   
   if (state?.isLogin == null) <Loader />
   if (state?.isLogin == false) return <Navigate to="/login" />;

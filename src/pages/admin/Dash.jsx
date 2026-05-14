@@ -17,6 +17,7 @@ import api from "../../components/api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useContext } from "react";
+import { showToast } from "../../components/types";
 
 // Bar chart data
 const BarChartData = [
@@ -78,8 +79,6 @@ const Dash = () => {
     try {
       setLoading(true)
       let Orders = await api.get("/orders");
-
-      console.log("ORders", Orders);
       setOrders(Orders.data.OrderItems);
       setCustomerDetail(Orders.data.CustomerData);
     } catch (error) {}
@@ -135,7 +134,10 @@ const Dash = () => {
         title: "Delete Product",
       });
     } catch (error) {
-      console.log(error);
+     showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 

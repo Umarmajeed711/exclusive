@@ -4,8 +4,6 @@ import { buildFilterQuery } from "./types";
 import { MdOutlineFilterAlt } from "react-icons/md";
 
 const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal}) => {
-
-  console.log("showFilterModal",showFilterModal);
   
   const [showModal, setShowModal] = useState(showFilterModal);
    const [activeFilters, setActiveFilters] = useState(value || []);

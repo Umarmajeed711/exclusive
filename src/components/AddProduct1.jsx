@@ -39,8 +39,6 @@ const AddProduct = () => {
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
-      console.log(values);
-      console.log(selectedFiles);
       let productSizes = values.productSizes.split(",");
       let productColor = values.productColor.split(",");
 
@@ -87,7 +85,6 @@ const AddProduct = () => {
 
         //      })
 
-        console.log("response", response);
         setloading(false);
         const Toast = Swal.mixin({
           toast: true,
@@ -111,7 +108,6 @@ const AddProduct = () => {
       } catch (error) {
         setApiError(error?.response.data.message || "Something went wrong");
         setloading(false);
-        console.log(error);
       }
     },
   });
@@ -119,7 +115,6 @@ const AddProduct = () => {
   const handleFileChange = (event) => {
     let files = event.target.files;
     setSelectedFiles(files);
-    console.log(files);
   };
 
   const [show, setShow] = useState(false);
@@ -151,9 +146,7 @@ const AddProduct = () => {
   const getProducts = async () => {
     try {
       let result = await api.get(`/products`);
-
       setProducts(result.data.products);
-      console.log(result.data);
     } catch (error) {}
   };
 

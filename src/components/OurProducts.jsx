@@ -12,6 +12,7 @@ import AddProductForm from "./addProject";
 import Swal from "sweetalert2";
 import ProductCardSkeleton from "./productCardSkeleton";
 import { MdClose } from "react-icons/md";
+import { showToast } from "./types";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -48,9 +49,11 @@ const OurProducts = ({
       dispatch({ type: "WISHLIST_RELOAD" });
 
 
-      console.log("Add to Wishlist", response);
     } catch (error) {
-      console.log(error);
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
     }
   };
 
@@ -96,7 +99,6 @@ const OurProducts = ({
         dispatch({ type: "WISHLIST_RELOAD" });
         // delProduct(product_id);
       } catch (error) {
-        console.log("eror", error);
 
         // Error toast
         Swal.fire({
@@ -141,7 +143,11 @@ const OurProducts = ({
       try {
         let response = await api.delete(`/product/${id}`);
 
-        console.log("response", response);
+       
+      showToast({
+        icon:"success",
+        title:"Product deleted successfully"
+      });
 
         // Success toast
         Swal.fire({
@@ -155,18 +161,10 @@ const OurProducts = ({
         });
         delProduct(id);
       } catch (error) {
-        console.log("eror", error);
-
-        // Error toast
-        Swal.fire({
-          icon: "error",
-          title: error?.response?.data?.message || "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
+        showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
       }
     }
   };
