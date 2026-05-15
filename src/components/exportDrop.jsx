@@ -160,6 +160,18 @@ export default function ExportDropdown({
         });
 
         break;
+      case "current-page-products":
+        exportToCSV({
+          fileName: "current-page-products",
+          columns: exportColumns,
+          data: paginatedUsers,
+        });
+
+        showToast({
+          icon: "success",
+          title: `${paginatedUsers.length} products exported`,
+        });
+        break;
 
       case "filtered-users":
         downloadFromAPI(
@@ -185,12 +197,25 @@ export default function ExportDropdown({
 
         break;
 
+      case "filtered-products":
+        downloadFromAPI(
+          `/admin/products/export?filters=${encodeURIComponent(
+            JSON.stringify(filters),
+          )}`,
+          "filtered-products",
+          "products",
+        );
+        break;
+
       case "all-users":
         downloadFromAPI(`/users/export`, "all-users", "all");
         break;
       case "all-orders":
         downloadFromAPI(`/orders-export`, "all-orders", "all");
 
+        break;
+      case "all-products":
+        downloadFromAPI(`/admin/products/export`, "all-products", "all");
         break;
     }
   };

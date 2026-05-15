@@ -12,6 +12,7 @@ import { exportToCSV } from "./exportToCSV";
 import ExportDropdown from "./exportDrop";
 import { X } from "lucide-react";
 import { ProductDetailSkeleton } from "./productCardSkeleton";
+import BulkUpdateProductForm from "./updateBulkProduct";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -19,13 +20,13 @@ import { ProductDetailSkeleton } from "./productCardSkeleton";
    (Product is NOT included here)
 ================================ */
 const DEFAULT_COLUMNS = [
-  { key: "category", label: "Category", visible: true },
+  { key: "category_name", label: "Category", visible: true },
+  { key: "cost_price", label: "CT Price", visible: true },
   { key: "price", label: "Price", visible: true },
-  { key: "cost_price", label: "Cost Price", visible: true },
   { key: "discount", label: "Discount", visible: true },
-  { key: "stock", label: "Stock", visible: true },
-  { key: "status", label: "Status", visible: true },
-  { key: "created", label: "Created", visible: true },
+  { key: "quantity", label: "Stock", visible: true },
+  { key: "is_available", label: "Status", visible: true },
+  { key: "created_at", label: "Created", visible: true },
   { key: "actions", label: "Actions", visible: true },
 ];
 
@@ -40,6 +41,7 @@ const ProductListView = ({
   delProduct,
   loading = true,
   filters = [],
+  onBulkUpdate = () => {}
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
   let isAdmin = state?.isAdmin;
@@ -51,6 +53,7 @@ const ProductListView = ({
   const [projectData, setProjectData] = useState({});
 
   const [showModal, setShowModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
 
   /* ==============================
      LOAD FROM LOCALSTORAGE
@@ -126,14 +129,14 @@ const ProductListView = ({
 
   const renderCell = (key, product) => {
     switch (key) {
-      case "category":
+      case "category_name":
         return <span className="capitalize">{product.category_name}</span>;
-
-      case "price":
-        return <span className="font-medium">${product.price}</span>;
 
       case "cost_price":
         return <span className="font-medium">${product?.cost_price}</span>;
+      case "price":
+        return <span className="font-medium">${product.price}</span>;
+
 
       case "discount":
         return product.discount ? (
@@ -142,10 +145,10 @@ const ProductListView = ({
           "—"
         );
 
-      case "stock":
+      case "quantity":
         return product.quantity;
 
-      case "status":
+      case "is_available":
         return (
           <span
             className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -158,7 +161,7 @@ const ProductListView = ({
           </span>
         );
 
-      case "created":
+      case "created_at":
         return new Date(product.created_at).toLocaleDateString();
 
       case "actions":
@@ -209,6 +212,8 @@ const ProductListView = ({
     setProjectData(product);
     setShowModal(true);
   };
+
+  
 
   const deleteProduct = async (id) => {
     // 🔥 Show confirmation alert first
@@ -298,11 +303,26 @@ const ProductListView = ({
     updateProduct(product);
     setProjectData({});
     setShowModal(false);
+    setShowBulkModal(false);
+    setSelectedProducts([]);
     showToast({
       icon: icon,
       title: message,
     });
   };
+
+  const onBulkSuccess = ({ position, icon, message }) => {
+    onBulkUpdate();
+
+    setShowBulkModal(false);
+    setSelectedProducts([]);
+    showToast({
+      icon: icon,
+      title: message,
+    });
+  };
+
+  
 
   const OnError = ({ position, icon, message }) => {
     showToast({
@@ -317,21 +337,21 @@ const ProductListView = ({
 
   const fixedColumns = [
     {
-      key: "name",
-      label: "Name",
-    },
-    {
       key: "product_id",
       label: "Product ID",
     },
     {
-      key: "sizes",
-      label: "Sizes",
+      key: "name",
+      label: "Name",
     },
-    {
-      key: "description",
-      label: "Description",
-    },
+    // {
+    //   key: "sizes",
+    //   label: "Sizes",
+    // },
+    // {
+    //   key: "description",
+    //   label: "Description",
+    // },
   ];
 
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -457,6 +477,14 @@ const ProductListView = ({
                     selected
                   </span>
 
+                    <button
+              title="update Bulk Product"
+              onClick={() => setShowBulkModal(true)}
+              className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+            >
+               <FiEdit2 size={16} />  Bulk Update
+            </button>
+
                   {/* Export  */}
 
                   <button
@@ -568,7 +596,7 @@ const ProductListView = ({
                 <thead className="bg-gray-100 text-sm">
                   <tr>
                     {/* FIXED PRODUCT COLUMN */}
-                    <th className="p-3 sticky left-0 z-10 ">
+                    <th className="p-3 sticky left-0 z-20 ">
                       <input
                         type="checkbox"
                         checked={
@@ -606,10 +634,10 @@ const ProductListView = ({
                         <input
                           type="checkbox"
                           checked={selectedProducts?.includes(
-                            product.product_id,
+                            product?.product_id,
                           )}
                           onChange={(e) => {
-                            toggleSelectOrder(product.product_id);
+                            toggleSelectOrder(product?.product_id);
                           }}
                         />
                       </td>
@@ -654,6 +682,27 @@ const ProductListView = ({
           />
         </Modal>
       )}
+
+      {showBulkModal && (
+        <Modal
+          onClose={() => {
+            setShowBulkModal(false);
+            setSelectedProducts([]);
+          }}
+          isOpen={showBulkModal}
+        >
+          <BulkUpdateProductForm
+            onclose={() => {
+              setShowBulkModal(false);
+              setSelectedProducts({});
+            }}
+            selectedProducts={selectedProducts}
+            OnSuccess={onBulkSuccess}
+            OnError={OnError}
+          />
+        </Modal>
+      )}
+      
     </>
   );
 };

@@ -426,6 +426,7 @@ const AddProduct = () => {
           updateProduct={handleProductUpdate}
           delProduct={handleProductDelete}
           filters={filters}
+          onBulkUpdate={getProducts}
         />
       )}
 
