@@ -461,7 +461,7 @@ const OrderList = ({
           <>
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{title ?? "Orders"}</h2>
+              <h2 className="text-xl font-semibold">{title ? title : "Orders"}</h2>
 
               {selectedOrders.length > 0 && isAdmin && (
                 <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
@@ -542,7 +542,7 @@ const OrderList = ({
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setOpen(!open)}
-                    className="px-4 py-2 bg-gray-100 rounded"
+                    className="px-4 py-2 bg-gray-100 rounded-lg"
                   >
                     Columns ⚙
                   </button>
@@ -653,7 +653,7 @@ const OrderList = ({
             setShowDetails(false);
           }}
           isOpen={showDetails}
-          className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
+          className="!w-[95%] !md:w-[1000px]  !max-w-[1000px] !bg-white  !flex !flex-col "
         >
           <OrderDetailsModal
             order={selectedOrder}

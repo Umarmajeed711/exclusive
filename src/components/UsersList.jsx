@@ -374,7 +374,7 @@ const UsersList = ({
   const handleBulkDelete = async () => {
     const result = await Swal.fire({
       title: "Are You Sure?",
-      text: "Do you want to delete this Users?",
+      text: "Do you want to delete this users?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -517,7 +517,7 @@ const UsersList = ({
   const deleteUser = async (ids, user = null) => {
     const result = await Swal.fire({
       title: "Are You Sure?",
-      text: "Do you want to delete this Order?",
+      text: "Do you want to delete this user?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -788,7 +788,7 @@ const UsersList = ({
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setOpen(!open)}
-                    className="px-4 py-2 bg-gray-100 rounded"
+                    className="px-4 py-2 bg-gray-100 rounded-lg"
                   >
                     Columns ⚙
                   </button>
@@ -915,7 +915,7 @@ const UsersList = ({
           isOpen={showModal}
         >
           <UserUpdateForm
-            onclose={() => {
+            onClose={() => {
               setShowModal(false);
               setSelectedUser({});
             }}

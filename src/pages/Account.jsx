@@ -9,15 +9,21 @@ import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import api from "../components/api";
 import Breadcrums from "../components/Breadcrums";
+import { FiEdit2 } from "react-icons/fi";
+import { getInitials } from "../components/types";
 
 const Account = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
-  let { user_id, name, email, phone } = state?.user;
+  let { user_id, name, email, phone , image_url} = state?.user;
 
   const [loading, setloading] = useState(false);
 
   const [apiError, setApiError] = useState("");
+
+  
+    const [profileImage, setProfileImage] = useState(image_url || null);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const contactValidation = yup.object({
     name: yup
@@ -91,6 +97,7 @@ const Account = () => {
       name: name,
       email: email,
       phone: phone ? phone : "",
+      image: null,
       password: "",
       newPassword: "",
       confirmPassword: "",
@@ -112,16 +119,32 @@ const Account = () => {
         setloading(false);
         return Swal.fire("No Changes", "You haven’t made any changes!", "info");
       }
+
+        const formData = new FormData();
+        
+          formData.append("user_id",user_id);
+      formData.append("name", values.name !== name ? values.name : null);
+      formData.append("email", values.email !== email ? values.email : null);
+      formData.append("phone", values.phone !== phone ? values.phone : null);
+      formData.append("password", values.password);
+       formData.append("newPassword", values.newPassword);
+        formData.append("confirmPassword", values.confirmPassword);
+
+      if (profileImage) {
+        formData.append("profile", values?.image);
+      }
       try {
-        let response = await api.put(`/edit-profile`, {
-          user_id: user_id,
-          name: values.name !== name ? values.name : null,
-          email: values.email !== email ? values.email : null,
-          phone: values.phone !== phone ? values.phone : null,
-          password: values.password,
-          newPassword: values.newPassword,
-          confirmPassword: values.confirmPassword,
-        });
+        // let response = await api.put(`/edit-profile`, {
+        //   user_id: user_id,
+        //   name: values.name !== name ? values.name : null,
+        //   email: values.email !== email ? values.email : null,
+        //   phone: values.phone !== phone ? values.phone : null,
+        //   password: values.password,
+        //   newPassword: values.newPassword,
+        //   confirmPassword: values.confirmPassword,
+        // });
+
+         const response = await api.put(`/edit-profile`, formData );
 
        
 
@@ -151,6 +174,18 @@ const Account = () => {
       }
     },
   });
+
+  const handleImage = (file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Only image allowed");
+      return;
+    }
+
+    setProfileImage(file);
+    setPreviewImage(URL.createObjectURL(file));
+  };
 
   const Styles = {
     inputField:
@@ -244,6 +279,54 @@ const Account = () => {
             <div className="text-2xl font-semibold text-theme-primary py-2">
               Edit Your Profile
             </div>
+
+            {/* Profile Image */}
+<div className="flex flex-col items-center justify-center">
+  <div className="relative w-[120px] h-[120px]">
+
+    {
+      previewImage ?
+      <img
+        src={previewImage}
+        alt="profile"
+        className="w-full h-full rounded-full object-cover border-4 border-theme-primary shadow"
+      />
+      :  <span className="uppercase tracking-wide w-full h-full rounded-full object-cover border-4 border-theme-primary shadow">
+                          {getInitials(contactFormik.values.name || "U")}
+                        </span>
+
+    }
+
+    {/* Edit Button */}
+    <label
+      htmlFor="profileImage"
+      className="absolute bottom-1 right-1 bg-theme-primary text-white p-2 rounded-full cursor-pointer hover:scale-105 transition-all duration-200"
+    >
+      <FiEdit2 size={16} />
+    </label>
+
+    {/* Hidden Input */}
+    <input
+      type="file"
+      id="profileImage"
+      accept="image/*"
+      hidden
+      onChange={(e) => {
+        const file = e.target.files[0];
+
+        if (file) {
+          handleImage(file)
+        }
+      }}
+      disabled={loading}
+    />
+  </div>
+
+  {/* User Name */}
+  <div className="mt-3 text-lg font-semibold text-theme-primary">
+    {contactFormik.values.name || "User Name"}
+  </div>
+</div>
 
             <div className=" grid grid-cols-1 md:grid-cols-3 gap-2">
               {/* name */}

@@ -3,15 +3,18 @@ import Modal from "./modal";
 import { buildFilterQuery } from "./types";
 // import { MdOutlineFilterAlt } from "react-icons/md";
 
-const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , onClose = () => {}}) => {
+const SmartFilter = ({
+  filters = [],
+  onChange,
+  value = [],
+  showFilterModal,
+  onClose = () => {},
+}) => {
+  const [activeFilters, setActiveFilters] = useState(value || []);
 
-
-   const [activeFilters, setActiveFilters] = useState(value || []);
-
-   
-   useEffect(() => {
-     setActiveFilters(value);
-   }, [value]);
+  useEffect(() => {
+    setActiveFilters(value);
+  }, [value]);
 
   /* ================= HELPERS ================= */
 
@@ -74,8 +77,8 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
 
   const clearFilters = () => {
     setActiveFilters([]);
-    onChange?.([],[]);
-    onClose?.()
+    onChange?.([], []);
+    // onClose?.()
   };
 
   const hasInvalidFilters = activeFilters?.some((f) =>
@@ -166,7 +169,8 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
                 value: [e.target.value, value[1]],
               })
             }
-            className="w-full rounded-md border px-3 py-1.5 text-sm"
+            // className="w-full rounded-md border px-3 py-1.5 text-sm"
+            className="inputField"
           />
           <input
             type={inputType}
@@ -177,7 +181,8 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
                 value: [value[0], e.target.value],
               })
             }
-            className="w-full rounded-md border px-3 py-1.5 text-sm"
+            // className="w-full rounded-md border px-3 py-1.5 text-sm"
+            className="inputField"
           />
         </div>
       );
@@ -189,7 +194,8 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
         <select
           value={value}
           onChange={(e) => updateFilter(filter.key, { value: e.target.value })}
-          className="w-full rounded-md border px-3 py-1.5 text-sm"
+          // className="w-full rounded-md border px-3 py-1.5 text-sm"
+          className="inputField"
         >
           <option value="" disabled>
             Select {filter.label}
@@ -210,7 +216,9 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
         value={value}
         placeholder="Enter value"
         onChange={(e) => updateFilter(filter?.key, { value: e.target.value })}
-        className="w-full rounded-md border px-3 py-1.5 text-sm"
+        // className="w-full rounded-md border px-3 py-1.5 text-sm"
+
+        className="inputField"
       />
     );
   };
@@ -218,8 +226,8 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
   const applyFilters = () => {
     const query = buildFilterQuery(activeFilters);
 
-    onChange?.(query,activeFilters);
-    onClose?.()
+    onChange?.(query, activeFilters);
+    onClose?.();
   };
 
   /* ================= UI ================= */
@@ -233,99 +241,115 @@ const SmartFilter = ({ filters = [], onChange ,value = [] , showFilterModal , on
         🔍 Filters
       </button> */}
 
-
-      
-
       <Modal
         isOpen={showFilterModal}
         onClose={() => onClose?.()}
         // className="!min-h-48 h-full"
       >
-        <div className="w-full max-w-2xl rounded-lg bg-white p-4 h-full flex flex-col  justify-between">
-          <h3 className="mb-4 text-lg font-semibold">Filters</h3>
+        <div className="overflow-auto h-full w-full bg-transparent">
+          <div
+            className="border  w-full overflow-hidden h-full  bg-gray-200"
+            style={{ boxShadow: "0 0 10px #03A9F4" }}
+          >
+            {/* <div className="w-full max-w-2xl  bg-gray-200 p-4 h-full flex flex-col gap-2  justify-between"
+         style={{ boxShadow: "0 0 10px #03A9F4" }}> */}
 
-          <div className="w-full h-full overflow-auto flex flex-col items-center justify-between">
-            <div className="w-full h-full overflow-hidden overflow-y-auto custom-scrollbar">
-              {/* ACTIVE FILTER ROWS */}
-              <div className="space-y-3 ">
-                {activeFilters.map((f) => (
-                  <div
-                    key={f.key}
-                    className="flex items-center justify-between gap-3 rounded-md border bg-gray-50 p-3"
-                  >
-                    <div className="flex w-full flex-col gap-2">
-                      <strong className="text-sm">{f.label}</strong>
+            <div className="flex justify-center items-center flex-col h-full">
+              <div className="px-4 flex flex-col gap-4  overflow-hidden h-full w-full">
+                <h3 className="jetBranis text-xl sm:text-2xl font-semibold mt-3">
+                  Filters
+                </h3>
 
-                      <select
-                        value={f.operator}
-                        onChange={(e) =>
-                          updateFilter(f.key, {
-                            operator: e.target.value,
-                            value: e.target.value === "between" ? ["", ""] : "",
-                          })
-                        }
-                        className="rounded-md border px-3 py-1.5 text-sm"
-                      >
-                        {f.meta.operators.map((op) => (
-                          <option key={op} value={op}>
-                            {op}
-                          </option>
-                        ))}
-                      </select>
+                <div className="w-full h-full overflow-auto flex flex-col items-center justify-between">
+                  <div className="w-full h-full overflow-hidden overflow-y-auto custom-scrollbar p-1">
+                    {/* ACTIVE FILTER ROWS */}
+                    <div className="space-y-3 ">
+                      {activeFilters.map((f) => (
+                        <div
+                          key={f.key}
+                          className="flex items-center justify-between gap-3 rounded-lg border bg-white p-4"
+                        >
+                          <div className="flex w-full flex-col gap-2">
+                            <strong className="text-sm">{f.label}</strong>
 
-                      {renderValue(f)}
+                            <select
+                              value={f.operator}
+                              onChange={(e) =>
+                                updateFilter(f.key, {
+                                  operator: e.target.value,
+                                  value:
+                                    e.target.value === "between"
+                                      ? ["", ""]
+                                      : "",
+                                })
+                              }
+                              // className="rounded-md border px-3 py-1.5 text-sm"
+                              className="inputField"
+                            >
+                              {f.meta.operators.map((op) => (
+                                <option key={op} value={op}>
+                                  {op}
+                                </option>
+                              ))}
+                            </select>
+
+                            {renderValue(f)}
+                          </div>
+
+                          <button
+                            onClick={() => removeFilter(f.key)}
+                            className="text-gray-400 hover:text-red-500"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
                     </div>
 
-                    <button
-                      onClick={() => removeFilter(f.key)}
-                      className="text-gray-400 hover:text-red-500"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
+                    {/* INACTIVE FILTER TAGS */}
+                    {inactiveFilters?.length > 0 && (
+                      <div>
+                        <h4 className="mt-4 mb-2 text-sm font-medium text-gray-700">
+                          Add Filters
+                        </h4>
 
-              {/* INACTIVE FILTER TAGS */}
-              {inactiveFilters?.length > 0 && (
-                <div className="py-2">
-                  <h4 className="mt-4 mb-2 text-sm font-medium text-gray-700">
-                    Add Filters
-                  </h4>
-
-                  <div className="flex flex-wrap gap-2">
-                    {inactiveFilters?.map((f) => (
-                      <span
-                        key={f.key}
-                        onClick={() => addFilter(f)}
-                        className="cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300"
-                      >
-                        + {f.label}
-                      </span>
-                    ))}
+                        <div className="flex flex-wrap gap-2">
+                          {inactiveFilters?.map((f) => (
+                            <span
+                              key={f.key}
+                              onClick={() => addFilter(f)}
+                              className="cursor-pointer rounded-full bg-gray-50 px-3 py-1 text-xs transition-all hover:text-white hover:bg-theme-primary hover:shadow-theme-primary hover:shadow roboto"
+                            >
+                              + {f.label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
+                {/* FOOTER */}
+                {activeFilters?.length > 0 && (
+                  <div className="my-2 w-full flex  gap-3">
+                    <button
+                      onClick={clearFilters}
+                      className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      onClick={applyFilters}
+                      disabled={hasInvalidFilters}
+                      className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
+                      // className="rounded-md bg-black px-4 py-2 text-sm text-white w-full hover:bg-gray-800 disabled:opacity-50"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-          {/* FOOTER */}
-          {activeFilters?.length > 0 && (
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={clearFilters}
-                className="rounded-md border px-4 py-1.5 text-sm hover:bg-gray-100"
-              >
-                Clear
-              </button>
-              <button
-                onClick={applyFilters}
-                disabled={hasInvalidFilters}
-                className="rounded-md bg-black px-4 py-1.5 text-sm text-white hover:bg-gray-800 disabled:opacity-50"
-              >
-                Apply Filters
-              </button>
-            </div>
-          )}
         </div>
       </Modal>
     </div>

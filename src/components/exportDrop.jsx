@@ -226,7 +226,7 @@ export default function ExportDropdown({
         onClick={() => setOpen(!open)}
         className="
           flex items-center gap-2
-          rounded-xl
+          rounded-lg
           bg-emerald-600
           px-4 py-2.5
           text-sm font-medium text-white
@@ -246,8 +246,8 @@ export default function ExportDropdown({
 
       <div
         className={`
-          absolute right-0 top-14 z-50
-          w-52 rounded-2xl
+          absolute right-0 top-12 z-50
+          w-52 rounded-xl
           border border-zinc-200
           bg-white shadow-2xl
           transition-all duration-200

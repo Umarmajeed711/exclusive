@@ -480,9 +480,10 @@ const ProductListView = ({
                     <button
               title="update Bulk Product"
               onClick={() => setShowBulkModal(true)}
-              className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+              className="flex gap-1 items-center px-4 py-1.5 text-sm font-medium  
+              rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-[1.02] transition"
             >
-               <FiEdit2 size={16} />  Bulk Update
+               <FiEdit2 size={14} />  Bulk Update
             </button>
 
                   {/* Export  */}
@@ -490,7 +491,7 @@ const ProductListView = ({
                   <button
                     className="
                         flex items-center gap-2
-                        rounded-xl
+                        rounded-lg
                         bg-emerald-600
                         px-4 py-1.5
                         text-sm font-medium text-white
@@ -512,7 +513,7 @@ const ProductListView = ({
                     onClick={() => {
                       handleBulkDelete();
                     }}
-                    className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
+                    className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg
                                      hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
                                  duration-200 transition-all  
                                  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""
@@ -546,7 +547,7 @@ const ProductListView = ({
                 <div className="relative" ref={menuRef}>
                   <button
                     onClick={() => setOpen(!open)}
-                    className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200"
+                    className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 "
                   >
                     Columns ⚙
                   </button>
@@ -672,7 +673,7 @@ const ProductListView = ({
           isOpen={showModal}
         >
           <AddProductForm
-            onclose={() => {
+            onClose={() => {
               setShowModal(false);
               setProjectData({});
             }}

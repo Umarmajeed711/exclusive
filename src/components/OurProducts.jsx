@@ -307,7 +307,7 @@ const OurProducts = ({
                 to={`/ProductDetail/${product?.product_id}`}
                 className="col-span-1"
               >
-                <div className="relative border-none  overflow-hidden  group hover:-translate-y-4 hover:shadow-2xl transition duration-500">
+                <div className="relative border-none shadow-xl  overflow-hidden  group hover:-translate-y-4 hover:rounded-xl hover:shadow-[0_0_20px_#03A9F4,0_0_20px_#4EC3F8]  transition duration-500">
                   {/* Image & hover */}
                   <div className="relative w-full  h-64 aspect-square overflow-hidden   flex justify-center items-center   bg-slate-100  ">
                     <img
@@ -323,7 +323,7 @@ const OurProducts = ({
                     <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
                       {isWishList ? (
                         <button
-                          className="bg-white p-2 rounded-full shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
+                          className="bg-white p-2 rounded-full opacity-0 group-hover:opacity-90 shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -335,7 +335,7 @@ const OurProducts = ({
                         </button>
                       ) : (
                         <button
-                          className="bg-white p-2 rounded-full shadow hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
+                          className="bg-white p-2 rounded-full shadow opacity-0 group-hover:opacity-90 hover:bg-gray-200 hover:scale-110 hover:!text-theme-primary"
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -360,7 +360,7 @@ const OurProducts = ({
                       {Admin && !isWishList ? (
                         <>
                           <button
-                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary "
+                            className="bg-white p-2 rounded-full opacity-0 group-hover:opacity-90 shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary "
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -370,7 +370,7 @@ const OurProducts = ({
                             <BiEditAlt className="text-lg text-gray-700" />
                           </button>
                           <button
-                            className="bg-white p-2 rounded-full shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary"
+                            className="bg-white p-2 rounded-full opacity-0 group-hover:opacity-90 shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
@@ -463,7 +463,7 @@ const OurProducts = ({
           isOpen={showModal}
         >
           <AddProductForm
-            onclose={() => {
+            onClose={() => {
               setShowModal(false);
               setProjectData({});
             }}

@@ -41,6 +41,7 @@ const UserUpdateForm = ({
   const validationSchema = yup.object({
     name: yup.string().required("Name is required"),
     email: yup.string().email().required("Email is required"),
+     role: yup.string().required("Role is required"),
   });
 
   const userFormik = useFormik({
@@ -110,20 +111,24 @@ const UserUpdateForm = ({
       {/*Add Project Form */}
 
       <div
-        className="border rounded-lg  w-full   overflow-hidden h-full pl-[2px] bg-white"
+        className="border   w-full   overflow-hidden h-full  bg-gray-200"
         style={{ boxShadow: "0 0 10px #03A9F4  " }}
       >
         <div className="flex justify-center items-center flex-col h-full ">
           <form
             onSubmit={userFormik.handleSubmit}
-            className=" px-4   flex flex-col gap-2 items-center overflow-hidden h-full w-full "
+            className=" px-4   flex flex-col gap-2   overflow-hidden h-full w-full "
           >
             <p className=" text-xl sm:text-2xl font-medium sm:font-semibold mt-2   ">
               Update User
             </p>
 
+            <div className="flex flex-col gap-5 w-full overflow-y-auto h-full custom-scrollbar p-1">
+
             {/* Profile Image */}
-            <div className="flex flex-col items-center gap-2 relative group">
+            <div className="flex justify-center items-center">
+
+            <div className="flex flex-col items-center  gap-2 relative group">
               {/* Avatar */}
               <div
                 className="w-20 h-20 rounded-full overflow-hidden cursor-pointer flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 text-lg font-semibold text-gray-700 border-2 border-white shadow-sm"
@@ -158,6 +163,7 @@ const UserUpdateForm = ({
                 accept="image/*"
                 onChange={(e) => handleImage(e.target.files[0])}
               />
+            </div>
             </div>
 
             <div className="flex flex-col gap-2 w-full">
@@ -269,17 +275,57 @@ const UserUpdateForm = ({
                 <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
                   ▼
                 </div>
+                <div className="error-wrapper">
+                    {userFormik.submitCount > 0 &&
+                      userFormik.errors.role && (
+                        <p className="requiredError">
+                          {userFormik.errors.role}
+                        </p>
+                      )}
+                  </div>
+              </div>
               </div>
             </div>
+            
+
 
             {/* Submit */}
-            <button
+
+              <div className=" flex gap-3 w-full my-2">
+              <button
+                onClick={() => {
+                userFormik.resetForm();
+                onClose()
+              }}
+                type="button"
+                className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
+              >
+                Close
+              </button>
+              
+              <button
+                  type="submit"
+                  disabled={loading}
+                  className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
+                >
+                  {loading ? (
+                    <div className="flex items-center px-1 py-2 gap-2">
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                      <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
+                    </div>
+                  ) : (
+                    "Update User"
+                  )}
+                </button>
+             </div>
+            {/* <button
               type="submit"
               disabled={loading}
               className="bg-theme-primary text-white py-2 rounded p-1 mt-2"
             >
               {loading ? "Updating..." : "Update User"}
-            </button>
+            </button> */}
           </form>
         </div>
       </div>

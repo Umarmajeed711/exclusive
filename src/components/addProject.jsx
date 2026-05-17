@@ -137,7 +137,7 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
 };
 
 const AddProductForm = ({
-  onclose = () => {},
+  onClose = () => {},
   productData = {},
   OnSuccess = () => {},
   OnError = () => {},
@@ -405,15 +405,15 @@ const AddProductForm = ({
       {/*Add Project Form */}
 
       <div
-        className="border rounded-lg  w-full   overflow-hidden h-full pl-[2px] bg-gray-200"
+        className="border  w-full   overflow-hidden h-full  bg-gray-200"
         style={{ boxShadow: "0 0 10px #03A9F4  " }}
       >
         <div className="flex justify-center items-center flex-col h-full ">
           <form
             onSubmit={addProjectFormik.handleSubmit}
-            className=" px-4   flex flex-col gap-4 items-center overflow-hidden h-full w-full "
+            className=" px-4   flex flex-col gap-4  overflow-hidden h-full w-full "
           >
-            <p className="jetBranis text-xl sm:text-2xl  font-medium sm:font-semibold mt-2   ">
+            <p className="jetBranis text-xl sm:text-2xl  font-medium sm:font-semibold mt-2 ">
               {productData?.product_id ? "Update" : "Add"} Product
             </p>
 
@@ -829,10 +829,24 @@ const AddProductForm = ({
                 </p>
               )}
 
-              <div className="flex flex-col justify-between items-center">
+             
+            </div>
+
+            
+
+                  <div className=" flex gap-3 w-full my-2">
+              <button
+                onClick={() => {
+                addProjectFormik.resetForm();
+              }}
+                type="button"
+                className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
+              >
+                Close
+              </button>
                 <button
                   disabled={loading}
-                  className=" bg-theme-primary transition-all duration-200 flex justify-center rounded px-3 py-2 my-2 text-white  hover:shadow-theme-secondary hover:shadow-md"
+                  className=" bg-theme-primary transition-all duration-200 flex justify-center rounded w-full py-2  text-white  hover:shadow-theme-secondary hover:shadow-md"
                   type="submit"
                 >
                   {loading ? (
@@ -847,7 +861,7 @@ const AddProductForm = ({
                     "Add Product"
                   )}
                 </button>
-              </div>
+              
             </div>
           </form>
         </div>

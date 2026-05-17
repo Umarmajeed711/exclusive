@@ -34,6 +34,12 @@ const Shop = () => {
     } catch (error) {}
   };
 
+const categoryOptions = categoryList?.map((c) => ({
+  label: c?.category_name,
+  value: c?.category_id,
+}));
+  // console.log("catergory options", categoryOptions)
+
   const [Products, setProducts] = useState([]);
   const [productsByPage, setProductsByPage] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -146,11 +152,7 @@ const Shop = () => {
       label: "Category",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
-      options: [
-        { label: "Headphones", value: "headphones" },
-        { label: "Mobile", value: "mobile" },
-        { label: "Laptop", value: "laptop" },
-      ],
+      options: categoryOptions,
     },
     {
       key: "colors",
@@ -413,7 +415,7 @@ const Shop = () => {
           isOpen={showModal}
         >
           <AddProductForm
-            onclose={() => {
+            onClose={() => {
               setShowModal(false);
               setProjectData({});
             }}

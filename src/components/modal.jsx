@@ -71,7 +71,7 @@ const Modal = ({ isOpen, onClose, children, className }) => {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1010] flex items-center justify-center modal"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1010] flex items-center justify-end modal"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -82,18 +82,23 @@ const Modal = ({ isOpen, onClose, children, className }) => {
             ref={modalRef}
             role="dialog"
             aria-modal="true"
-            className={`relative w-[90%] max-w-lg h-[700px] max-h-[80vh] overflow-hidden rounded-xl bg-theme-primary p-4 shadow-xl ${className || ""}`}
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            // className={`relative w-[90%] max-w-lg h-[700px] max-h-[80vh] overflow-hidden rounded-xl bg-theme-primary p-4 shadow-xl ${className || ""}`}
+            className={`relative w-[90%] max-w-lg h-screen  overflow-hidden  border-l-[12px] border-theme-primary shadow-xl ${className || ""}`}
+           initial={{ x: "100%", opacity: 0 }}
+  animate={{ x: 0, opacity: 1 }}
+  exit={{ x: "100%", opacity: 0 }}
+            // transition={{ type: "spring", stiffness: 460, damping: 20 }}
+            transition={{
+    duration: 0.35,
+    ease: [0.22, 1, 0.36, 1],
+  }}
             onClick={(e) => e.stopPropagation()} // Prevent backdrop close
           >
             {/* Close Button */}
             <button
               onClick={onClose}
               aria-label="Close modal"
-              className="absolute p-2 right-4 top-3 text-xl font-bold text-theme-primary transition hover:scale-110"
+              className="absolute  right-4 top-3 text-xl font-bold text-theme-primary transition hover:scale-110"
             >
               ×
             </button>
