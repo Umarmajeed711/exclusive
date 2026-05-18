@@ -96,7 +96,7 @@ export const Login = () => {
         }
       } catch (error) {
         setloading(false);
-        setApiError(error?.response.data.message || "Something went wrong");
+        setApiError(error?.response?.data?.message || "Something went wrong");
       }
     },
   });

@@ -150,7 +150,7 @@ const UserUpdateForm = ({
               <span
                 onClick={() => document.getElementById("profileInput").click()}
                 className="absolute bottom-1 right-1 bg-white border shadow-md rounded-full p-1.5 
-    text-gray-600 hover:text-blue-600 hover:scale-110 transition cursor-pointer"
+              text-gray-600 hover:text-blue-600 hover:scale-110 transition cursor-pointer"
               >
                 <FiEdit2 size={14} />
               </span>

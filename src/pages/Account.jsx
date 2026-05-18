@@ -10,20 +10,19 @@ import Alert from "@mui/material/Alert";
 import api from "../components/api";
 import Breadcrums from "../components/Breadcrums";
 import { FiEdit2 } from "react-icons/fi";
-import { getInitials } from "../components/types";
+import { getInitials, showToast } from "../components/types";
 
 const Account = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
-  let { user_id, name, email, phone , image_url} = state?.user;
+  let { user_id, name, email, phone, profile } = state?.user;
 
   const [loading, setloading] = useState(false);
 
   const [apiError, setApiError] = useState("");
 
-  
-    const [profileImage, setProfileImage] = useState(image_url || null);
-  const [previewImage, setPreviewImage] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(profile || null);
 
   const contactValidation = yup.object({
     name: yup
@@ -109,6 +108,7 @@ const Account = () => {
       setloading(true);
 
       if (
+        profile == previewImage &&
         name === values.name &&
         email === values.email &&
         phone === values.phone &&
@@ -120,17 +120,20 @@ const Account = () => {
         return Swal.fire("No Changes", "You haven’t made any changes!", "info");
       }
 
-        const formData = new FormData();
-        
-          formData.append("user_id",user_id);
-      formData.append("name", values.name !== name ? values.name : null);
-      formData.append("email", values.email !== email ? values.email : null);
-      formData.append("phone", values.phone !== phone ? values.phone : null);
-      formData.append("password", values.password);
-       formData.append("newPassword", values.newPassword);
-        formData.append("confirmPassword", values.confirmPassword);
+      const formData = new FormData();
 
-      if (profileImage) {
+      formData.append("user_id", user_id);
+      formData.append("name", values.name !== name ? values.name : "");
+      formData.append("email", values.email !== email ? values.email : "");
+      formData.append("phone", values.phone !== phone ? values.phone : "");
+      formData.append("password", values.password);
+      formData.append("newPassword", values.newPassword);
+      formData.append("confirmPassword", values.confirmPassword);
+
+      // if (profileImage) {
+      //   formData.append("profile", profileImage);
+      // }
+      if (values?.image) {
         formData.append("profile", values?.image);
       }
       try {
@@ -144,58 +147,49 @@ const Account = () => {
         //   confirmPassword: values.confirmPassword,
         // });
 
-         const response = await api.put(`/edit-profile`, formData );
-
-       
+        const response = await api.put(`/edit-profile`, formData);
 
         dispatch({ type: "USER_LOGIN", payload: response.data.profile });
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
+        showToast({
           icon: "success",
           title: "Edit Profile Successfully",
         });
 
         setloading(false);
         contactFormik.resetForm();
+        // setProfileImage(null);
       } catch (error) {
+        // showToast({
+        //   icon:"error",
+        //   title:error?.response?.data?.message|| "Something went wrong"
+        // })
+
         setloading(false);
-        setApiError(error?.response.data.message || "Something went wrong");
+        setApiError(error?.response?.data?.message || "Something went wrong");
       }
     },
   });
 
-  const handleImage = (file) => {
-    if (!file) return;
+  // const handleImage = (file) => {
+  //   if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert("Only image allowed");
-      return;
-    }
+  //   if (!file.type.startsWith("image/")) {
+  //     alert("Only image allowed");
+  //     return;
+  //   }
 
-    setProfileImage(file);
-    setPreviewImage(URL.createObjectURL(file));
-  };
+  //   contactFormik.handleChange(file);
+
+  //   // setProfileImage(file);
+  //   setPreviewImage(URL.createObjectURL(file));
+  // };
 
   const Styles = {
     inputField:
       "border-b-2 bg-gray-200 outline-none w-full px-3 py-2 focus:border-theme-primary transition",
   };
 
-  //   const Styles = {
-  //   inputField:
-  //     "w-full bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition",
-  // };
 
   return (
     <div className="mx-5 md:mx-8 lg:mx-14">
@@ -259,79 +253,77 @@ const Account = () => {
 
         {/* contact Form */}
 
-        <div className="col-span-3 lg:col-span-2  min-w-[300px] p-5 md:p-8 h-full  shadow-[0_0_7px_rgba(0,0,0,.5)]">
-          <div className="h-[40px] w-full flex justify-center items-center mb-2 overflow-hidden">
-            <Alert
-              severity="error"
-              className={`transition-all duration-300 transform text-sm px-4 py-1 w-[350px] md:w-full flex justify-center
-                ${
-                  apiError
-                    ? "opacity-100 visible translate-y-0"
-                    : "opacity-0 invisible -translate-y-2"
-                }
-              `}
-            >
-              {apiError || "placeholder"}
-            </Alert>
-          </div>
-
-          <form onSubmit={contactFormik.handleSubmit}>
-            <div className="text-2xl font-semibold text-theme-primary py-2">
+        <div className="col-span-3 lg:col-span-2 w-full  min-w-[300px] p-5 md:p-8 h-full  shadow-[0_0_7px_rgba(0,0,0,.5)]">
+          <form
+            onSubmit={contactFormik.handleSubmit}
+            className="flex flex-col items-center w-full"
+          >
+            <div className="text-2xl font-semibold text-theme-primary py-2 flex justify-start w-full">
               Edit Your Profile
             </div>
 
             {/* Profile Image */}
-<div className="flex flex-col items-center justify-center">
-  <div className="relative w-[120px] h-[120px]">
+            <div className="flex flex-col items-center  relative group">
+              <div
+                className="w-20 h-20 rounded-full overflow-hidden cursor-pointer flex items-center justify-center bg-gradient-to-br from-gray-200 to-gray-300 text-lg font-semibold text-gray-700 border-2 border-white shadow-sm"
+                onClick={() => document.getElementById("profileInput").click()}
+              >
+                {previewImage ? (
+                  <img
+                    src={previewImage}
+                    alt="profile"
+                    className="w-full h-full rounded-full object-cover border-4 border-theme-primary shadow group-hover:scale-105 transition duration-200"
+                  />
+                ) : (
+                  <span className="uppercase tracking-wide flex justify-center items-center w-full h-full rounded-full object-cover border-4 border-theme-primary shadow group-hover:scale-105 transition duration-200">
+                    {getInitials(contactFormik.values.name || "U")}
+                  </span>
+                )}
+              </div>
 
-    {
-      previewImage ?
-      <img
-        src={previewImage}
-        alt="profile"
-        className="w-full h-full rounded-full object-cover border-4 border-theme-primary shadow"
-      />
-      :  <span className="uppercase tracking-wide w-full h-full rounded-full object-cover border-4 border-theme-primary shadow">
-                          {getInitials(contactFormik.values.name || "U")}
-                        </span>
+              {/* Edit Button */}
+              <span
+                htmlFor="profileInput"
+                onClick={() => document.getElementById("profileInput").click()}
+                className="absolute bottom-1 right-1  bg-theme-primary text-white   shadow-md rounded-full p-1.5 
+              hover:scale-110 transition cursor-pointer"
+              >
+                <FiEdit2 size={16} />
+              </span>
 
+              {/* Hidden Input */}
+             <input
+  name="image"
+  type="file"
+  id="profileInput"
+  accept="image/*"
+  hidden
+  onChange={(e) => {
+    const file = e.target.files[0];
+
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        alert("Only image allowed");
+        return;
+      }
+
+      contactFormik.setFieldValue("image", file);
+
+      setPreviewImage(URL.createObjectURL(file));
     }
+  }}
+  disabled={loading}
+/>
+            </div>
+            {/* User Name */}
+            <div className="mt-3 text-lg font-semibold text-theme-primary">
+              {name || "User Name"}
+            </div>
 
-    {/* Edit Button */}
-    <label
-      htmlFor="profileImage"
-      className="absolute bottom-1 right-1 bg-theme-primary text-white p-2 rounded-full cursor-pointer hover:scale-105 transition-all duration-200"
-    >
-      <FiEdit2 size={16} />
-    </label>
-
-    {/* Hidden Input */}
-    <input
-      type="file"
-      id="profileImage"
-      accept="image/*"
-      hidden
-      onChange={(e) => {
-        const file = e.target.files[0];
-
-        if (file) {
-          handleImage(file)
-        }
-      }}
-      disabled={loading}
-    />
-  </div>
-
-  {/* User Name */}
-  <div className="mt-3 text-lg font-semibold text-theme-primary">
-    {contactFormik.values.name || "User Name"}
-  </div>
-</div>
-
-            <div className=" grid grid-cols-1 md:grid-cols-3 gap-2">
+            <div className=" grid grid-cols-1 md:grid-cols-3 gap-2 w-full">
               {/* name */}
               <div className="flex flex-col gap-3 justify-center col-span-1 ">
-                <div>Name</div>
+                <div className="text-base font-semibold">Name</div>
                 <div className="w-full">
                   <input
                     type="text"
@@ -369,7 +361,7 @@ const Account = () => {
 
               {/* email */}
               <div className="flex flex-col gap-3 justify-center col-span-1">
-                <div>Email</div>
+                <div  className="text-base font-semibold">Email</div>
                 <div className="w-full">
                   <input
                     type="email"
@@ -407,7 +399,7 @@ const Account = () => {
 
               {/* phone */}
               <div className="flex flex-col gap-3 justify-center col-span-1">
-                <div>Phone</div>
+                <div  className="text-base font-semibold">Phone</div>
                 <div className="w-full">
                   <input
                     type="tel"
@@ -444,8 +436,8 @@ const Account = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 justify-center col-span-3">
-              <div>Password Changes</div>
+            <div className="flex flex-col gap-3 justify-center col-span-3 w-full">
+              <div  className="text-base font-semibold">Password Changes</div>
               <div className=" grid grid-cols-1 md:grid-cols-3 gap-2">
                 {/* Password */}
                 <div className="flex gap-3 items-center col-span-1 ">
@@ -549,23 +541,55 @@ const Account = () => {
               </div>
             </div>
 
-            <div className="flex justify-end items-center">
-              <button
-                disabled={loading}
-                type="submit"
-                className=" bg-theme-primary transition-all duration-200 rounded flex justify-center px-8 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+            <div className="h-[40px]  flex justify-center items-center mb-2 overflow-hidden">
+              <Alert
+                severity="error"
+                className={`transition-all duration-300 transform text-sm px-4 py-1 w-[350px] md:w-full flex justify-center
+                ${
+                  apiError
+                    ? "opacity-100 visible translate-y-0"
+                    : "opacity-0 invisible -translate-y-2"
+                }
+              `}
               >
-                {loading ? (
-                  <div className="flex items-center  p-2 gap-2">
-                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
-                  </div>
-                ) : (
-                  "send Message"
-                )}
-              </button>
+                {apiError || "placeholder"}
+              </Alert>
             </div>
+
+            {contactFormik.dirty && (
+              <div className="flex justify-end items-center w-full animate-fadeIn">
+                <div className="flex w-[50%] gap-2">
+                  <button
+                    onClick={() => {
+                      contactFormik.resetForm();
+                      setPreviewImage(profile || "");
+                    }}
+                    type="button"
+                    className="rounded-md border py-3 text-sm bg-white transition-all duration-200 hover:bg-gray-100 hover:shadow-md w-full"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    disabled={loading}
+                    type="submit"
+                    className="bg-theme-primary w-full transition-all duration-200 rounded flex justify-center px-8 py-3 text-white hover:shadow-theme-secondary hover:shadow"
+                  >
+                    {loading ? (
+                      <div className="flex items-center p-2 gap-2">
+                        <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                        <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                        <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
+                      </div>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+            {/* <div className="flex justify-end items-center w-full">
+            </div> */}
           </form>
         </div>
       </div>
