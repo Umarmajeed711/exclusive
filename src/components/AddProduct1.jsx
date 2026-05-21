@@ -6,8 +6,8 @@ import * as yup from "yup";
 import { AiOutlineClose } from "react-icons/ai";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
-import api from "./api";
-import OurProducts from "./OurProducts";
+import api from "./helper/api";
+import OurProducts from "./Product/OurProducts";
 
 const AddProduct = () => {
   const [apiError, setApiError] = useState("");
@@ -591,7 +591,7 @@ const AddProduct = () => {
                 <button
                   disabled={loading}
                   type="submit"
-                  className=" bg-red-600 transition-all duration-200 rounded flex justify-center p-2 my-3 text-white  hover:shadow-red-400 hover:shadow-md"
+                  className=" bg-red-600 transition-all duration-200 rounded-md flex justify-center p-2 my-3 text-white  hover:shadow-red-400 hover:shadow-md"
                 >
                   {loading ? (
                     <div className="flex items-center p-2 gap-2">

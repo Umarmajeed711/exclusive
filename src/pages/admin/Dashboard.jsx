@@ -1,7 +1,7 @@
-import DashboardCards from "../../components/DashboardCards";
-import DashboardCharts from "../../components/DashboardCharts";
-import OrderList from "../../components/OrderList";
-import RecentOrders from "../../components/RecentOrders";
+import DashboardCards from "../../components/dashboard/DashboardCards";
+import DashboardCharts from "../../components/dashboard/DashboardCharts";
+import OrderList from "../../components/order/OrderList";
+import RecentOrders from "../../components/order/RecentOrders";
 
 const Dashboard = () => {
 

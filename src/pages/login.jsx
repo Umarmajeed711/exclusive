@@ -9,7 +9,7 @@ import { GlobalContext } from "../context/Context";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import api from "../components/api";
+import api from "../components/helper/api";
 
 export const Login = () => {
   let { dispatch } = useContext(GlobalContext);
@@ -33,7 +33,7 @@ export const Login = () => {
 
   const loginValidation = yup.object({
     email: yup.string().trim().email().required("Email is required"),
-    password: yup.string().required("Password is required"),
+    password: yup.string().trim().required("Password is required"),
   });
 
   const loginFormik = useFormik({
@@ -110,12 +110,23 @@ export const Login = () => {
   //   }
   // }, [load]);
 
+
+  const [pageChange,setPageChange]= useState(false);
+
+  const handlePageChange = (link = "/") => {
+    setPageChange(true)
+    setTimeout(() => {
+      navigate(link)
+
+    },100)
+  }
   let Styles = {
     inputField:
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl hover: w-[220px]",
   };
   return (
-    <div className="flex justify-center  items-center h-screen">
+    <div className={`flex justify-center  items-center h-screen ${pageChange ? "animate-slideDown" :"animate-slideUp"}`}>
+      
       <div className=" flex items-center  gap-20 sm:p-10 bg-theme-background min-w-[320px]">
         {/* Image div */}
         <div className="hidden md:flex flex-col ">
@@ -257,7 +268,7 @@ export const Login = () => {
             <div className="flex justify-between items-center">
               <button
                 disabled={loading}
-                className=" bg-theme-primary transition-all duration-200 flex justify-center rounded px-3 py-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+                className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md px-3 py-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
                 type="submit"
               >
                 {loading ? (
@@ -272,12 +283,20 @@ export const Login = () => {
               </button>
 
               <div>
-                <Link
+                {/* <Link
                   to="/ForgetPassword"
                   className="text-theme-primary hover:text-theme-secondary"
                 >
                   Forgot Password?
-                </Link>
+                </Link> */}
+
+                <span
+                className="text-theme-primary hover:text-theme-secondary"
+                onClick={() => {handlePageChange("/ForgetPassword")}}
+                >
+                  Forgot Password?
+
+                </span>
               </div>
             </div>
 
@@ -296,12 +315,18 @@ export const Login = () => {
             <div className="flex justify-center mt-2">
               <p>
                 Don't have an account?{" "}
-                <Link
+                {/* <Link
                   to="/signup"
                   className="transition-all duration-100  hover:underline hover:text-theme-secondary"
                 >
                   Sign Up
-                </Link>
+                </Link> */}
+                 <span
+                  className="transition-all duration-100  hover:underline hover:text-theme-secondary"
+                  onClick={() => handlePageChange("/signup")}
+                >
+                  Sign Up
+                </span>
               </p>
             </div>
           </form>

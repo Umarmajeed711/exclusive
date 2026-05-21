@@ -3,16 +3,16 @@ import { Link } from "react-router-dom";
 import { AiOutlineHeart } from "react-icons/ai";
 import { BiEditAlt } from "react-icons/bi";
 import { RiDeleteBin5Line } from "react-icons/ri";
-import "../App.css";
-import Title from "./Title";
-import api from "./api";
-import { GlobalContext } from "../context/Context";
-import Modal from "./modal";
-import AddProductForm from "./addProject";
+import "../../App.css";
+import Title from "../helper/Title";
+import api from "../helper/api";
+import { GlobalContext } from "../../context/Context";
+import Modal from "../helper/modal";
+import AddProductForm from "./addProduct";
 import Swal from "sweetalert2";
 import ProductCardSkeleton from "./productCardSkeleton";
 import { MdClose } from "react-icons/md";
-import { showToast } from "./types";
+import { showToast } from "../helper/types";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);

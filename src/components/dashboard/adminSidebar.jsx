@@ -28,12 +28,16 @@ const AdminSidebar = () => {
 
   return (
     <div
-      className={`h-screen bg-white top-0 sticky shadow-lg  transition-all duration-300 ${
-        collapsed ? "w-16" : "min-w-52"
+      
+      className={`relative bg-white ${
+        collapsed ? "closeadminSidebar" : "adminSidebar"
       }`}
+      // className={`h-screen bg-white top-0  z-50 sticky shadow-lg transition-all duration-300${
+      //   collapsed ? "w-16" : "min-w-52"
+      // }`}
     >
       {/* Top */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b  sticky top-0 z-50 bg-white">
         {!collapsed && <h2 className="text-xl font-bold">Admin</h2>}
 
         <button

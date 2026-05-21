@@ -1,16 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../../context/Context";
-import ProductListView from "../../components/ProductList";
-import Pagination from "../../components/Pagination";
-import OrderList from "../../components/OrderList";
+import ProductListView from "../../components/Product/ProductList";
+import Pagination from "../../components/helper/Pagination";
+import OrderList from "../../components/order/OrderList";
 import {
   FILTER_OPERATORS,
   INPUT_TYPES,
   showToast,
-} from "../../components/types";
-import api from "../../components/api";
-import SmartFilter from "../../components/SmartFilters";
-import { ActiveFilters } from "../../components/ActiveFilters";
+} from "../../components/helper/types";
+import api from "../../components/helper/api";
+import SmartFilter from "../../components/helper/SmartFilters";
+import { ActiveFilters } from "../../components/Product/ActiveFilters";
 import { MdOutlineFilterAlt } from "react-icons/md";
 import Swal from "sweetalert2";
 

@@ -6,7 +6,7 @@ import * as yup from "yup";
 import { AiOutlineClose } from "react-icons/ai";
 import Alert from '@mui/material/Alert';
 import Swal from 'sweetalert2';
-import api from './api';
+import api from '../helper/api';
 
 const Category = () => {
 
@@ -225,7 +225,7 @@ useEffect(() => {
                
                 
  <button disabled={loading} type="submit"
- className=" bg-red-600 transition-all duration-200 rounded flex justify-center p-2 my-4 text-white  hover:shadow-red-400 hover:shadow-md">
+ className=" bg-red-600 transition-all duration-200 rounded-md flex justify-center p-2 my-4 text-white  hover:shadow-red-400 hover:shadow-md">
             {loading ? (
               <div className="flex items-center p-2 gap-2">
                 <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>

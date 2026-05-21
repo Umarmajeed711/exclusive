@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../context/Context";
+import { GlobalContext } from "../../context/Context";
 import api from "./api";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -306,7 +306,7 @@ const UserUpdateForm = ({
               <button
                   type="submit"
                   disabled={loading}
-                  className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
+                  className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded-md  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
                 >
                   {loading ? (
                     <div className="flex items-center px-1 py-2 gap-2">

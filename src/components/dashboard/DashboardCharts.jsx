@@ -123,8 +123,8 @@
 import { useEffect, useState } from "react";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import api from "./api";
-import { formatStatus, Loader, showToast, TableCard } from "./types";
+import api from "../helper/api";
+import { formatStatus, Loader, showToast, TableCard } from "../helper/types";
 
 // const salesData = [
 //   { name: "Jan", sales: 400, orders: 40 },

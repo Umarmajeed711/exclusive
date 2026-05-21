@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { GlobalContext } from "../context/Context";
+import { GlobalContext } from "../../context/Context";
 import OrderList from "./OrderList";
-import api from "./api";
-import { showToast } from "./types";
+import api from "../helper/api";
+import { showToast } from "../helper/types";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 

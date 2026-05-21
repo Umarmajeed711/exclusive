@@ -1,9 +1,9 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import api from "./api";
-import { GlobalContext } from "../context/Context";
+import { GlobalContext } from "../../context/Context";
 import useOutsideClick from "./outSideClick";
-import OrderDetailsModal from "./OrderDetailModal";
+import OrderDetailsModal from "../order/OrderDetailModal";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { formatText, getInitials, showToast } from "./types";
 import {
@@ -17,8 +17,8 @@ import { useNavigate } from "react-router-dom";
 import { FiEdit2 } from "react-icons/fi";
 import UserUpdateForm from "./updateUser";
 import { X } from "lucide-react";
-import { exportToCSV } from "./exportToCSV";
-import ExportDropdown from "./exportDrop";
+import { exportToCSV } from "../export/exportToCSV";
+import ExportDropdown from "../export/exportDrop";
 
 /* ==============================
    DEFAULT COLUMNS

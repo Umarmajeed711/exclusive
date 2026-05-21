@@ -2,8 +2,8 @@ import  { useContext, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router";
 import { GlobalContext } from "../context/Context";
-import api from "../components/api";
-import { showToast } from "../components/types";
+import api from "../components/helper/api";
+import { showToast } from "../components/helper/types";
 
 const OrderConfirmation = () => {
   let { state, dispatch } = useContext(GlobalContext);

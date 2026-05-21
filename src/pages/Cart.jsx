@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import api from "../components/api";
+import api from "../components/helper/api";
 import { useContext } from "react";
 import { GlobalContext } from "../context/Context";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
-import Breadcrums from "../components/Breadcrums";
+import Breadcrums from "../components/helper/Breadcrums";
 import { PiMinus, PiPlus } from "react-icons/pi";
 
 const Cart = () => {

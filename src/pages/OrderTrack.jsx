@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../components/api";
-import { OrderTrackingPage } from "../components/OrderTracking";
+import api from "../components/helper/api";
+import { OrderTrackingPage } from "../components/order/OrderTracking";
 import Swal from "sweetalert2";
 
 export const OrderTrackingWrapper = () => {

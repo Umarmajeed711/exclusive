@@ -2,8 +2,8 @@ import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { GlobalContext } from "../context/Context";
-import api from "./api";
+import { GlobalContext } from "../../context/Context";
+import api from "../helper/api";
 
 const DiscountField = ({ originalPrice = 0, formik, loading }) => {
   const discount = Number(formik.values.productDiscount) || 0;
@@ -846,7 +846,7 @@ const AddProductForm = ({
               </button>
                 <button
                   disabled={loading}
-                  className=" bg-theme-primary transition-all duration-200 flex justify-center rounded w-full py-2  text-white  hover:shadow-theme-secondary hover:shadow-md"
+                  className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md w-full py-2  text-white  hover:shadow-theme-secondary hover:shadow-md"
                   type="submit"
                 >
                   {loading ? (

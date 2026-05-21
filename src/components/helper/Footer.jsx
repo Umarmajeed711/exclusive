@@ -1,6 +1,12 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { GlobalContext } from "../../context/Context";
 
 const Footer = () => {
+
+  const {state} = useContext(GlobalContext)
+
+  const isLogin = state?.isLogin;
   return (
     // <footer className=" bg-black text-white">
     //   <div className="mx-4 mt-5   lg:mt-8 ">
@@ -113,23 +119,24 @@ const Footer = () => {
     //   </div>
     // </footer>
     <footer className="bg-black text-white border-t border-gray-700">
-  <div className="max-w-[1440px] mx-auto px-6 py-14">
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+  <div className="max-w-[1440px] mx-auto px-6 py-4  sm:py-8 flex flex-col">
 
-      {/* Brand / Subscribe */}
-      <div className="flex flex-col gap-4">
+     <div className="grid grid-cols-2 sm:grid-cols-6 gap-10">
+
+     {/* Brand / Subscribe */}
+      <div className="flex flex-col gap-4  col-span-2">
         <h3 className="text-2xl font-semibold">Exclusive</h3>
         <p className="text-lg">Subscribe</p>
         <p className="text-sm text-gray-400">
           Get 10% off your first order
         </p>
 
-        <form className="relative mt-2">
+        <form className="relative mt-2 max-w-80">
           <input
             type="email"
             required
             placeholder="Enter your email"
-            className="w-full bg-transparent border border-gray-600 rounded-md px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-white"
+            className="w-full max-w-80 bg-transparent border border-gray-600 rounded-md px-3 py-2 text-sm text-gray-300 focus:outline-none focus:border-white"
           />
           <button
             type="submit"
@@ -139,6 +146,9 @@ const Footer = () => {
           </button>
         </form>
       </div>
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-10 flex-grow w-full col-span-4">
+
+     
 
       {/* Support */}
       <div className="flex flex-col gap-4">
@@ -158,8 +168,8 @@ const Footer = () => {
       <div className="flex flex-col gap-4">
         <h4 className="text-xl font-medium">Account</h4>
         <ul className="flex flex-col gap-2">
-          <li><Link to="/Account" className="footer-link">My Account</Link></li>
-          <li><Link to="/login" className="footer-link">Login / Register</Link></li>
+          <li><Link to= {isLogin ? "/Account" : "/login"} className="footer-link">{isLogin ? "My Account" : "Login / Register"} </Link></li>
+          {/* <li><Link to="" className="footer-link"></Link></li> */}
           <li><Link to="/Cart" className="footer-link">Cart</Link></li>
           <li><Link to="/wishlist" className="footer-link">Wishlist</Link></li>
           <li><Link to="/Shop" className="footer-link">Shop</Link></li>
@@ -189,8 +199,10 @@ const Footer = () => {
 
     </div>
 
+     </div>
+
     {/* Bottom Bar */}
-    <div className="mt-14 pt-6 border-t border-gray-800 text-center text-sm text-gray-500">
+    <div className="mt-1 sm:mt-10 pt-6 border-t border-gray-800 text-center text-sm text-gray-500">
       © {new Date().getFullYear()} Exclusive. All rights reserved.
     </div>
   </div>

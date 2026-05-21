@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { GlobalContext } from "../context/Context";
-import api from "./api";
+import { GlobalContext } from "../../context/Context";
+import api from "../helper/api";
 import Swal from "sweetalert2";
 import { useParams } from "react-router-dom";
 import { MdDone } from "react-icons/md";
 import OurProducts from "./OurProducts";
 import ReactStars from "react-stars";
 import { IoMdClose } from "react-icons/io";
-import Breadcrums from "./Breadcrums";
+import Breadcrums from "../helper/Breadcrums";
 import {
   HorizontalReviewSkeleton,
   ProductDetailSkeleton,
 } from "./productCardSkeleton";
-import { showToast } from "./types";
+import { showToast } from "../helper/types";
 
 const ProductDetail = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -523,7 +523,7 @@ const ProductDetail = () => {
                   </button>
                 </div>
                 <button
-                  className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded px-6 hover:shadow-xl  text-base sm:text-xl  "
+                  className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded-md px-6 hover:shadow-xl  text-base sm:text-xl  "
                   onClick={addtoCart}
                   disabled={cartloading}
                   type="submit"

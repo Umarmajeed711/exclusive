@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { GlobalContext } from "../../context/Context";
-import { Loader } from "../types";
+import { Loader } from "../helper/types";
 
 const ProtectedRoute = () => {
   const { state } = useContext(GlobalContext);

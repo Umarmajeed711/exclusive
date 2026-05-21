@@ -2,12 +2,13 @@ import "./App.css";
 import Myroute from "./components/Myroute";
 import { useContext, useEffect } from "react";
 import { GlobalContext } from "./context/Context";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import api from "./components/api";
+// import Navbar from "./components/Navbar";
+// import Footer from "./components/Footer";
+import api from "./components/helper/api";
 import AppRoutes from "./components/routes/AppRoutes";
 import { useNavigate } from "react-router-dom";
-import { showToast } from "./components/types";
+import { showToast } from "./components/helper/types";
+// import { showToast } from "./components/types";
 
 const App = () => {
   // data store in a context api

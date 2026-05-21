@@ -1,17 +1,17 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
-import api from "./api";
-import { GlobalContext } from "../context/Context";
-import useOutsideClick from "./outSideClick";
+import api from "../helper/api";
+import { GlobalContext } from "../../context/Context";
+import useOutsideClick from "../helper/outSideClick";
 import OrderDetailsModal from "./OrderDetailModal";
 import { RiDeleteBin6Fill } from "react-icons/ri";
-import { formatText, showToast } from "./types";
-import { DeliveryStatusDropdown, PaymentStatusDropdown } from "./statusOptions";
-import Modal from "./modal";
+import { formatText, showToast } from "../helper/types";
+import { DeliveryStatusDropdown, PaymentStatusDropdown } from "../helper/statusOptions";
+import Modal from "../helper/modal";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
-import { exportToCSV } from "./exportToCSV";
-import ExportDropdown from "./exportDrop";
+import { exportToCSV } from "../export/exportToCSV";
+import ExportDropdown from "../export/exportDrop";
 
 /* ==============================
    DEFAULT COLUMNS

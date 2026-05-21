@@ -1,13 +1,13 @@
 import {useEffect } from "react";
 import "../App.css";
 import { Link } from "react-router";
-import api from "../components/api";
+import api from "../components/helper/api";
 import { useState } from "react";
-import OurProducts from "../components/OurProducts";
-import TopOffers from "../components/TopOffers";
-import HeroCarousel from "../components/HeroCarousal";
-import HeroSection from "../components/heroSection";
-import { showToast } from "../components/types";
+import OurProducts from "../components/Product/OurProducts";
+import TopOffers from "../components/helper/TopOffers";
+import HeroCarousel from "../components/helper/HeroCarousal";
+import HeroSection from "../components/helper/heroSection";
+import { showToast } from "../components/helper/types";
 
 const Home = () => {
   // let { state, dispatch } = useContext(GlobalContext);

@@ -1,16 +1,16 @@
 import { useContext, useState } from "react";
 import { useEffect } from "react";
 import Swal from "sweetalert2";
-import api from "../components/api";
-import OurProducts from "../components/OurProducts";
-import Modal from "../components/modal";
-import AddProductForm from "../components/addProject";
+import api from "../components/helper/api";
+import OurProducts from "../components/Product/OurProducts";
+import Modal from "../components/helper/modal";
 import { GlobalContext } from "../context/Context";
 import { MdOutlineAdd, MdOutlineFilterAlt } from "react-icons/md";
-import SmartFilter from "../components/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES } from "../components/types";
-import { ActiveFilters } from "../components/ActiveFilters";
-import Pagination from "../components/Pagination";
+import SmartFilter from "../components/helper/SmartFilters";
+import { FILTER_OPERATORS, INPUT_TYPES } from "../components/helper/types";
+import { ActiveFilters } from "../components/Product/ActiveFilters";
+import Pagination from "../components/helper/Pagination";
+import AddProductForm from "../components/Product/addProduct";
 
 const Shop = () => {
   const { state } = useContext(GlobalContext);

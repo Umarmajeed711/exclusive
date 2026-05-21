@@ -1,14 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { GlobalContext } from "../context/Context";
-import api from "../components/api";
+import api from "../components/helper/api";
 import { Link } from "react-router-dom";
 import { AiOutlineHeart, AiOutlineEye } from "react-icons/ai";
-import OurProducts from "../components/OurProducts";
-import Title from "../components/Title";
+import OurProducts from "../components/Product/OurProducts";
+import Title from "../components/helper/Title";
 import Swal from "sweetalert2";
-import { ActiveFilters } from "../components/ActiveFilters";
-import TopOffers from "../components/TopOffers";
-import { showToast } from "../components/types";
+import { ActiveFilters } from "../components/Product/ActiveFilters";
+import TopOffers from "../components/helper/TopOffers";
+import { showToast } from "../components/helper/types";
 
 const Whishlist = () => {
   let { state, dispatch } = useContext(GlobalContext);

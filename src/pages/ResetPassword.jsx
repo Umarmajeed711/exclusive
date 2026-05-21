@@ -8,7 +8,7 @@ import { GlobalContext } from "../context/Context";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../components/api";
+import api from "../components/helper/api";
 
 
 const ResetPassword = () => {
@@ -244,7 +244,7 @@ const ResetPassword = () => {
           <div className="flex justify-between items-center">
             <button
               disabled={loading}
-              className=" bg-theme-primary transition-all duration-200 flex justify-center rounded px-3 py-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow-md"
+              className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md px-3 py-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow-md"
               type="submit"
             >
               {loading ? (

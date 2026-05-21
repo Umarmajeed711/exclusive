@@ -1,7 +1,7 @@
-import api from "./api";
+import api from "../helper/api";
 import { useEffect, useState } from "react";
 import { DollarSign, ShoppingCart, Users, Package } from "lucide-react";
-import { showToast } from "./types";
+import { showToast } from "../helper/types";
 
 // const cards = [
 //   {

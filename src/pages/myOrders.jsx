@@ -1,17 +1,17 @@
 import { useEffect, useState, useContext, useMemo } from "react";
 import Swal from "sweetalert2";
 import { GlobalContext } from "../context/Context";
-import OrderDetailsModal from "../components/OrderDetailModal";
-import api from "../components/api";
+import OrderDetailsModal from "../components/order/OrderDetailModal";
+import api from "../components/helper/api";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ActiveFilters } from "../components/ActiveFilters";
+import { ActiveFilters } from "../components/Product/ActiveFilters";
 import { MdOutlineFilterAlt } from "react-icons/md";
-import Pagination from "../components/Pagination";
-import SmartFilter from "../components/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../components/types";
-import { generateInvoice } from "../components/generateInvoice";
-import Modal from "../components/modal";
+import Pagination from "../components/helper/Pagination";
+import SmartFilter from "../components/helper/SmartFilters";
+import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../components/helper/types";
+import { generateInvoice } from "../components/helper/generateInvoice";
+import Modal from "../components/helper/modal";
 import { useNavigate } from "react-router-dom";
 
 const OrdersPage = () => {

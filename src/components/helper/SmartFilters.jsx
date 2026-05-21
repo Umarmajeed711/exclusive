@@ -340,7 +340,7 @@ const SmartFilter = ({
                     <button
                       onClick={applyFilters}
                       disabled={hasInvalidFilters}
-                      className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
+                      className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded-md  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
                       // className="rounded-md bg-black px-4 py-2 text-sm text-white w-full hover:bg-gray-800 disabled:opacity-50"
                     >
                       Apply Filters

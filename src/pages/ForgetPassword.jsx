@@ -7,7 +7,7 @@ import { GlobalContext } from "../context/Context";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../components/api";
+import api from "../components/helper/api";
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
@@ -86,12 +86,22 @@ const ForgetPassword = () => {
     },
   });
 
+      const [pageChange,setPageChange]= useState(false);
+
+  const handlePageChange = (link = "/") => {
+    setPageChange(true)
+    setTimeout(() => {
+      navigate(link)
+
+    },100)
+  }
+
   let Styles = {
     inputField:
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl hover: w-[220px]",
   };
   return (
-    <div className="flex justify-center  items-center h-screen">
+      <div className={`flex justify-center  items-center h-screen ${pageChange ? "animate-slideDown" :"animate-slideUp"}`}>
       <div className=" flex items-center  gap-20 p-10 bg-slate-100">
         {/* Image div */}
         <div className="hidden md:flex flex-col ">
@@ -213,7 +223,7 @@ const ForgetPassword = () => {
             <div className="flex justify-between items-center">
               <button
                 disabled={loading}
-                className=" bg-theme-primary transition-all duration-200 flex justify-center rounded px-3 py-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+                className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md px-3 py-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
                 type="submit"
               >
                 {loading ? (
@@ -234,12 +244,18 @@ const ForgetPassword = () => {
             <div className="flex justify-center mt-2">
               <p>
                 Don't have an account?{" "}
-                <Link
+                {/* <Link
                   to="/signup"
                   className="transition-all duration-100  hover:underline hover:text-theme-secondary"
                 >
                   Sign Up
-                </Link>
+                </Link> */}
+                 <span
+                  className="transition-all duration-100  hover:underline hover:text-theme-secondary"
+                  onClick={() => handlePageChange("/signup")}
+                >
+                  Sign Up
+                </span>
               </p>
             </div>
           </form>

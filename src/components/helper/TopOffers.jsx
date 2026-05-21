@@ -1,7 +1,7 @@
 import api from "./api";
 import { useState } from "react";
 import { useEffect } from "react";
-import OurProducts from "./OurProducts";
+import OurProducts from "../Product/OurProducts";
 import { showToast } from "./types";
 
 const TopOffers = ({onAdd = () => {}}) => {

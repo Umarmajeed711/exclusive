@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import api from "../components/api";
+import api from "../components/helper/api";
 import { GlobalContext } from "../context/Context";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Link } from "react-router";
-import { showToast } from "../components/types";
+import { showToast } from "../components/helper/types";
 const stripePromise = loadStripe("pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf");
 
 function Form() {
@@ -444,7 +444,7 @@ function Form() {
                     <div className="flex justify-center sm:justify-start mt-4">
                       <button
                         disabled={!stripe}
-                        className=" bg-red-600 transition-all duration-200 flex justify-center rounded px-6 py-3 my-4 text-white  hover:shadow-red-400 hover:shadow-md"
+                        className=" bg-red-600 transition-all duration-200 flex justify-center rounded-md px-6 py-3 my-4 text-white  hover:shadow-red-400 hover:shadow-md"
                         type="submit"
                       >
                         {loading ? (

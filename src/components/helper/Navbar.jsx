@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { MdOutlineClose } from "react-icons/md";
 import { Link, NavLink } from "react-router-dom";
-import { GlobalContext } from "../context/Context";
+import { GlobalContext } from "../../context/Context";
 import api from "./api";
 import { FaRegUser } from "react-icons/fa6";
 

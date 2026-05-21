@@ -27,6 +27,16 @@ export const Signup = () => {
   };
 
 
+    const [pageChange,setPageChange]= useState(false);
+
+  const handlePageChange = (link = "/") => {
+    setPageChange(true)
+    setTimeout(() => {
+      navigate(link)
+
+    },100)
+  }
+
 
   const signUpValidation = yup.object({
     name: yup.string().trim().required("Name is required"),
@@ -108,7 +118,7 @@ export const Signup = () => {
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl w-[220px]",
   };
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className={`flex justify-center items-center h-screen ${pageChange ? "animate-slideDown" :"animate-slideUp"}`}>
       <div className="flex justify-center items-center  gap-20 sm:p-10 bg-slate-100 min-w-[320px]">
         {/* Image div */}
         
@@ -268,7 +278,7 @@ export const Signup = () => {
             <button
               disabled={loading}
               type="submit"
-               className=" bg-theme-primary transition-all duration-300 rounded flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+               className=" bg-theme-primary transition-all duration-300 rounded-md flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
               
             >
               {loading ? (
@@ -286,12 +296,19 @@ export const Signup = () => {
             <div className="flex justify-center mt-2">
               <p>
                 Already have an account?{" "}
-                <Link
+                {/* <Link
                   to="/login"
                   className="transition-all duration-100  hover:underline hover:text-theme-secondary"
                 >
                   LogIn
-                </Link>
+                </Link> */}
+
+                    <span
+                  className="transition-all duration-100  hover:underline hover:text-theme-secondary"
+                  onClick={() => handlePageChange("/login")}
+                >
+                  LogIn
+                </span>
               </p>
             </div>
           </form>

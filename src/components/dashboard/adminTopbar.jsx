@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { GlobalContext } from "../context/Context";
+import { GlobalContext } from "../../context/Context";
 import { Bell, Search, LogOut, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

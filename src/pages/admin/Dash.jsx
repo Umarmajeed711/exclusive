@@ -13,11 +13,11 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import api from "../../components/api";
+import api from "../../components/helper/api";
 import { useEffect } from "react";
 import { useState } from "react";
 import { useContext } from "react";
-import { showToast } from "../../components/types";
+import { showToast } from "../../components/helper/types";
 
 // Bar chart data
 const BarChartData = [

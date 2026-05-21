@@ -8,8 +8,8 @@ import {
   Database,
 } from "lucide-react";
 
-import { showToast } from "./types";
-import api from "./api";
+import { showToast } from "../helper/types";
+import api from "../helper/api";
 
 const iconMap = {
   FileSpreadsheet,

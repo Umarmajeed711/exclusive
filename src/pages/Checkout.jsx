@@ -3,9 +3,9 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router";
 import { GlobalContext } from "../context/Context";
-import api from "../components/api";
+import api from "../components/helper/api";
 import { loadStripe } from "@stripe/stripe-js";
-import Breadcrums from "../components/Breadcrums";
+import Breadcrums from "../components/helper/Breadcrums";
 import Swal from "sweetalert2";
 
 const stripePromise = loadStripe(
@@ -479,7 +479,7 @@ const Checkout = () => {
                     <div className="flex justify-center sm:justify-start mt-4">
                       <button
                         disabled={loading}
-                        className=" bg-theme-primary transition-all duration-200 flex justify-center rounded px-6 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow-md"
+                        className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md px-6 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow-md"
                         type="submit"
                       >
                         {loading ? (

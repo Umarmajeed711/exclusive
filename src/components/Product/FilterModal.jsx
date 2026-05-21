@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Modal from "./modal";
+import Modal from "../modal";
 
 const FilterModal = ({ filters, onApply, isOpen, onClose }) => {
   const [field, setField] = useState(null);

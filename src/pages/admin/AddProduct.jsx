@@ -6,10 +6,10 @@ import { AiOutlineClose } from "react-icons/ai";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
-import api from "../../components/api";
-import OurProducts from "../../components/OurProducts";
-import Modal from "../../components/modal";
-import AddProductForm from "../../components/addProject";
+import api from "../../components/helper/api";
+import OurProducts from "../../components/Product/OurProducts";
+import Modal from "../../components/helper/modal";
+import AddProductForm from "../../components/Product/addProduct";
 import { GlobalContext } from "../../context/Context";
 import { BiGrid, BiListCheck, BiPlus } from "react-icons/bi";
 import {
@@ -17,11 +17,11 @@ import {
   MdOutlineAdd,
   MdOutlineFilterAlt,
 } from "react-icons/md";
-import ProductListView from "../../components/ProductList";
-import SmartFilter from "../../components/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../../components/types";
-import { ActiveFilters } from "../../components/ActiveFilters";
-import Pagination from "../../components/Pagination";
+import ProductListView from "../../components/Product/ProductList";
+import SmartFilter from "../../components/helper/SmartFilters";
+import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../../components/helper/types";
+import { ActiveFilters } from "../../components/Product/ActiveFilters";
+import Pagination from "../../components/helper/Pagination";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);

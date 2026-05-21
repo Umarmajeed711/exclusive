@@ -5,7 +5,8 @@ import * as yup from "yup";
 import "../App.css";
 import { useState } from "react";
 import Swal from "sweetalert2";
-import Breadcrums from "../components/Breadcrums";
+import Breadcrums from "../components/helper/Breadcrums";
+import { showToast } from "../components/helper/types";
 
 const Contact = () => {
   const [loading, setloading] = useState(false);
@@ -19,17 +20,18 @@ const Contact = () => {
       .trim()
       .email("Invalid email format")
       .required("Email is required")
-      .test(
-        "valid-domain",
-        "emails ending in @gmail.com are allowed",
-        (value) => (value ? value.toLowerCase().endsWith("@gmail.com") : false),
-      ),
+      // .test(
+      //   "valid-domain",
+      //   "emails ending in @gmail.com are allowed",
+      //   (value) => (value ? value.toLowerCase().endsWith("@gmail.com") : false),
+      // )
+      ,
 
     phone: yup
       .string()
       .required("Phone number is required")
       .matches(/^[0-9]+$/, "Phone number must contain only digits")
-      .min(11, "Phone number must be at least 11 digits")
+      .min(9, "Phone number must be at least 11 digits")
       .max(13, "Phone number is too long"),
   });
 
@@ -37,7 +39,7 @@ const Contact = () => {
     initialValues: {
       name: "",
       email: "",
-      title: "",
+      message: "",
       phone: undefined,
     },
     validationSchema: contactValidation,
@@ -50,22 +52,27 @@ const Contact = () => {
       // Simulate form submit (API call, FormSubmit, etc.)
       setTimeout(() => {
         setloading(false);
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: "success",
-          title: "Thank you for message",
-        });
+        // const Toast = Swal.mixin({
+        //   toast: true,
+        //   position: "top-end",
+        //   showConfirmButton: false,
+        //   timer: 3000,
+        //   timerProgressBar: true,
+        //   didOpen: (toast) => {
+        //     toast.onmouseenter = Swal.stopTimer;
+        //     toast.onmouseleave = Swal.resumeTimer;
+        //   },
+        // });
+        // Toast.fire({
+        //   icon: "success",
+        //   title: "Thank you for message",
+        // });
 
+
+         showToast({
+          icon:"success",
+          title:"Thank you for message"
+         })
         contactFormik.resetForm();
       }, 1000);
     },
@@ -321,7 +328,7 @@ const Contact = () => {
               <button
                 disabled={loading}
                 type="submit"
-                className=" bg-theme-primary transition-all duration-200 rounded flex justify-center px-8 py-3 mt-4 text-white  hover:shadow-theme-secondary hover:shadow"
+                className=" bg-theme-primary transition-all duration-200 rounded-md flex justify-center px-8 py-3 mt-4 text-white  hover:shadow-theme-secondary hover:shadow"
               >
                 {loading ? (
                   <div className="flex items-center  p-2 gap-2">
