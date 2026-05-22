@@ -29,9 +29,6 @@ const Account = () => {
 
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(profile || null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const contactValidation = yup.object({
     name: yup
       .string()
@@ -43,12 +40,6 @@ const Account = () => {
       .trim()
       .email("Invalid email format")
       .required("Email is required"),
-    // .test(
-    //   "valid-domain",
-    //   "emails ending in @gmail.com are allowed",
-    //   (value) => (value ? value.toLowerCase().endsWith("@gmail.com") : false),
-    // )
-    // phone: yup.string().required("Phone number is required").matches(/^\+?[0-9]{10,14}$/,"Enter a valid number")
     phone: yup
       .string()
       .required("Phone number is required")
@@ -59,58 +50,6 @@ const Account = () => {
         const digits = val.replace(/\D/g, "");
         return digits.length >= 10 && digits.length <= 13;
       }),
-    // If user enters a newPassword, require currentPassword
-    password: yup
-      .string()
-      .when("newPassword", {
-        is: (val) => !!val && val.length > 0,
-        then: (schema) => schema.required("Password is required"),
-        otherwise: (schema) => schema.notRequired(),
-      })
-      .max(72, "Password too long"),
-
-    // newPassword is optional, but if present must meet strength rules
-    newPassword: yup
-      .string()
-      .nullable()
-      .test(
-        "min-length",
-        "At least 8 characters",
-        (val) => !val || val.length >= 8,
-      )
-      .test(
-        "lowercase",
-        "Must include a lowercase letter",
-        (val) => !val || /[a-z]/.test(val),
-      )
-      .test(
-        "uppercase",
-        "Must include an uppercase letter",
-        (val) => !val || /[A-Z]/.test(val),
-      )
-      .test("number", "Must include a number", (val) => !val || /\d/.test(val))
-      .test(
-        "special",
-        "Must include a special character",
-        (val) => !val || /[@$!%*?&#]/.test(val),
-      )
-      .test(
-        "same-password",
-        "New password must be different from current password",
-        function (val) {
-          return !val || val !== this.parent.password;
-        },
-      ),
-
-    // confirmPassword only required when newPassword is present and must match
-    confirmPassword: yup.string().when("newPassword", {
-      is: (val) => val && val.length > 0,
-      then: (schema) =>
-        schema
-          .required("Please confirm  password")
-          .oneOf([yup.ref("newPassword")], "Passwords must match"),
-      otherwise: (schema) => schema.notRequired(),
-    }),
   });
 
   const contactFormik = useFormik({
@@ -119,9 +58,6 @@ const Account = () => {
       email: email,
       phone: phone ? phone : "",
       image: null,
-      password: "",
-      newPassword: "",
-      confirmPassword: "",
     },
     enableReinitialize: true,
     validationSchema: contactValidation,
@@ -134,10 +70,7 @@ const Account = () => {
         profile == previewImage &&
         name === values.name &&
         email === values.email &&
-        phone === values.phone &&
-        !values.password &&
-        !values.confirmPassword &&
-        !values.newPassword
+        phone === values.phone 
       ) {
         setloading(false);
         return Swal.fire("No Changes", "You haven’t made any changes!", "info");
@@ -155,13 +88,7 @@ const Account = () => {
         "phone",
         values.phone !== phone ? values.phone?.trim() : "",
       );
-      formData.append("password", values.password);
-      formData.append("newPassword", values.newPassword);
-      formData.append("confirmPassword", values.confirmPassword);
-
-      // if (profileImage) {
-      //   formData.append("profile", profileImage);
-      // }
+     
       if (values?.image) {
         formData.append("profile", values?.image);
       }
@@ -191,10 +118,7 @@ const Account = () => {
             name: response.data.profile.name || "",
             email: response.data.profile.email || "",
             phone: response.data.profile.phone || "",
-            image: null,
-            password: "",
-            newPassword: "",
-            confirmPassword: "",
+            image: null
           },
         });
         // setProfileImage(null);
@@ -214,10 +138,9 @@ const hasChanges =
   !!contactFormik.values.image ||
   contactFormik.values.name?.trim() !== (name || "").trim() ||
   contactFormik.values.email?.trim() !== (email || "").trim() ||
-  contactFormik.values.phone?.trim() !== String(phone || "").trim() ||
-  !!contactFormik.values.password?.trim() ||
-  !!contactFormik.values.newPassword?.trim() ||
-  !!contactFormik.values.confirmPassword?.trim();    
+  contactFormik.values.phone?.trim() !== String(phone || "").trim() 
+
+  const handlePageChange = () => {setShowPasswordForm(true); console?.log("show Security form", showPasswordForm)}
 
   useEffect(() => {
     return () => {
@@ -274,11 +197,11 @@ const hasChanges =
               </p>
             </div>
 
-            <div className="flex mx-10 gap-2 items-center p-2">
+            <div className="flex mx-10 gap-2 items-center p-2 cursor-pointer ">
               <span onClick={() => {setShowPasswordForm(false)}}>My Profile</span>
             </div>
-             <div className="flex mx-10 gap-2 items-center p-2">
-              <span onClick={() => {setShowPasswordForm(true)}}>Account Security</span>
+             <div className="flex mx-10 gap-2 items-center p-2 cursor-pointer">
+              <span onClick={handlePageChange}>Account Security</span>
             </div>
           </div>
 
@@ -319,6 +242,8 @@ const hasChanges =
           showPasswordForm ? 
           <AccountSecurity />
           :
+        
+
         <div className="col-span-3 lg:col-span-2 w-full  min-w-[300px] p-5 md:p-8 h-full  shadow-[0_0_7px_rgba(0,0,0,.5)]">
           <form
             onSubmit={contactFormik.handleSubmit}
@@ -422,7 +347,8 @@ const hasChanges =
               {name || "User Name"}
             </div>
 
-            <div className=" grid grid-cols-1 md:grid-cols-3 gap-2 w-full">
+            {/* <div className=" grid grid-cols-1 md:grid-cols-3 gap-2 w-full"> */}
+               <div className="flex flex-col gap-3 justify-center col-span-3 w-full">
               {/* name */}
               <div className="flex flex-col gap-3 justify-center col-span-1 ">
                 <div className="text-base font-semibold">Name</div>
@@ -532,168 +458,7 @@ const hasChanges =
               </div>
             </div>
 
-            <div className="flex flex-col gap-3 justify-center col-span-3 w-full">
-              <div className="text-base font-semibold">Password Changes</div>
-              <div className=" grid grid-cols-1 md:grid-cols-3 gap-2">
-                {/* Password */}
-                <div className="flex gap-3 items-center col-span-1 ">
-                  <div className="w-full relative">
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      placeholder="Current Password"
-                      // autoComplete="current-password"
-                      value={contactFormik.values.password}
-                      onChange={(e) => {
-                        contactFormik.handleChange(e);
-                        setApiError(""); // clear backend error
-                      }}
-                      onBlur={(e) => {
-                        contactFormik.setFieldValue(
-                          "password",
-                          e.target.value.trim(),
-                        );
-                      }}
-                      className={Styles.inputField}
-                      disabled={loading}
-                    />
-
-                    <p
-                      onClick={() => {
-                        // if (loading) return;
-                        setShowPassword(!showPassword);
-                      }}
-                      style={{
-                        position: "absolute",
-                        right: "0",
-                        top: "0",
-                        margin: "10px",
-                        cursor: "pointer",
-                      }}
-                      className={
-                        loading ? "pointer-events-none opacity-50" : null
-                      }
-                    >
-                      {showPassword ? <FaEyeSlash /> : <FaEye />}
-                    </p>
-
-                    <div className="error-wrapper">
-                      {contactFormik.touched.password &&
-                        contactFormik.errors.password && (
-                          <p className="requiredError">
-                            {contactFormik.errors.password}
-                          </p>
-                        )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* new password */}
-                <div className="flex gap-3 items-center col-span-1">
-                  <div className="w-full relative">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      name="newPassword"
-                      placeholder="New Password"
-                      autoComplete="new-password"
-                      value={contactFormik.values.newPassword}
-                      onChange={(e) => {
-                        contactFormik.handleChange(e);
-
-                        setApiError(""); // clear backend error
-                      }}
-                      onBlur={(e) => {
-                        contactFormik.setFieldValue(
-                          "newPassword",
-                          e.target.value.trim(),
-                        );
-                      }}
-                      className={Styles.inputField}
-                      disabled={loading}
-                    />
-
-                    <p
-                      onClick={() => {
-                        setShowNewPassword(!showNewPassword);
-                      }}
-                      style={{
-                        position: "absolute",
-                        right: "0",
-                        top: "0",
-                        margin: "10px",
-                        cursor: "pointer",
-                      }}
-                      className={
-                        loading ? "pointer-events-none opacity-50" : null
-                      }
-                    >
-                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                    </p>
-
-                    <div className="error-wrapper">
-                      {contactFormik.touched.newPassword &&
-                        contactFormik.errors.newPassword && (
-                          <p className="requiredError">
-                            {contactFormik.errors.newPassword}
-                          </p>
-                        )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Confirm new password */}
-                <div className="flex gap-3 items-center col-span-1">
-                  <div className="w-full relative">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      placeholder="Confirm Password"
-                      aria-label="Current Password"
-                      value={contactFormik.values.confirmPassword}
-                      onChange={(e) => {
-                        contactFormik.handleChange(e);
-                        setApiError(""); // clear backend error
-                      }}
-                      onBlur={(e) => {
-                        contactFormik.setFieldValue(
-                          "confirmPassword",
-                          e.target.value.trim(),
-                        );
-                      }}
-                      className={Styles.inputField}
-                      disabled={loading}
-                    />
-
-                    <p
-                      onClick={() => {
-                        setShowConfirmPassword(!showConfirmPassword);
-                      }}
-                      style={{
-                        position: "absolute",
-                        right: "0",
-                        top: "0",
-                        margin: "10px",
-                        cursor: "pointer",
-                      }}
-                      className={
-                        loading ? "pointer-events-none opacity-50" : null
-                      }
-                    >
-                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                    </p>
-
-                    <div className="error-wrapper">
-                      {contactFormik.touched.confirmPassword &&
-                        contactFormik.errors.confirmPassword && (
-                          <p className="requiredError">
-                            {contactFormik.errors.confirmPassword}
-                          </p>
-                        )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
 
             {/* <div className="h-[40px]  flex justify-center items-center mb-2 overflow-hidden">
               <Alert
@@ -746,8 +511,8 @@ const hasChanges =
             </div> */}
           </form>
         </div>
-
         }
+
 
       </div>
     </div>

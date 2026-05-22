@@ -29,7 +29,7 @@ const AdminSidebar = () => {
   return (
     <div
       
-      className={`relative bg-white ${
+      className={`sticky bg-white top-0 ${
         collapsed ? "closeadminSidebar" : "adminSidebar"
       }`}
       // className={`h-screen bg-white top-0  z-50 sticky shadow-lg transition-all duration-300${

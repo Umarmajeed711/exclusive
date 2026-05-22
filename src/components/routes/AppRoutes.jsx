@@ -50,14 +50,12 @@ const AppRoutes = () => {
         <Route path="/Category" element={<Category />}></Route>
         <Route path="/wishlist" element={<Whishlist />}></Route>
 
-        <Route path="/admin" element={<AdminLayout />}>
-          {/* <Route index element={<Dash />} /> */}
+        {/* <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard/>} />
           <Route path="users" element={<Users />} />
           <Route path="orders" element={<Orders />} />
-          {/* <Route path="products" element={<Products />} /> */}
           <Route path="add-product" element={<AddProduct />} />
-        </Route>
+        </Route> */}
 
         {/* Protected user */}
         <Route element={<ProtectedRoute />}>
