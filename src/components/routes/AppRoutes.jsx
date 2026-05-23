@@ -22,7 +22,7 @@ import Products from "../../pages/admin/Products";
 import AddProduct from "../../pages/admin/AddProduct";
 import MainLayout from "../layouts/mainLayout";
 import AdminLayout from "../layouts/adminLayout";
-import Verify_email from "../../pages/Verify_email";
+import VerifyEmail from "../../pages/VerifyEmail";
 import ForgetPassword from "../../pages/ForgetPassword";
 import ResetPassword from "../../pages/ResetPassword";
 import OrdersPage from "../../pages/myOrders";
@@ -75,7 +75,7 @@ const AppRoutes = () => {
       <Route>
          
         <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/verify_email" element={<Verify_email />}></Route>
+        <Route path="/verify_email" element={<VerifyEmail />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/ForgetPassword" element={<ForgetPassword />}></Route>
        

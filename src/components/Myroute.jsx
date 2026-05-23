@@ -12,7 +12,7 @@ import Checkout from "../pages/Checkout";
 import ProductDetail from "./Product/ProductDetail";
 import ForgetPassword from "../pages/ForgetPassword";
 import ResetPassword from "../pages/ResetPassword";
-import Verify_email from "../pages/Verify_email";
+import Verify_email from "../pages/VerifyEmail";
 import Cart from "../pages/Cart";
 import Whishlist from "../pages/Whishlist";
 import OrderConfirmation from "../pages/OrderComplete";

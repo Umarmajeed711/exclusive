@@ -66,6 +66,10 @@ export const getInitials = (name) => {
     : words[0][0];
 };
 
+export const Styles = {
+  inputField:
+    "border-b-2 bg-gray-200 outline-none w-full rounded-xl px-3 py-2 focus:border-theme-primary transition",
+};
 
 export const showToast = ({
   icon = "success",

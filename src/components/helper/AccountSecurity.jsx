@@ -14,11 +14,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { GlobalContext } from "../../context/Context";
 import { TbShieldFilled } from "react-icons/tb";
 import { Shield } from "lucide-react";
-
-const Styles = {
-  inputField:
-    "border-b-2 bg-gray-200 outline-none w-full px-3 py-2 focus:border-theme-primary transition",
-};
+import { Styles } from "./types";
 
 const AccountSecurity = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -99,7 +95,7 @@ const AccountSecurity = () => {
       setloading(true);
 
       try {
-        let response = await api.put(`/edit-profile`, {
+        let response = await api.put(`/account/password`, {
           user_id: user_id,
           password: values.password,
           newPassword: values.newPassword,
@@ -151,7 +147,9 @@ const AccountSecurity = () => {
     <>
       {/* contact Form */}
 
-      <div className="col-span-3 lg:col-span-2 w-full  min-w-[300px] p-5 md:p-8 h-full  shadow-[0_0_7px_rgba(0,0,0,.5)]">
+      <div className="col-span-3 lg:col-span-2 w-full  min-w-[300px] p-5 md:p-8 h-full  bg-white rounded-2xl
+    border border-gray-100
+    shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
         <form
           onSubmit={contactFormik.handleSubmit}
           className="flex flex-col items-center w-full gap-2"

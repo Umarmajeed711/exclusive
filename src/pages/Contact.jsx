@@ -7,6 +7,7 @@ import { useState } from "react";
 import Swal from "sweetalert2";
 import Breadcrums from "../components/helper/Breadcrums";
 import { showToast } from "../components/helper/types";
+import { Styles } from "../components/helper/types";
 
 const Contact = () => {
   const [loading, setloading] = useState(false);
@@ -78,10 +79,7 @@ const Contact = () => {
     },
   });
 
-  const Styles = {
-    inputField:
-      "border-b-2 bg-gray-200 outline-none w-full px-3 py-2  focus:border-theme-primary transition",
-  };
+
   return (
     <div className="mx-5 md:mx-8 lg:mx-14">
       {/* BreadCrums */}
@@ -90,7 +88,9 @@ const Contact = () => {
       <Breadcrums currentPage="Contact" />
 
       <div className="my-10  grid grid-cols-1 lg:grid-cols-3 place-content-center gap-10 ">
-        <div className="col-span-3 lg:col-span-1 min-w-[300px] shadow-[0_0_7px_rgba(0,0,0,.5)] flex flex-col gap-5  p-5 md:p-8">
+        <div className="col-span-3 lg:col-span-1 min-w-[300px] bg-white rounded-2xl
+    border border-gray-100
+    shadow-[0_10px_40px_rgba(0,0,0,0.08)] flex flex-col gap-5  p-5 md:p-8">
           {/* Calls to Us */}
           <div>
             <div className="flex gap-10 items-center ">
@@ -196,7 +196,9 @@ const Contact = () => {
 
         {/* contact Form */}
 
-        <div className="col-span-3 lg:col-span-2 min-w-[300px] p-5 md:p-8 lg:p-8 h-full shadow-[0_0_7px_rgba(0,0,0,.5)]">
+        <div className="col-span-3 lg:col-span-2 min-w-[300px] p-5 md:p-8 lg:p-8 h-full bg-white rounded-2xl
+    border border-gray-100
+    shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
           <form
             action="https://formsubmit.co/abc@gmail.com"
             method="POST"
@@ -301,7 +303,7 @@ const Contact = () => {
                 onBlur={contactFormik.handleBlur}
                 disabled={loading}
                 placeholder="Your Message *"
-                className="w-full h-52 sm:h-[320px] bg-gray-200 outline-none p-2 resize-none border-b-2 border-transparent focus:border-theme-primary transition"
+                className="w-full h-52 sm:h-[320px] rounded-xl bg-gray-200 outline-none p-2 resize-none border-b-2 border-transparent focus:border-theme-primary transition"
                 // className="w-full min-h-48 max-h-60 sm:min-h-[320px] sm:max-h-80  h-full  bg-gray-200  outline-none  p-2 "
                 required
               ></textarea>

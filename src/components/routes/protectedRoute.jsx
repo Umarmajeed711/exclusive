@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
 
   return (
 
-    state?.isLogin  ? <Outlet /> : state?.isLogin == false  ? <Loader/> : <Navigate to="/login" state={{ from: location }} replace />
+    state?.isLogin  ? <Outlet /> : state?.isLogin == null  ? <Loader/> : <Navigate to="/login" state={{ from: location }} replace />
   )
   
 };

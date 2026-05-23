@@ -14,11 +14,7 @@ import { getInitials, showToast } from "../components/helper/types";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import AccountSecurity from "../components/helper/AccountSecurity";
 import { Shield } from "lucide-react";
-
-const Styles = {
-  inputField:
-    "border-b-2 bg-gray-200 outline-none w-full px-3 py-2 focus:border-theme-primary transition",
-};
+import { Styles } from "../components/helper/types";
 
 const Account = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -109,7 +105,7 @@ const Account = () => {
         //   confirmPassword: values.confirmPassword,
         // });
 
-        const response = await api.put(`/edit-profile`, formData);
+        const response = await api.put(`/account/profile`, formData);
 
         dispatch({ type: "USER_LOGIN", payload: response.data.profile });
 
@@ -170,24 +166,6 @@ const Account = () => {
 
   const allowed = ["image/jpeg", "image/png", "image/webp"];
 
-  // const handleImage = (file) => {
-  //   if (!file) return;
-
-  //   if (!file.type.startsWith("image/")) {
-  //     alert("Only image allowed");
-  //     return;
-  //   }
-
-  //   contactFormik.handleChange(file);
-
-  //   // setProfileImage(file);
-  //   setPreviewImage(URL.createObjectURL(file));
-  // };
-
-  const Styles = {
-    inputField:
-      "border-b-2 bg-gray-200 outline-none w-full px-3 py-2 focus:border-theme-primary transition",
-  };
 
   return (
     <div className="mx-5 md:mx-8 lg:mx-14">
@@ -197,71 +175,6 @@ const Account = () => {
 
       <div className="my-10 grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
         {/* side Navigation section */}
-        {/* <div
-          // className="col-span-3 lg:col-span-1 min-w-80 shadow-lg flex flex-col gap-5  p-10"
-          className="col-span-3 lg:col-span-1 min-w-[300px] bg-white shadow-[0_0_7px_rgba(0,0,0,.5)]  flex flex-col gap-5 p-5 md:p-8"
-        >
-          
-          <div>
-            <div className="flex gap-3 items-center ">
-              <p className="bg-theme-primary  p-2 rounded-full shadow-theme-secondary shadow-md ">
-                <AiOutlineHeart className="text-lg text-white" />
-              </p>
-              <p className="text-lg font-semibold text-gray-800">
-                Manage My Account
-              </p>
-            </div>
-
-            <div className="flex mx-10 gap-2 items-center p-2 cursor-pointer">
-              <span
-                onClick={() => {
-                  handleNavigate(false);
-                }}
-              >
-                My Profile
-              </span>
-            </div>
-            <div className="flex mx-10 gap-2 items-center p-2 cursor-pointer">
-              <span
-                onClick={() => {
-                  handleNavigate(true);
-                }}
-              >
-                Account Security
-              </span>
-            </div>
-          </div>
-
-          <div className="h-[3px] w-full bg-slate-400"></div>
-
-          <div>
-            <div className="flex gap-3 items-center ">
-              <p className="bg-theme-primary  p-2 rounded-full shadow-theme-secondary shadow-md ">
-                <AiOutlineHeart className="text-lg text-white" />
-              </p>
-              <p className="text-lg font-semibold text-gray-800">My Orders</p>
-            </div>
-
-            <div className=" mx-12 flex flex-col gap-2 ">
-              <Link to="/myOrders">My returns</Link>
-              <Link to="/myOrders">My cancellations</Link>
-            </div>
-          </div>
-
-          <div className="h-[3px] w-full bg-slate-400"></div>
-
-          <div>
-            <div className="flex gap-3 items-center ">
-              <p className="bg-theme-primary  p-2 rounded-full shadow-theme-secondary shadow-md ">
-                <AiOutlineHeart className="text-lg text-white" />
-              </p>
-              <p className="text-lg font-semibold text-gray-800">My Wishlist</p>
-            </div>
-            <div className=" mx-12 flex flex-col gap-2 ">
-              <Link to="/wishlist">Check wishlist</Link>
-            </div>
-          </div>
-        </div> */}
 
         <div
           className="
@@ -403,7 +316,7 @@ const Account = () => {
           </div>
 
           {/* Divider */}
-          <div className="my-6 border-t border-gray-100"></div>
+          <div className="my-3 border-t border-gray-100"></div>
 
           {/* Orders */}
           <div>
@@ -455,7 +368,7 @@ const Account = () => {
           </div>
 
           {/* Divider */}
-          <div className="my-6 border-t border-gray-100"></div>
+          <div className="my-3 border-t border-gray-100"></div>
 
           {/* Wishlist */}
           <div>
@@ -499,11 +412,13 @@ const Account = () => {
         {showSecurityForm ? (
           <AccountSecurity />
         ) : (
-          <div className="col-span-3 lg:col-span-2 w-full
+          <div
+            className="col-span-3 lg:col-span-2 w-full
             min-w-[300px] p-5 md:p-8 h-full 
               bg-white rounded-2xl
     border border-gray-100
-    shadow-[0_10px_40px_rgba(0,0,0,0.08)]">
+    shadow-[0_10px_40px_rgba(0,0,0,0.08)]"
+          >
             <form
               onSubmit={contactFormik.handleSubmit}
               className="flex flex-col items-center w-full gap-2"
