@@ -16,7 +16,7 @@ import Verify_email from "../pages/Verify_email";
 import Cart from "../pages/Cart";
 import Whishlist from "../pages/Whishlist";
 import OrderConfirmation from "../pages/OrderComplete";
-import Account from "../pages/Account";
+import Account from "../pages/Account-old";
 import Shop from "../pages/Shop";
 import Dash from "../pages/admin/Dash";
 import AddProduct from "../pages/admin/AddProduct";
