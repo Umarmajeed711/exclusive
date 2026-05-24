@@ -3,6 +3,7 @@ import Navbar from "../helper/Navbar";
 import Footer from "../helper/Footer";
 import { useContext } from "react";
 import { GlobalContext } from "../../context/Context";
+import { VerifyEmailBanner } from "../helper/VerifyBanner";
 
 const MainLayout = () => {
 
@@ -23,6 +24,9 @@ const MainLayout = () => {
    return  (
     <>
       <Navbar />
+        {!state?.user?.email_verified && (
+    <VerifyEmailBanner />
+  )}
       <Outlet />
       <Footer />
     </>

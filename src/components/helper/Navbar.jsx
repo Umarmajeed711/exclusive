@@ -15,6 +15,7 @@ import { HiOutlineArrowLeftStartOnRectangle } from "react-icons/hi2";
 import { IoLogIn, IoStarOutline } from "react-icons/io5";
 import useOutsideClick from "./outSideClick";
 import { showToast } from "./types";
+import { VerifyEmailBanner } from "./VerifyBanner";
 
 const Navbar = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -82,6 +83,7 @@ const Navbar = () => {
 
   return (
     <header className="relative z-[1000]">
+      
       <div className="px-2  lg:px-10 sticky top-0  z-10 bg-white border-b">
         <div className="h-20  w-full  mx-auto px-4  py-4 flex justify-between items-center">
           {/* max-w-7xl */}

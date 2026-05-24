@@ -688,7 +688,7 @@ const Account = () => {
               <div className="flex justify-end items-center w-full animate-fadeIn mt-2">
                 <div className="flex w-full sm:w-[50%] gap-2">
                   <button
-                    disabled={!hasChanges}
+                    disabled={!hasChanges || loading}
                     onClick={() => {
                       contactFormik.resetForm();
                       setPreviewImage(profile || "");
