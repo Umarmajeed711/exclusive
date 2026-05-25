@@ -10,6 +10,7 @@ import { GlobalContext } from "../context/Context";
 import axios from "axios";
 import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
+import { showToast } from "../components/helper/types";
 
 export const Signup = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -86,22 +87,12 @@ export const Signup = () => {
         );
 
         setloading(false);
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: "success",
-          title: "Account Created",
-        });
 
+        showToast({
+          icon:"success",
+          title:response?.data?.message || "Account created. Please verify your email."
+        })
+      
         signUpFormik.resetForm();
 
         navigate("/login");

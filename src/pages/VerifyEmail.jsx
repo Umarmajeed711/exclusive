@@ -82,7 +82,7 @@ const VerifyEmail = () => {
     try {
       setStatus("verifying");
 
-      await api.post(`/verify-email?token=${token}`);
+      // await api.post(`/verify-email?token=${token}`);
 
       setStatus("success");
 
