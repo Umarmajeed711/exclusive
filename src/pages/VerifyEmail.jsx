@@ -75,14 +75,12 @@ const VerifyEmail = () => {
 
   const token = new URLSearchParams(window.location.search).get("token");
 
-  // =========================
   // VERIFY EMAIL
-  // =========================
   const verifyEmail = async () => {
     try {
       setStatus("verifying");
 
-      // await api.post(`/verify-email?token=${token}`);
+      await api.post(`/verify-email?token=${token}`);
 
       setStatus("success");
 
@@ -110,9 +108,7 @@ const VerifyEmail = () => {
     }
   };
 
-  // =========================
   // RESEND EMAIL
-  // =========================
   const resendEmail = async () => {
     try {
       setResending(true);

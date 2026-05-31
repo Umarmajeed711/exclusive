@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../components/helper/api";
+import { showToast } from "../components/helper/types";
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
@@ -49,11 +50,12 @@ const ForgetPassword = () => {
             email: values.email,
           });
 
-          Swal.fire(
-            "Success",
-            "OTP Send Successfully",
-            "success"
-          );
+        
+
+          showToast({
+            icon:"success",
+            title:"OTP send on your email"
+          })
 
           setIsOtpSent(true)
           dispatch({ type: "RESET_PASSWORD", payload: response.data });
@@ -65,11 +67,16 @@ const ForgetPassword = () => {
             otp: values.otp,
           });
  
-          Swal.fire(
-            "Verified",
-            "OTP verified! You can now reset your password.",
-            "success"
-          );
+          // Swal.fire(
+          //   "Verified",
+          //   "OTP verified! You can now reset your password.",
+          //   "success"
+          // );
+
+          showToast({
+            icon:"success",
+            title:"OTP verified! You can now reset your password."
+          })
 
           
 

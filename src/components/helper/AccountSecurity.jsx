@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineHeart } from "react-icons/ai";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -19,9 +19,11 @@ import { Styles } from "./types";
 const AccountSecurity = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
-  let { user_id, name, email, phone, profile } = state?.user;
+  let { user_id, name, email, phone, profile } = state?.user || {};
 
   const [loading, setloading] = useState(false);
+
+   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -106,7 +108,7 @@ const AccountSecurity = () => {
 
         showToast({
           icon: "success",
-          title: "Edit Profile Successfully",
+          title: "Password Change Successfully",
         });
 
         setloading(false);
@@ -117,6 +119,8 @@ const AccountSecurity = () => {
             confirmPassword: "",
           },
         });
+
+         navigate("/login");
         // setProfileImage(null);
       } catch (error) {
         showToast({

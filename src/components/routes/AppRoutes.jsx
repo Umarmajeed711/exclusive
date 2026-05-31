@@ -64,7 +64,6 @@ const AppRoutes = () => {
           <Route path="/OrderComplete" element={<OrderConfirmation />}></Route>
           <Route path="/orders/:id" element={<OrderTrackingWrapper />}></Route>
           <Route path="/myOrders" element={<OrdersPage />}></Route>
-          <Route path="/ResetPassword" element={<ResetPassword />}></Route>
         </Route>
       </Route>
 
@@ -78,6 +77,7 @@ const AppRoutes = () => {
         <Route path="/verify_email" element={<VerifyEmail />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/ForgetPassword" element={<ForgetPassword />}></Route>
+        <Route path="/ResetPassword" element={<ResetPassword/>}></Route>
        
         <Route path="*" element={<Navigate to="/login" />}></Route>
       </Route>

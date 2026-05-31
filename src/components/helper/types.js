@@ -68,7 +68,7 @@ export const getInitials = (name) => {
 
 export const Styles = {
   inputField:
-    "border-b-2 bg-gray-200 outline-none w-full rounded-xl px-3 py-2 focus:border-theme-primary transition",
+    "border-b-2 bg-gray-200 outline-none w-full rounded-xl px-3 py-2 focus:border-theme-primary transition disabled:cursor-not-allowed disabled:opacity-50",
 };
 
 export const showToast = ({
