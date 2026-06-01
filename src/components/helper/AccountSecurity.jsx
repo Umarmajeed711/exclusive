@@ -16,14 +16,14 @@ import { TbShieldFilled } from "react-icons/tb";
 import { Shield } from "lucide-react";
 import { Styles } from "./types";
 
+ 
+
 const AccountSecurity = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
   let { user_id, name, email, phone, profile } = state?.user || {};
 
   const [loading, setloading] = useState(false);
-
-   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -83,6 +83,20 @@ const AccountSecurity = () => {
     }),
   });
 
+  const logout = async () => {
+    try {
+      let user_logout = await api.get("/logout");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      dispatch({ type: "USER_LOGOUT" });
+    } catch (error) {
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
+    }
+  };
+
   const contactFormik = useFormik({
     initialValues: {
       password: "",
@@ -120,8 +134,9 @@ const AccountSecurity = () => {
           },
         });
 
-         navigate("/login");
-        // setProfileImage(null);
+        setTimeout(() => {
+        logout();
+      }, 2000);
       } catch (error) {
         showToast({
           icon: "error",

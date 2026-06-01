@@ -3,6 +3,7 @@ import api from '../components/helper/api';
 import { useEffect, useState ,useRef, useContext } from 'react';
 import Swal from 'sweetalert2';
 import { GlobalContext } from '../context/Context';
+import { showToast } from '../components/helper/types';
 
 // const VerifyEmail = () => {
 
@@ -61,7 +62,7 @@ import { GlobalContext } from '../context/Context';
 const VerifyEmail = () => {
   const navigate = useNavigate();
 
-  const {state} = useContext(GlobalContext);
+  const {state , dispatch} = useContext(GlobalContext);
 
   const email = state?.user?.email;
 
@@ -74,6 +75,20 @@ const VerifyEmail = () => {
   const hasRun = useRef(false);
 
   const token = new URLSearchParams(window.location.search).get("token");
+
+  const logout = async () => {
+      try {
+        let user_logout = await api.get("/logout");
+        localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
+        dispatch({ type: "USER_LOGOUT" });
+      } catch (error) {
+        showToast({
+          icon:"error",
+          title:error?.data?.message || "something went wrong"
+        })
+      }
+    };
 
   // VERIFY EMAIL
   const verifyEmail = async () => {
@@ -93,8 +108,10 @@ const VerifyEmail = () => {
       });
 
       setTimeout(() => {
-        navigate("/login");
+        logout();
       }, 2000);
+
+      
     } catch (error) {
       setStatus("error");
 

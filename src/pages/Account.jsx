@@ -74,6 +74,21 @@ const Account = () => {
   }),
 });
 
+
+ const logout = async () => {
+    try {
+      let user_logout = await api.get("/logout");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      dispatch({ type: "USER_LOGOUT" });
+    } catch (error) {
+      showToast({
+        icon:"error",
+        title:error?.data?.message || "something went wrong"
+      })
+    }
+  };
+
   const contactFormik = useFormik({
     initialValues: {
       name: name,
@@ -137,7 +152,9 @@ const Account = () => {
         });
 
         if(email !== contactFormik?.values?.email){
-           navigate("/login");
+          setTimeout(() => {
+        logout();
+      }, 2000);
         }
 
         setloading(false);
