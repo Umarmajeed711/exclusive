@@ -109,7 +109,7 @@ const VerifyEmail = () => {
 
       setTimeout(() => {
         logout();
-      }, 2000);
+      }, 200);
 
       
     } catch (error) {

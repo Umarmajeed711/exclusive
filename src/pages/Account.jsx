@@ -154,7 +154,7 @@ const Account = () => {
         if(email !== contactFormik?.values?.email){
           setTimeout(() => {
         logout();
-      }, 2000);
+      }, 200);
         }
 
         setloading(false);

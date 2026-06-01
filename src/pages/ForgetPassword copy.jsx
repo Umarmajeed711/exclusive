@@ -80,17 +80,7 @@ const ForgetPassword = () => {
 
           
 
-          sessionStorage.setItem(
-  "resetToken",
-  response.data.resetToken
-);
-
-sessionStorage.setItem(
-  "resetEmail",
-  values.email
-);
-
-navigate("/ResetPassword");
+          navigate("/ResetPassword")
 
          
         }

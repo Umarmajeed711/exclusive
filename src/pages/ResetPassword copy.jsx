@@ -1,7 +1,7 @@
 import { useFormik } from "formik";
 import * as yup from "yup";
 import "../App.css";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { FaEye, FaEyeSlash} from "react-icons/fa";
 import { RiLockPasswordFill } from "react-icons/ri";
 import { GlobalContext } from "../context/Context";
@@ -76,14 +76,11 @@ const ResetPassword = () => {
         try {
 
         
-          
-          const resetToken =
-  sessionStorage.getItem("resetToken");
-
-await api.post("/reset-password", {
-  password,
-  resetToken,
-});
+          let response = await api.post(`/reset-password`, {
+            email:email,
+            password: values.password,
+            otp:otp
+          });
           
        
   
@@ -93,17 +90,7 @@ await api.post("/reset-password", {
   
           ResetFormik.resetForm();
   
-         sessionStorage.removeItem(
-  "resetToken"
-);
-
-sessionStorage.removeItem(
-  "resetEmail"
-);
-
-navigate("/login", {
-  replace: true,
-});
+          navigate("/login");
   
          
         } catch (error) {
