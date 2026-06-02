@@ -24,9 +24,7 @@ const MainLayout = () => {
    return  (
     <>
       <Navbar />
-        {!state?.user?.email_verified && (
-    <VerifyEmailBanner />
-  )}
+      <VerifyEmailBanner />
       <Outlet />
       <Footer />
     </>

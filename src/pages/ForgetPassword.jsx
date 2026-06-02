@@ -18,17 +18,16 @@ const ForgetPassword = () => {
   const [apiError, setApiError] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
 
-
-
   const ForgertValidation = yup.object({
-    email: isOtpSent ? yup.string() :
-       yup
-      .string()
-      .trim()
-      .email("Invalid Email")
-      .required("Email is required"),
+    email: isOtpSent
+      ? yup.string()
+      : yup
+          .string()
+          .trim()
+          .email("Invalid Email")
+          .required("Email is required"),
     otp: isOtpSent
-      ? yup.string().length(5, "Must be 5 digits").required("OTP is required")
+      ? yup.string().length(6, "Must be 6 digits").required("OTP is required")
       : yup.string(),
   });
 
@@ -42,31 +41,29 @@ const ForgetPassword = () => {
     onSubmit: async (values) => {
       setloading(true);
 
-      
-
       try {
         if (!isOtpSent) {
-           let response = await api.post(`/forget-password`, {
+          let response = await api.post(`/forget-password`, {
             email: values.email,
           });
 
-        
-
           showToast({
-            icon:"success",
-            title:"OTP send on your email"
-          })
+            icon: "success",
+            title: response?.data?.message || "OTP send on your email",
+          });
 
-          setIsOtpSent(true)
-          dispatch({ type: "RESET_PASSWORD", payload: response.data });
-
+          setIsOtpSent(true);
+          sessionStorage.setItem("resetEmail", values.email);
+          // dispatch({ type: "RESET_PASSWORD", payload: response.data });
         } else {
+        
+           const resetEmail = sessionStorage.getItem("resetEmail");
 
-           let response = await api.post("/verify-otp", {
-            email: state?.userData.email,
+          let response = await api.post("/verify-otp", {
+            email: resetEmail,
             otp: values.otp,
           });
- 
+
           // Swal.fire(
           //   "Verified",
           //   "OTP verified! You can now reset your password.",
@@ -74,50 +71,41 @@ const ForgetPassword = () => {
           // );
 
           showToast({
-            icon:"success",
-            title:"OTP verified! You can now reset your password."
-          })
+            icon: "success",
+            title: response?.message || "OTP verified! You can now reset your password.",
+          });
+
+          sessionStorage.setItem("resetToken", response.data.resetToken);
 
           
 
-          sessionStorage.setItem(
-  "resetToken",
-  response.data.resetToken
-);
-
-sessionStorage.setItem(
-  "resetEmail",
-  values.email
-);
-
-navigate("/ResetPassword");
-
-         
+          navigate("/ResetPassword");
         }
       } catch (error) {
         setApiError(error?.response?.data?.message || "Something went wrong");
-        
       } finally {
         setloading(false);
       }
     },
   });
 
-      const [pageChange,setPageChange]= useState(false);
+  const [pageChange, setPageChange] = useState(false);
 
   const handlePageChange = (link = "/") => {
-    setPageChange(true)
+    setPageChange(true);
     setTimeout(() => {
-      navigate(link)
-    },100)
-  }
+      navigate(link);
+    }, 100);
+  };
 
   let Styles = {
     inputField:
       "border-b-2  bg-transparent p-1 outline-none focus:drop-shadow-xl hover: w-[220px]",
   };
   return (
-      <div className={`flex justify-center  items-center h-screen ${pageChange ? "animate-slideDown" :"animate-slideUp"}`}>
+    <div
+      className={`flex justify-center  items-center h-screen ${pageChange ? "animate-slideDown" : "animate-slideUp"}`}
+    >
       <div className=" flex items-center  gap-20 p-10 bg-slate-100">
         {/* Image div */}
         <div className="hidden md:flex flex-col ">
@@ -133,7 +121,6 @@ navigate("/ResetPassword");
         {/* Login form */}
 
         <div>
-
           <div className="h-[40px] w-full flex justify-center items-center mb-2 overflow-hidden">
             <Alert
               severity="error"
@@ -157,9 +144,7 @@ navigate("/ResetPassword");
             <p className="py-2">Enter your email to receive an OTP</p>
 
             <div className="flex flex-col justify-center gap-3 my-2">
-
-              {
-                isOtpSent ? 
+              {isOtpSent ? (
                 <div className="flex gap-3 items-center">
                   <label htmlFor="otp">
                     <span className="text-xl font-bold">
@@ -179,7 +164,6 @@ navigate("/ResetPassword");
                       }}
                       disabled={loading}
                       className={Styles.inputField}
-                      
                     />
 
                     {ForgetPassFormik.touched.otp &&
@@ -193,47 +177,40 @@ navigate("/ResetPassword");
                     )}
                   </div>
                 </div>
-
-                :
+              ) : (
                 <div className="flex gap-3 items-center">
-                <label htmlFor="email">
-                  <span className="text-xl font-bold">
-                    <MdEmail />
-                  </span>
-                </label>
-                <div>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    placeholder="enter your Email"
-                    value={ForgetPassFormik.values.email}
-                    onChange={(e) => {
-                      ForgetPassFormik.handleChange(e);
-                      setApiError(""); // clear backend error
-                    }}
-                    disabled={loading || isOtpSent}
-                    className={Styles.inputField}
-                  />
+                  <label htmlFor="email">
+                    <span className="text-xl font-bold">
+                      <MdEmail />
+                    </span>
+                  </label>
+                  <div>
+                    <input
+                      type="email"
+                      name="email"
+                      id="email"
+                      placeholder="enter your Email"
+                      value={ForgetPassFormik.values.email}
+                      onChange={(e) => {
+                        ForgetPassFormik.handleChange(e);
+                        setApiError(""); // clear backend error
+                      }}
+                      disabled={loading || isOtpSent}
+                      className={Styles.inputField}
+                    />
 
-                  {ForgetPassFormik.touched.email &&
-                  Boolean(ForgetPassFormik.errors.email) ? (
-                    <p className="requiredError">
-                      {ForgetPassFormik.touched.email &&
-                        ForgetPassFormik.errors.email}
-                    </p>
-                  ) : (
-                    <p className="ErrorArea">Error Area</p>
-                  )}
+                    {ForgetPassFormik.touched.email &&
+                    Boolean(ForgetPassFormik.errors.email) ? (
+                      <p className="requiredError">
+                        {ForgetPassFormik.touched.email &&
+                          ForgetPassFormik.errors.email}
+                      </p>
+                    ) : (
+                      <p className="ErrorArea">Error Area</p>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              }
-              
-
-              
-                
-            
+              )}
             </div>
 
             <div className="flex justify-between items-center">
@@ -248,13 +225,12 @@ navigate("/ResetPassword");
                     <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
                     <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
                   </div>
+                ) : isOtpSent ? (
+                  "Verify OTP"
                 ) : (
-
-                  isOtpSent ? "Verify OTP" : "Send OTP"
-                  
+                  "Send OTP"
                 )}
               </button>
-
             </div>
 
             <div className="flex justify-center mt-2">
@@ -266,7 +242,7 @@ navigate("/ResetPassword");
                 >
                   Sign Up
                 </Link> */}
-                 <span
+                <span
                   className="transition-all duration-100  hover:underline hover:text-theme-secondary"
                   onClick={() => handlePageChange("/signup")}
                 >
