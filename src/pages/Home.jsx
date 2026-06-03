@@ -92,7 +92,7 @@ const Home = () => {
           // <Link to="/" className="px-3 py-2 bg-red-600 text-white rounded">
           //   View ALL Products
           // </Link>
-           <Link to="/Shop" className="text-decoration-none mt-3">
+           <Link to="/shop" className="text-decoration-none mt-3">
               <button className="bg-[#03A9F4] text-white px-6 py-3 rounded-lg font-medium hover:bg-[#0288d1] transition">
                 Explore More
               </button>

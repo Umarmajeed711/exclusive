@@ -79,7 +79,7 @@ const OrderConfirmation = () => {
             <Link
               className="body-text bg-black text-white w-full sm:w-auto px-9 py-3 rounded-full text-lg font-medium 
               hover:bg-gray-800 transition duration-300 mb-8 md:mb-10"
-              to="/Shop"
+              to="/shop"
             >
               Go to Shop
             </Link>

@@ -304,7 +304,7 @@ const OurProducts = ({
             {products?.map((product, i) => (
               <Link
                 key={i}
-                to={`/ProductDetail/${product?.product_id}`}
+                to={`/productDetail/${product?.product_id}`}
                 className="col-span-1"
               >
                 <div className="relative border-none shadow-xl  overflow-hidden  group hover:-translate-y-4 hover:rounded-xl hover:shadow-[0_0_20px_#03A9F4,0_0_20px_#4EC3F8]  transition duration-500">

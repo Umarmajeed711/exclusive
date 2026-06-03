@@ -150,7 +150,7 @@ const Cart = () => {
   const handleCheckout = () => {
     if (productCart.length > 0) {
       // If there are items in the cart, redirect to the checkout page
-      window.location.href = "/Checkout";
+      window.location.href = "/checkout";
     } else {
       // If the cart is empty, show an alert or message
       Swal.fire({

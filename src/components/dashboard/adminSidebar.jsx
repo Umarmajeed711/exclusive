@@ -20,7 +20,7 @@ const AdminSidebar = () => {
     { name: "Users", path: "/admin/users", icon: Users },
     { name: "Orders", path: "/admin/orders", icon: ShoppingCart },
     // { name: "Products", path: "/admin/products", icon: Boxes },
-    { name: "Products", path: "/admin/add-product", icon: PackagePlus },
+    { name: "Products", path: "/admin/addProduct", icon: PackagePlus },
 
     // ✅ IMPORTANT (back to website)
     { name: "View Store", path: "/", icon: Home , nextTab:true},

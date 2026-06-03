@@ -284,7 +284,7 @@ export const Login = () => {
 
               <div>
                 {/* <Link
-                  to="/ForgetPassword"
+                  to="/forgetPassword"
                   className="text-theme-primary hover:text-theme-secondary"
                 >
                   Forgot Password?
@@ -292,7 +292,7 @@ export const Login = () => {
 
                 <span
                 className="text-theme-primary hover:text-theme-secondary"
-                onClick={() => {handlePageChange("/ForgetPassword")}}
+                onClick={() => {handlePageChange("/forgetPassword")}}
                 >
                   Forgot Password?
 

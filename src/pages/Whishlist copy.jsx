@@ -256,7 +256,7 @@ const Whishlist = () => {
 
                 <Link
                   key={i}
-                  to={`/ProductDetail/${product?.product_id}`}
+                  to={`/productDetail/${product?.product_id}`}
                   className="col-span-1"
                 >
                   <div className="relative border-none  overflow-hidden  group hover:-translate-y-4 hover:shadow-2xl transition duration-500">

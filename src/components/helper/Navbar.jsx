@@ -111,7 +111,7 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink
-                to="/Shop"
+                to="/shop"
                 className={({ isActive }) =>
                   `${style.navLink} ${isActive ? style.active : "after:w-0 hover:after:w-full"}`
                 }
@@ -121,7 +121,7 @@ const Navbar = () => {
             </li>
             <li>
               <NavLink
-                to="/Contact"
+                to="/contact"
                 className={({ isActive }) =>
                   `${style.navLink} ${isActive ? style.active : "after:w-0 hover:after:w-full"}`
                 }
@@ -132,7 +132,7 @@ const Navbar = () => {
             {state?.isLogin ? (
               <li>
                 <NavLink
-                  to="/Account"
+                  to="/account"
                   className={({ isActive }) =>
                     `${style.navLink} ${isActive ? style.active : "after:w-0 hover:after:w-full"}`
                   }
@@ -178,7 +178,7 @@ const Navbar = () => {
                 {/* <FaRegHeart className="text-xl hover:scale-110 transition-all duration-200" /> */}
               </Link>
 
-              <Link to="/Cart" className="link text-xl">
+              <Link to="/cart" className="link text-xl">
                 <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
                   <GrCart className="text-xl hover:scale-110 transition-all duration-200" />
                   {state?.cart?.length > 0 && (
@@ -211,7 +211,7 @@ const Navbar = () => {
                     {/* Menu items */}
                     <div className="flex flex-col py-2">
                       <Link
-                        to="/Account"
+                        to="/account"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
                       >
                         <FaRegUser className="text-lg text-gray-500" />
@@ -235,7 +235,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/Account"
+                        to="/account"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
                       >
                         <IoStarOutline className="text-lg text-gray-500" />
@@ -332,7 +332,7 @@ const Navbar = () => {
                   {/* <FaRegHeart className="text-xl text-gray-600 hover:text-black transition" /> */}
                 </Link>
 
-                <Link to="/Cart" className="relative">
+                <Link to="/cart" className="relative">
                   <span className="relative text-xl cursor-pointer group transition-all duration-300 ">
                     <GrCart className="text-xl hover:scale-110 transition-all duration-200" />
                     {state?.cart?.length > 0 && (
@@ -343,7 +343,7 @@ const Navbar = () => {
                   </span>
                 </Link>
 
-                <Link to="/Account">
+                <Link to="/account">
                   <FaRegUser className="text-xl text-gray-600 hover:text-black transition" />
                 </Link>
               </div>
@@ -371,7 +371,7 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  to="/Account"
+                  to="/account"
                   className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
                 >
                   <IoStarOutline className="text-gray-500" />

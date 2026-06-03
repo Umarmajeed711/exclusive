@@ -281,7 +281,7 @@ const ProductDetail = () => {
             <span className="inline-block w-32 h-4 bg-gray-200 rounded animate-pulse" />
           )
         }
-        prevPages={[{ name: "shop", url: "/Shop" }]}
+        prevPages={[{ name: "shop", url: "/shop" }]}
       />
 
       {/* Product Detail */}

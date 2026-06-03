@@ -79,7 +79,7 @@ const ForgetPassword = () => {
 
           
 
-          navigate("/ResetPassword");
+          navigate("/resetPassword");
         }
       } catch (error) {
         setApiError(error?.response?.data?.message || "Something went wrong");
@@ -153,7 +153,7 @@ const ForgetPassword = () => {
                   </label>
                   <div>
                     <input
-                      type="number"
+                      type="text"
                       name="otp"
                       id="otp"
                       placeholder="enter your OTP"

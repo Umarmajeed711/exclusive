@@ -168,11 +168,11 @@ const Footer = () => {
       <div className="flex flex-col gap-4">
         <h4 className="text-xl font-medium">Account</h4>
         <ul className="flex flex-col gap-2">
-          <li><Link to= {isLogin ? "/Account" : "/login"} className="footer-link">{isLogin ? "My Account" : "Login / Register"} </Link></li>
+          <li><Link to= {isLogin ? "/account" : "/login"} className="footer-link">{isLogin ? "My Account" : "Login / Register"} </Link></li>
           {/* <li><Link to="" className="footer-link"></Link></li> */}
-          <li><Link to="/Cart" className="footer-link">Cart</Link></li>
+          <li><Link to="/cart" className="footer-link">Cart</Link></li>
           <li><Link to="/wishlist" className="footer-link">Wishlist</Link></li>
-          <li><Link to="/Shop" className="footer-link">Shop</Link></li>
+          <li><Link to="/shop" className="footer-link">Shop</Link></li>
         </ul>
       </div>
 
@@ -183,7 +183,7 @@ const Footer = () => {
           <li><Link to="/" className="footer-link">Privacy Policy</Link></li>
           <li><Link to="/" className="footer-link">Terms of Use</Link></li>
           <li><Link to="/" className="footer-link">FAQs</Link></li>
-          <li><Link to="/Contact" className="footer-link">Contact</Link></li>
+          <li><Link to="/contact" className="footer-link">Contact</Link></li>
         </ul>
       </div>
 

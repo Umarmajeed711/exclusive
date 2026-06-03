@@ -37,8 +37,9 @@ export const VerifyEmailBanner = () => {
       setSendingEmail(false);
     }
   };
+  
 
-  if (state?.user?.email_verified || !state?.user) {
+  if (state?.user?.email_verified || !state?.user?.id) {
     return null;
   }
 

@@ -96,7 +96,7 @@ const Checkout = () => {
             // COD or Offline Order Success
             // Optionally redirect to success page
             dispatch({ type: "UPDATE_CART", payload: null });
-            navigate("/OrderComplete");
+            navigate("/orderComplete");
           }
         } catch (error) {
           Swal.fire("Error!", "Something went wrong", "error");

@@ -42,11 +42,11 @@ const AppRoutes = () => {
       {/* ================= USER SIDE ================= */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/Shop" element={<Shop />} />
-        <Route path="/ProductDetail/:id" element={<ProductDetail />} />
-        <Route path="/Contact" element={<Contact />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/productDetail/:id" element={<ProductDetail />} />
+        <Route path="/contact" element={<Contact />} />
 
-        <Route path="/Category" element={<Category />}></Route>
+        <Route path="/category" element={<Category />}></Route>
         <Route path="/wishlist" element={<Whishlist />}></Route>
 
         {/* <Route path="/admin" element={<AdminLayout />}>
@@ -58,12 +58,12 @@ const AppRoutes = () => {
 
         {/* Protected user */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/Cart" element={<Cart />} />
-          <Route path="/Account" element={<Account />} />
-          <Route path="/Checkout" element={<Checkout />} />
-          <Route path="/OrderComplete" element={<OrderConfirmation />}></Route>
-          <Route path="/orders/:id" element={<OrderTrackingWrapper />}></Route>
-          <Route path="/myOrders" element={<OrdersPage />}></Route>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/orderComplete" element={<OrderConfirmation />}/>
+          <Route path="/orders/:id" element={<OrderTrackingWrapper />}/>
+          <Route path="/myOrders" element={<OrdersPage />}/>
         </Route>
       </Route>
 
@@ -74,10 +74,10 @@ const AppRoutes = () => {
       <Route>
          
         <Route path="/signup" element={<Signup />}></Route>
-        <Route path="/verify_email" element={<VerifyEmail />}></Route>
+        <Route path="/verifyEmail" element={<VerifyEmail />}></Route>
         <Route path="/login" element={<Login />}></Route>
-        <Route path="/ForgetPassword" element={<ForgetPassword />}></Route>
-        <Route path="/ResetPassword" element={<ResetPassword/>}></Route>
+        <Route path="/forgetPassword" element={<ForgetPassword />}></Route>
+        <Route path="/resetPassword" element={<ResetPassword/>}></Route>
        
         <Route path="*" element={<Navigate to="/login" />}></Route>
       </Route>
@@ -90,7 +90,7 @@ const AppRoutes = () => {
           <Route path="users" element={<Users />} />
           <Route path="orders" element={<Orders />} />
           {/* <Route path="products" element={<Products />} /> */}
-          <Route path="add-product" element={<AddProduct />} />
+          <Route path="addProduct" element={<AddProduct />} />
         </Route>
       </Route>
 

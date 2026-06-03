@@ -11,7 +11,7 @@ const slides = [
     title: "Next-Gen Gaming Gear",
     subtitle: "Experience precision, performance, and immersive control",
     cta: "Shop Gaming",
-    link: "/Shop",
+    link: "/shop",
   },
 
   {
@@ -19,21 +19,21 @@ const slides = [
     title: "Premium Audio",
     subtitle: "Crystal-clear sound with comfort built for all-day listening",
     cta: "Shop Headphones",
-    link: "/Shop",
+    link: "/shop",
   },
   {
     image: "keyboard.png",
     title: "High-Performance Keyboards",
     subtitle: "Built for speed, accuracy, and professional workflows",
     cta: "View Collection",
-    link: "/Shop",
+    link: "/shop",
   },
   {
     image: "gamepade2.jpg",
     title: "Smart Accessories",
     subtitle: "Designed to enhance your everyday digital experience",
     cta: "Explore Now",
-    link: "/Shop",
+    link: "/shop",
   },
   {
     image: "laptop.jpeg",
