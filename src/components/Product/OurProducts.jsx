@@ -47,6 +47,10 @@ const OurProducts = ({
       });
       onAdd();
       dispatch({ type: "WISHLIST_RELOAD" });
+      showToast({
+        icon:"success",
+        title:response?.data?.message || "Add to wishlist"
+      })
 
 
     } catch (error) {
@@ -119,7 +123,6 @@ const OurProducts = ({
     }
   };
 
-  //
   const editProduct = (product) => {
     setProjectData(product);
     setShowModal(true);
@@ -149,16 +152,12 @@ const OurProducts = ({
         title:"Product deleted successfully"
       });
 
-        // Success toast
-        Swal.fire({
-          icon: "success",
-          title: "Product deleted successfully",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-        });
+       
+        showToast({
+          icon:"success",
+          title: "Product deleted successfully"
+
+        })
         delProduct(id);
       } catch (error) {
         showToast({
@@ -206,42 +205,118 @@ const OurProducts = ({
   const [cartLoading, setcartLoading] = useState(false);
 
   // function for add to cart
+  // const addtoCart = async (product) => {
+  //   setcartLoading(true);
+  //   try {
+  //     let response = await api.post("/add-cart", {
+  //       productId: product.product_id,
+  //       productName: product.name,
+  //       productPrice: product.price,
+  //       productDiscount: product.discount,
+  //       productImage: product?.image_urls[0],
+  //       productSize: product?.sizes[0],
+  //       productColor: product?.colors[0],
+  //       quantity: 1,
+  //       user_id: state?.user?.user_id,
+  //     });
+  //     dispatch({ type: "TOGGLE_CART" });
+  //     // const Toast = Swal.mixin({
+  //     //   toast: true,
+  //     //   position: "bottom-left",
+  //     //   showConfirmButton: false,
+  //     //   timer: 3000,
+  //     //   timerProgressBar: true,
+  //     //   didOpen: (toast) => {
+  //     //     toast.onmouseenter = Swal.stopTimer;
+  //     //     toast.onmouseleave = Swal.resumeTimer;
+  //     //   },
+  //     // });
+  //     // Toast.fire({
+  //     //   icon: "success",
+  //     //   title: "Add product successfully",
+  //     // });
+
+  //     showToast({
+  //       icon:"success",
+  //       title:response?.data?.message || "Add product successfully"
+  //     })
+  //   } catch (e) {
+  //     console.error("Error adding document: ", e);
+  //     showToast({
+  //             icon:"error",
+  //             title:e?.data?.message || "Something went wrong"
+  //           })
+  //   } finally {
+  //     setcartLoading(false);
+  //   }
+  // };
+  
+
   const addtoCart = async (product) => {
-    setcartLoading(true);
-    try {
-      let addTOCart = await api.post("/add-cart", {
-        productId: product.product_id,
-        productName: product.name,
-        productPrice: product.price,
-        productDiscount: product.discount,
-        productImage: product?.image_urls[0],
-        productSize: product?.sizes[0],
-        productColor: product?.colors[0],
-        quantity: 1,
-        user_id: state?.user?.user_id,
-      });
+  setcartLoading(true);
+
+  try {
+    // Guest User
+    if (!state?.user?.user_id) {
+      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+      const existingProduct = cart.find(
+        (item) => item.productId === product.product_id
+      );
+
+      if (existingProduct) {
+        existingProduct.quantity += 1;
+      } else {
+        cart.push({
+          productId: product.product_id,
+          productName: product.name,
+          productPrice: product.price,
+          productDiscount: product.discount,
+          productImage: product?.image_urls[0],
+          productSize: product?.sizes[0],
+          productColor: product?.colors[0],
+          quantity: 1,
+        });
+      }
+
+      localStorage.setItem("cart", JSON.stringify(cart));
+
       dispatch({ type: "TOGGLE_CART" });
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "bottom-left",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
+
+      return showToast({
         icon: "success",
-        title: "Add product successfully",
+        title: "Product added to cart",
       });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    } finally {
-      setcartLoading(false);
     }
-  };
+
+    // Logged In User
+    const response = await api.post("/add-cart", {
+      productId: product.product_id,
+      productName: product.name,
+      productPrice: product.price,
+      productDiscount: product.discount,
+      productImage: product?.image_urls[0],
+      productSize: product?.sizes[0],
+      productColor: product?.colors[0],
+      quantity: 1,
+      user_id: state.user.user_id,
+    });
+
+    dispatch({ type: "TOGGLE_CART" });
+
+    showToast({
+      icon: "success",
+      title: response?.data?.message,
+    });
+  } catch (e) {
+    showToast({
+      icon: "error",
+      title: e?.response?.data?.message || "Something went wrong",
+    });
+  } finally {
+    setcartLoading(false);
+  }
+};
 
   // const products = [
   //   {

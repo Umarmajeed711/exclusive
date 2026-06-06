@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { GlobalContext } from "../../context/Context";
-import { Loader } from "../helper/types";
+import { isActiveUser, Loader } from "../helper/types";
 
 const ProtectedRoute = () => {
   const { state } = useContext(GlobalContext);
@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
 
   return (
 
-    state?.isLogin  ? <Outlet /> : state?.isLogin == null  ? <Loader/> : <Navigate to="/login" state={{ from: location }} replace />
+    state?.isLogin && isActiveUser(state?.user) && state?.user?.email_verified ? <Outlet /> : state?.isLogin == null  ? <Loader/> : <Navigate to="/login" state={{ from: null }} replace />
   )
   
 };

@@ -12,7 +12,7 @@ import {
   HorizontalReviewSkeleton,
   ProductDetailSkeleton,
 } from "./productCardSkeleton";
-import { showToast } from "../helper/types";
+import { isActiveUser, showToast } from "../helper/types";
 
 const ProductDetail = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -216,7 +216,7 @@ const ProductDetail = () => {
   const addtoCart = async () => {
     setcartLoading(true);
     try {
-      let addTOCart = await api.post("/add-cart", {
+      let response = await api.post("/add-cart", {
         productId: Product.product_id,
         productName: Product.name,
         productPrice: Product.price,
@@ -228,26 +228,36 @@ const ProductDetail = () => {
         user_id: state?.user.user_id,
       });
       dispatch({ type: "TOGGLE_CART" });
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "bottem-left",
-        showConfirmButton: false,
-        timer: 3000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        },
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Add product successfully",
-      });
+      // const Toast = Swal.mixin({
+      //   toast: true,
+      //   position: "bottem-left",
+      //   showConfirmButton: false,
+      //   timer: 3000,
+      //   timerProgressBar: true,
+      //   didOpen: (toast) => {
+      //     toast.onmouseenter = Swal.stopTimer;
+      //     toast.onmouseleave = Swal.resumeTimer;
+      //   },
+      // });
+      // Toast.fire({
+      //   icon: "success",
+      //   title: "Add product successfully",
+      // });
+      
+      showToast({
+        icon:"success",
+        title:response?.date?.message || "Add product successfully"
+      })
+
       setSelectedColor(Product?.colors[0]);
       setSelectedSize(Product?.sizes[0]);
       setCounter("1");
     } catch (e) {
       console.error("Error adding document: ", e);
+      showToast({
+        icon:"error",
+        title:e?.data?.message || "Something went wrong"
+      })
     } finally {
       setcartLoading(false);
     }
@@ -287,7 +297,14 @@ const ProductDetail = () => {
       {/* Product Detail */}
       {productLoading ? (
         <ProductDetailSkeleton />
-      ) : (
+      ):
+      Product  ==  "" ?
+      <div className="flex justify-center items-center h-[50vh]">
+          <div className="text-md sm:text-xl font-medium drop-shadow">
+            Product not found!
+          </div>
+        </div>
+       : (
         <div className=" container   my-5 ">
           {/* mx-auto  px-4 lg:px-20 */}
           {/* Product details */}
@@ -817,7 +834,7 @@ const ProductDetail = () => {
         </form>
       </div> */}
 
-      {state?.isLogin ? (
+      {state?.isLogin && isActiveUser(state?.user) ? (
         <div className="container mx-auto px-6 mt-10 flex flex-col items-center">
           <p className="text-xl sm:text-2xl font-bold mb-4">
             Rate this product

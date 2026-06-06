@@ -70,6 +70,18 @@ const App = () => {
   const getCartProduct = async (user_id) => {
     dispatch({ type: "LODING_CART", payload: true });
     try {
+       if (!user_id) {
+      const guestCart =
+        JSON.parse(localStorage.getItem("cart")) || [];
+
+      dispatch({
+        type: "UPDATE_CART",
+        payload: guestCart,
+      });
+
+      return;
+    }
+    
       let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
       dispatch({ type: "UPDATE_CART", payload: cart_products?.data?.products });
     } catch (error) {

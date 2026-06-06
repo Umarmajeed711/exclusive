@@ -280,7 +280,7 @@ const Dash = () => {
         </div>
       ) : (CustomerDetail.length  === 0)  ? (
         <div className="flex justify-center items-center h-[50vh]">
-          <div className="text-md sm:text-xl font-medium text-red-500 drop-shadow">
+          <div className="text-md sm:text-xl font-medium drop-shadow">
             Products not found!
           </div>
         </div>

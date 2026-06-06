@@ -10,7 +10,11 @@ import Alert from "@mui/material/Alert";
 import api from "../components/helper/api";
 import Breadcrums from "../components/helper/Breadcrums";
 import { FiEdit2 } from "react-icons/fi";
-import { getInitials, showToast } from "../components/helper/types";
+import {
+  getInitials,
+  isActiveUser,
+  showToast,
+} from "../components/helper/types";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import AccountSecurity from "../components/helper/AccountSecurity";
 import { Shield } from "lucide-react";
@@ -19,11 +23,11 @@ import { Styles } from "../components/helper/types";
 const Account = () => {
   let { state, dispatch } = useContext(GlobalContext);
 
-  let { user_id, name, email, phone, profile} = state?.user || {};
+  let { user_id, name, email, phone, profile, status } = state?.user || {};
 
   const navigate = useNavigate();
 
-  let {user} = state;
+  let { user } = state;
 
   const fileInputRef = useRef(null);
 
@@ -36,46 +40,41 @@ const Account = () => {
 
   const [profileImage, setProfileImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(profile || null);
- 
 
   const contactValidation = yup.object({
-  name: yup
-    .string()
-    .trim()
-    .required("Name is required")
-    .min(2, "Name is too short"),
+    name: yup
+      .string()
+      .trim()
+      .required("Name is required")
+      .min(2, "Name is too short"),
 
-  email: yup
-    .string()
-    .trim()
-    .email("Invalid email format")
-    .required("Email is required"),
+    email: yup
+      .string()
+      .trim()
+      .email("Invalid email format")
+      .required("Email is required"),
 
-  phone: yup
-    .string()
-    .required("Phone number is required")
-    .matches(/^\+?[0-9\s-]+$/, "Phone number must contain only digits")
-    .test("valid-phone-length", "Enter a valid phone number", (val) => {
-      if (!val) return false;
+    phone: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^\+?[0-9\s-]+$/, "Phone number must contain only digits")
+      .test("valid-phone-length", "Enter a valid phone number", (val) => {
+        if (!val) return false;
 
-      const digits = val.replace(/\D/g, "");
-      return digits.length >= 10 && digits.length <= 13;
+        const digits = val.replace(/\D/g, "");
+        return digits.length >= 10 && digits.length <= 13;
+      }),
+
+    password: yup.string().when("email", {
+      is: (email) =>
+        email?.trim()?.toLowerCase() !== user?.email?.trim()?.toLowerCase(),
+      then: (schema) =>
+        schema.required("current password is required to change email"),
+      otherwise: (schema) => schema.notRequired(),
     }),
+  });
 
-  password: yup.string().when("email", {
-    is: (email) =>
-      email?.trim()?.toLowerCase() !==
-      user?.email?.trim()?.toLowerCase(),
-    then: (schema) =>
-      schema.required(
-        "current password is required to change email"
-      ),
-    otherwise: (schema) => schema.notRequired(),
-  }),
-});
-
-
- const logout = async () => {
+  const logout = async () => {
     try {
       let user_logout = await api.get("/logout");
       localStorage.removeItem("user");
@@ -83,9 +82,9 @@ const Account = () => {
       dispatch({ type: "USER_LOGOUT" });
     } catch (error) {
       showToast({
-        icon:"error",
-        title:error?.data?.message || "something went wrong"
-      })
+        icon: "error",
+        title: error?.data?.message || "something went wrong",
+      });
     }
   };
 
@@ -102,6 +101,12 @@ const Account = () => {
 
     onSubmit: async (values) => {
       if (loading) return;
+      if (!isActiveUser(state?.user)) {
+        return showToast({
+          icon: "error",
+          title: `Your account is ${state?.user?.status}`,
+        });
+      }
       setloading(true);
 
       if (
@@ -151,10 +156,10 @@ const Account = () => {
           title: "Edit Profile Successfully",
         });
 
-        if(email !== contactFormik?.values?.email){
+        if (email !== contactFormik?.values?.email) {
           setTimeout(() => {
-        logout();
-      }, 200);
+            logout();
+          }, 200);
         }
 
         setloading(false);
@@ -198,8 +203,6 @@ const Account = () => {
     setShowSecurityForm(value ?? false);
   };
 
-  
-
   useEffect(() => {
     return () => {
       if (previewImage?.startsWith("blob:")) {
@@ -211,7 +214,6 @@ const Account = () => {
   const MAX_SIZE = 2 * 1024 * 1024;
 
   const allowed = ["image/jpeg", "image/png", "image/webp"];
-
 
   return (
     <div className="mx-5 md:mx-8 lg:mx-14">
@@ -259,9 +261,16 @@ const Account = () => {
             {/* Profile */}
             <button
               type="button"
+              disabled={!isActiveUser(state?.user)}
+              title={
+                isActiveUser(state?.user)
+                  ? "Profile"
+                  : `Your account is currently ${state?.user?.status}`
+              }
               onClick={() => handleNavigate(false)}
               className={`
         group flex items-center justify-between
+        disabled:cursor-not-allowed
         w-full rounded-xl px-4 py-3
         transition-all duration-200
         ${
@@ -312,9 +321,15 @@ const Account = () => {
             <button
               type="button"
               onClick={() => handleNavigate(true)}
+              disabled={!isActiveUser(state?.user)}
+              title={
+                isActiveUser(state?.user)
+                  ? "Account Security"
+                  : `Your account is currently ${state?.user?.status}`
+              }
               className={`
         group flex items-center justify-between
-        w-full rounded-xl px-4 py-3
+        w-full disabled:cursor-not-allowed rounded-xl px-4 py-3
         transition-all duration-200
         ${
           showSecurityForm
@@ -386,7 +401,12 @@ const Account = () => {
 
             <div className="flex flex-col gap-2">
               <Link
-                to="/myOrders"
+                title={
+                  isActiveUser(state?.user)
+                    ? "My Orders"
+                    : `Your account is currently ${state?.user?.status}`
+                }
+                to={isActiveUser(state?.user) ? "/myOrders" : ""}
                 className="
           px-4 py-3 rounded-xl
           hover:bg-gray-100
@@ -399,7 +419,12 @@ const Account = () => {
               </Link>
 
               <Link
-                to="/myOrders"
+                title={
+                  isActiveUser(state?.user)
+                    ? "My Cancellations"
+                    : `Your account is currently ${state?.user?.status}`
+                }
+                to={isActiveUser(state?.user) ? "/myOrders" : ""}
                 className="
           px-4 py-3 rounded-xl
           hover:bg-gray-100
@@ -478,17 +503,43 @@ const Account = () => {
                     </div>
                   </div>
 
-                  <div
-                    className="
+                  {status == "active" ? (
+                    <div
+                      className="
         hidden sm:flex items-center gap-2
         px-3 py-1.5 rounded-full
         bg-theme-primary/10 text-theme-primary
         text-sm font-medium border border-theme-primary/20
       "
-                  >
-                    <span className="w-2 h-2 rounded-full bg-theme-primary animate-pulse"></span>
-                    Active Account
-                  </div>
+                    >
+                      <span className="w-2 h-2 rounded-full bg-theme-primary animate-pulse"></span>
+                      Active Account
+                    </div>
+                  ) : status == "deactive" ? (
+                    <div
+                      className="
+        hidden sm:flex items-center gap-2
+        px-3 py-1.5 rounded-full
+        bg-gray-100 text-gray-700
+        text-sm font-medium border border-gray-700
+      "
+                    >
+                      <span className="w-2 h-2 rounded-full bg-gray-700 animate-pulse"></span>
+                      Deactivated
+                    </div>
+                  ) : status == "blocked" ? (
+                    <div
+                      className="
+        hidden sm:flex items-center gap-2
+        px-3 py-1.5 rounded-full
+        bg-red-100 text-red-700
+        text-sm font-medium border border-red-700
+      "
+                    >
+                      <span className="w-2 h-2 rounded-full bg-red-700 animate-pulse"></span>
+                      Blocked
+                    </div>
+                  ) : null}
                 </div>
 
                 {/* Profile Image Section */}
@@ -603,7 +654,7 @@ const Account = () => {
 
                       e.target.value = null;
                     }}
-                    disabled={loading}
+                    disabled={loading || !isActiveUser(state?.user)}
                   />
                 </div>
 
@@ -613,50 +664,64 @@ const Account = () => {
                     {name || "User Name"}
                   </h3>
 
-                  <p className="text-sm text-gray-500 mt-1">
-                    Keep your profile updated for a better experience
-                  </p>
+                  {isActiveUser(state?.user) && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Keep your profile updated for a better experience
+                    </p>
+                  )}
+                  {state?.user?.status === "blocked" && (
+                    <p className="text-sm text-red-500 mt-1">
+                      Your account has been blocked. Please contact customer
+                      support for assistance.
+                    </p>
+                  )}
+
+                  {state?.user?.status === "deactivated" && (
+                    <p className="text-sm text-orange-500 mt-1">
+                      Your account is currently currently deactivated. Some features may
+                      be unavailable.
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="flex flex-col gap-3 justify-center  w-full">
-
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
-                {/* name */}
-                <div className="flex flex-col gap-3 justify-center  w-full">
-                  <div className="text-base font-semibold">Name</div>
-                  <div className="w-full">
-                    <input
-                      type="text"
-                      name="name"
-                      id="name"
-                      placeholder="Your Name *"
-                      value={contactFormik.values.name}
-                      autoComplete="name"
-                      onChange={(e) => {
-                        contactFormik.handleChange(e);
-                        setApiError(""); // clear backend error
-                      }}
-                      className={Styles.inputField}
-                      disabled={loading}
-                      onBlur={(e) => {
-                        contactFormik.setFieldValue(
-                          "name",
-                          e.target.value.trim(),
-                        );
-                      }}
-                    />
+                  {/* name */}
+                  <div className="flex flex-col gap-3 justify-center  w-full">
+                    <div className="text-base font-semibold">Name</div>
+                    <div className="w-full">
+                      <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        placeholder="Your Name *"
+                        value={contactFormik.values.name}
+                        autoComplete="name"
+                        onChange={(e) => {
+                          contactFormik.handleChange(e);
+                          setApiError(""); // clear backend error
+                        }}
+                        className={Styles.inputField}
+                        disabled={loading || !isActiveUser(state?.user)}
+                        onBlur={(e) => {
+                          contactFormik.setFieldValue(
+                            "name",
+                            e.target.value.trim(),
+                          );
+                        }}
+                      />
 
-                    <div className="error-wrapper">
-                      {contactFormik.touched.name &&
-                        contactFormik.errors.name && (
-                          <p className="requiredError">
-                            {contactFormik.errors.name}
-                          </p>
-                        )}
+                      <div className="error-wrapper">
+                        {contactFormik.touched.name &&
+                          contactFormik.errors.name && (
+                            <p className="requiredError">
+                              {contactFormik.errors.name}
+                            </p>
+                          )}
+                      </div>
                     </div>
                   </div>
-                </div>
 
                   {/* email */}
                   <div className="flex flex-col gap-3 justify-center w-full">
@@ -680,7 +745,7 @@ const Account = () => {
                           );
                         }}
                         className={Styles.inputField}
-                        disabled={loading}
+                        disabled={loading || !isActiveUser(state?.user)}
                       />
 
                       <div className="error-wrapper">
@@ -693,11 +758,9 @@ const Account = () => {
                       </div>
                     </div>
                   </div>
-
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
-
                   {/* phone */}
                   <div className="flex flex-col gap-3 justify-center w-full ">
                     <div className="text-base font-semibold">Phone</div>
@@ -720,7 +783,7 @@ const Account = () => {
                           );
                         }}
                         className={Styles.inputField}
-                        disabled={loading}
+                        disabled={loading || !isActiveUser(state?.user)}
                       />
 
                       <div className="error-wrapper">
@@ -735,60 +798,62 @@ const Account = () => {
                   </div>
 
                   {/* Password */}
-                                    <div className="flex flex-col gap-3 justify-center w-full ">
+                  <div className="flex flex-col gap-3 justify-center w-full ">
+                    <div className="text-base font-semibold">Password</div>
+                    <div
+                      className="w-full relative"
+                      disabled={loading || contactFormik.values.email == email}
+                    >
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        placeholder="Current Password"
+                        // autoComplete="current-password"
+                        value={contactFormik.values.password}
+                        onChange={(e) => {
+                          contactFormik.handleChange(e);
+                          setApiError(""); // clear backend error
+                        }}
+                        onBlur={(e) => {
+                          contactFormik.setFieldValue(
+                            "password",
+                            e.target.value.trim(),
+                          );
+                        }}
+                        className={Styles.inputField}
+                        disabled={
+                          loading || contactFormik.values.email == email
+                        }
+                      />
 
-                                      <div className="text-base font-semibold">Password</div>
-                                      <div className="w-full relative" disabled={loading || contactFormik.values.email  == email}>
-                                        <input
-                                          type={showPassword ? "text" : "password"}
-                                          name="password"
-                                          placeholder="Current Password"
-                                          // autoComplete="current-password"
-                                          value={contactFormik.values.password}
-                                          onChange={(e) => {
-                                            contactFormik.handleChange(e);
-                                            setApiError(""); // clear backend error
-                                          }}
-                                          onBlur={(e) => {
-                                            contactFormik.setFieldValue(
-                                              "password",
-                                              e.target.value.trim(),
-                                            );
-                                          }}
-                                          className={Styles.inputField}
-                                          disabled={loading || contactFormik.values.email  == email}
+                      <p
+                        onClick={() => {
+                          setShowPassword(!showPassword);
+                        }}
+                        style={{
+                          position: "absolute",
+                          right: "0",
+                          top: "0",
+                          margin: "10px",
+                          cursor: "pointer",
+                        }}
+                        className={
+                          loading ? "pointer-events-none opacity-50" : null
+                        }
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </p>
 
-
-                                        />
-                  
-                                        <p
-                                          onClick={() => {
-                                            setShowPassword(!showPassword);
-                                          }}
-                                          style={{
-                                            position: "absolute",
-                                            right: "0",
-                                            top: "0",
-                                            margin: "10px",
-                                            cursor: "pointer",
-                                          }}
-                                          className={
-                                            loading ? "pointer-events-none opacity-50" : null
-                                          }
-                                        >
-                                          {showPassword ? <FaEyeSlash /> : <FaEye />}
-                                        </p>
-                  
-                                        <div className="error-wrapper">
-                                          {contactFormik.touched.password &&
-                                            contactFormik.errors.password && (
-                                              <p className="requiredError">
-                                                {contactFormik.errors.password}
-                                              </p>
-                                            )}
-                                        </div>
-                                      </div>
-                                    </div>
+                      <div className="error-wrapper">
+                        {contactFormik.touched.password &&
+                          contactFormik.errors.password && (
+                            <p className="requiredError">
+                              {contactFormik.errors.password}
+                            </p>
+                          )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

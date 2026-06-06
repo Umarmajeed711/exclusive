@@ -28,8 +28,7 @@ const DEFAULT_COLUMNS = [
   { key: "phone", label: "Phone", visible: true },
   { key: "email_verified", label: "Email Verified", visible: true },
   { key: "user_role", label: "Role", visible: true },
-  { key: "is_active", label: "Active", visible: true },
-  { key: "is_blocked", label: "Blocked", visible: true },
+  { key: "status", label: "Status", visible: true },
   { key: "created_at", label: "Date", visible: true },
   { key: "user_id", label: "User ID", visible: true },
   { key: "actions", label: "Actions", visible: true },
@@ -173,7 +172,7 @@ const UsersList = ({
           <span className="text-gray-700 font-medium">{user.phone || "-"}</span>
         );
 
-      case "is_active":
+      case "status":
         return isAdmin ? (
           <ActiveStatusDropdown
             user={user}
@@ -181,19 +180,19 @@ const UsersList = ({
             loadingId={loadingId}
           />
         ) : (
-          <b>{formatText(user?.is_active)}</b>
+          <b>{formatText(user?.status)}</b>
         );
 
-      case "is_blocked":
-        return isAdmin ? (
-          <BlockStatusDropdown
-            user={user}
-            updateUserStatus={updateUserStatus}
-            loadingId={loadingId}
-          />
-        ) : (
-          <b>{formatText(user.is_blocked)}</b>
-        );
+      // case "is_blocked":
+      //   return isAdmin ? (
+      //     <BlockStatusDropdown
+      //       user={user}
+      //       updateUserStatus={updateUserStatus}
+      //       loadingId={loadingId}
+      //     />
+      //   ) : (
+      //     <b>{formatText(user.is_blocked)}</b>
+      //   );
 
       case "email_verified":
         return user.email_verified ? (
@@ -718,13 +717,13 @@ const UsersList = ({
                     isBulk={true}
                   />
 
-                  <BlockStatusDropdown
+                  {/* <BlockStatusDropdown
                     user={users}
                     updateUserStatus={handleBulkUpdate}
                     loadingId={loadingId}
                     isDisabled={bulkUpdLoading}
                     isBulk={true}
-                  />
+                  /> */}
 
                    {/* Export  */}
 

@@ -9,6 +9,7 @@ import Swal from "sweetalert2";
 import { IoMdClose } from "react-icons/io";
 import Breadcrums from "../components/helper/Breadcrums";
 import { PiMinus, PiPlus } from "react-icons/pi";
+import { isActiveUser, showToast } from "../components/helper/types";
 
 const Cart = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -148,6 +149,12 @@ const Cart = () => {
 };
 
   const handleCheckout = () => {
+    if (!isActiveUser(state?.user)){
+      return showToast({
+                icon: "error",
+                title: `Your account is  ${state?.user?.status}`,
+              });
+    }
     if (productCart.length > 0) {
       // If there are items in the cart, redirect to the checkout page
       window.location.href = "/checkout";
@@ -436,8 +443,10 @@ const Cart = () => {
             <div className="flex justify-end items-center">
               <button
                 type="submit"
+                disabled={!isActiveUser(state?.user)}
+                title={isActiveUser(state?.user)? "Checkout": `Your account is currently ${state?.user?.status}`}
                 onClick={handleCheckout}
-                className=" bg-theme-primary transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+                className=" bg-theme-primary disabled:cursor-not-allowed transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
               >
                 Go to Checkout
               </button>

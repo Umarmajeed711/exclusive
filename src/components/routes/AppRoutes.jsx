@@ -32,11 +32,13 @@ import Whishlist from "../../pages/Whishlist";
 import Category from "../Product/Category";
 import Dashboard from "../../pages/admin/Dashboard";
 import ProductDetail from "../Product/ProductDetail";
+import { useContext } from "react";
+import { GlobalContext } from "../../context/Context";
+import { isActiveUser } from "../helper/types";
 
 const AppRoutes = () => {
+  const { state } = useContext(GlobalContext);
 
-
-  
   return (
     <Routes>
       {/* ================= USER SIDE ================= */}
@@ -45,9 +47,10 @@ const AppRoutes = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/productDetail/:id" element={<ProductDetail />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/wishlist" element={<Whishlist />} />
+        <Route path="/cart" element={<Cart />} />
 
-        <Route path="/category" element={<Category />}></Route>
-        <Route path="/wishlist" element={<Whishlist />}></Route>
+        <Route path={state?.isLogin ? "/account" : "/"} element={<Account />} />
 
         {/* <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard/>} />
@@ -58,12 +61,10 @@ const AppRoutes = () => {
 
         {/* Protected user */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/account" element={<Account />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orderComplete" element={<OrderConfirmation />}/>
-          <Route path="/orders/:id" element={<OrderTrackingWrapper />}/>
-          <Route path="/myOrders" element={<OrdersPage />}/>
+          <Route path="/orderComplete" element={<OrderConfirmation />} />
+          <Route path="/orders/:id" element={<OrderTrackingWrapper />} />
+          <Route path="/myOrders" element={<OrdersPage />} />
         </Route>
       </Route>
 
@@ -72,13 +73,12 @@ const AppRoutes = () => {
       <Route path="/signup" element={<Signup />} /> */}
 
       <Route>
-         
         <Route path="/signup" element={<Signup />}></Route>
         <Route path="/verifyEmail" element={<VerifyEmail />}></Route>
         <Route path="/login" element={<Login />}></Route>
         <Route path="/forgetPassword" element={<ForgetPassword />}></Route>
-        <Route path="/resetPassword" element={<ResetPassword/>}></Route>
-       
+        <Route path="/resetPassword" element={<ResetPassword />}></Route>
+
         <Route path="*" element={<Navigate to="/login" />}></Route>
       </Route>
 
@@ -86,7 +86,7 @@ const AppRoutes = () => {
       <Route element={<AdminRoute />}>
         <Route path="/admin" element={<AdminLayout />}>
           {/* <Route index element={<Dash />} /> */}
-          <Route index element={<Dashboard/>} />
+          <Route index element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="orders" element={<Orders />} />
           {/* <Route path="products" element={<Products />} /> */}

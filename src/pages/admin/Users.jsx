@@ -103,25 +103,18 @@ const Users = () => {
       ],
     },
     {
-      key: "is_active",
-      label: "Active",
+      key: "status",
+      label: "Status",
       operators: [FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.SELECT,
       options: [
-        { label: "Active", value: true },
-        { label: "Disabled", value: false },
+        { label: "Active", value: "active" },
+        { label: "Deactive", value: "deactive" },
+         { label: "Blocked", value: "blocked" },
+
       ],
     },
-    {
-      key: "is_blocked",
-      label: "Blocked",
-      operators: [FILTER_OPERATORS.IS],
-      inputType: INPUT_TYPES.SELECT,
-      options: [
-        { label: "Not Blocked", value: false },
-        { label: "Blocked Users", value: true },
-      ],
-    },
+    
     {
       key: "email_verified",
       label: "Verified",

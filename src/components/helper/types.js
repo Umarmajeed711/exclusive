@@ -79,7 +79,7 @@ export const showToast = ({
 }) => {
   Swal.fire({
     toast: true,
-    position: "bottom-end",
+    position: "bottom-right",
     icon,
     title,
     showConfirmButton: false,
@@ -116,4 +116,8 @@ export const formatStatus = (status = "") => {
     ?.replace(/\s+/g, " ") // remove extra spaces
     ?.trim()
     ?.toUpperCase(); // convert uppercase
+};
+
+export const isActiveUser = (user) => {
+  return user?.status === "active";
 };

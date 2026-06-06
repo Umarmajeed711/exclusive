@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import Alert from "@mui/material/Alert";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../components/helper/api";
+import { showToast } from "../components/helper/types";
 
 export const Login = () => {
   let { dispatch } = useContext(GlobalContext);
@@ -30,6 +31,23 @@ export const Login = () => {
   const PasswordVisible = () => {
     setShowPassword(!showPassword);
   };
+
+  const syncCart = async (user_id) => {
+  const guestCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+  if (!guestCart.length) return;
+
+  try {
+    await api.post("/sync-cart", {
+      cartItems: guestCart,
+       user_id: user_id,
+    });
+
+    localStorage.removeItem("cart");
+  } catch (err) {
+    console.log(err);
+  }
+};
 
   const loginValidation = yup.object({
     email: yup.string().trim().email().required("Email is required"),
@@ -61,21 +79,12 @@ export const Login = () => {
         }
 
         setloading(false);
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: "success",
-          title: "Login Successfully",
-        });
+        
+
+        showToast({
+          icon:"success",
+          title:"Login Successfully"
+        })
 
         loginFormik.resetForm();
         let adminLogin =
@@ -94,6 +103,8 @@ export const Login = () => {
         } else {
           navigate(from || "/", { replace: true });
         }
+        await syncCart(response?.data?.user?.user_id);
+        
       } catch (error) {
         setloading(false);
         setApiError(error?.response?.data?.message || "Something went wrong");

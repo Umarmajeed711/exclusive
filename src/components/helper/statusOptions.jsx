@@ -253,13 +253,13 @@ export const ActiveStatusDropdown = ({
 
     if (isBulk) {
       updateUserStatus({
-        field: "is_active",
+        field: "status",
         value,
       });
     } else {
       updateUserStatus({
         userId: [user?.user_id],
-        field: "is_active",
+        field: "status",
         value,
         user: user,
       });
@@ -278,12 +278,20 @@ export const ActiveStatusDropdown = ({
         className={`w-full px-3 py-1 text-sm border rounded flex justify-between items-center
           ${user?.user_role === 1 ? "opacity-50 cursor-not-allowed" : ""}
         ${
-          user?.is_active && !isBulk
+          user?.status == "active" && !isBulk
             ? "bg-green-100 text-green-700"
-            : "bg-gray-200 text-gray-600"
+            : user?.status == "blocked" && !isBulk
+              ? "bg-red-100 text-red-700"
+              : "bg-gray-200 text-gray-600"
         }`}
       >
-        {isBulk ? "- Select -" : user?.is_active ? "Active" : "Disabled"}
+        {isBulk
+          ? "- Select -"
+          : user?.status == "active"
+            ? "Active"
+            : user?.status == "deactive"
+              ? "Deactive"
+              : "Blocked"}
         <span className="text-xs">▼</span>
       </button>
 
@@ -292,36 +300,53 @@ export const ActiveStatusDropdown = ({
         (isBulk ? (
           <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow overflow-hidden">
             <div
-              onClick={() => handleSelect(true)}
+              onClick={() => handleSelect("active")}
               className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
             >
               Make Active
             </div>
 
             <div
-              onClick={() => handleSelect(false)}
+              onClick={() => handleSelect("deactive")}
               className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
             >
-              Make Disabled
+              Make Deactive
+            </div>
+
+            <div
+              onClick={() => handleSelect("blocked")}
+              className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+            >
+              Make Blocked
             </div>
           </div>
         ) : (
           <div className="absolute z-10 mt-1 w-full bg-white border rounded shadow overflow-hidden">
-            {user?.is_active == false ? (
+            {user?.status !== "active" ? (
               <div
-                onClick={() => handleSelect(true)}
-                className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleSelect("active")}
+                className="px-3 py-2 text-sm hover:bg-green-100 cursor-pointer"
               >
                 Active
               </div>
-            ) : (
+            ) : null}
+            {user?.status !== "deactive" ? (
               <div
-                onClick={() => handleSelect(false)}
+                onClick={() => handleSelect("deactive")}
                 className="px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
               >
-                Disabled
+                Deactive
               </div>
-            )}
+            ) : null}
+
+            {user?.status !== "blocked" ? (
+              <div
+                onClick={() => handleSelect("blocked")}
+                className="px-3 py-2 text-sm hover:bg-red-100 cursor-pointer"
+              >
+                Blocked
+              </div>
+            ) : null}
           </div>
         ))}
     </div>
