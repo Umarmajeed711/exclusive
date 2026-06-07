@@ -28,7 +28,7 @@ const OurProducts = ({
   description = "",
   loading = false,
   updateProduct = () => {},
-  delProduct =  () => {},
+  delProduct = () => {},
   skeletonProducts = 4,
   onAdd = () => {},
 }) => {
@@ -39,25 +39,82 @@ const OurProducts = ({
 
   const [showModal, setShowModal] = useState(false);
 
+  // const addToFavorite = async (product_id) => {
+  //   try {
+  //     let response = await api.post("/add_to_favorite", {
+  //       user_id: state?.user?.user_id,
+  //       product_id: product_id,
+  //     });
+  //     onAdd();
+  //     dispatch({ type: "WISHLIST_RELOAD" });
+  //     showToast({
+  //       icon:"success",
+  //       title:response?.data?.message || "Add to wishlist"
+  //     })
+
+  //   } catch (error) {
+  //     showToast({
+  //       icon:"error",
+  //       title:error?.response?.data?.message || "something went wrong"
+  //     })
+  //   }
+  // };
+
   const addToFavorite = async (product_id) => {
     try {
-      let response = await api.post("/add_to_favorite", {
+      // Guest User
+      if (!state?.user?.user_id) {
+        const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+        if (wishlist.includes(product_id)) {
+          return showToast({
+            icon: "info",
+            title: "Already in wishlist",
+          });
+        }
+
+        const updatedWishlist = [...wishlist, product_id];
+
+        localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
+
+        dispatch({
+          type: "WISHLIST_CART",
+          payload: updatedWishlist,
+        });
+
+        dispatch({
+          type: "WISHLIST_RELOAD",
+        });
+
+        onAdd();
+
+        return showToast({
+          icon: "success",
+          title: "Added to wishlist",
+        });
+      }
+
+      // Logged In User
+      const response = await api.post("/add_to_favorite", {
         user_id: state?.user?.user_id,
-        product_id: product_id,
+        product_id,
       });
+
       onAdd();
-      dispatch({ type: "WISHLIST_RELOAD" });
+
+      dispatch({
+        type: "WISHLIST_RELOAD",
+      });
+
       showToast({
-        icon:"success",
-        title:response?.data?.message || "Add to wishlist"
-      })
-
-
+        icon: "success",
+        title: response?.data?.message,
+      });
     } catch (error) {
       showToast({
-        icon:"error",
-        title:error?.data?.message || "something went wrong"
-      })
+        icon: "error",
+        title: error?.response?.data?.message || "Something went wrong",
+      });
     }
   };
 
@@ -73,9 +130,36 @@ const OurProducts = ({
       cancelButtonText: "Cancel",
     });
 
+    let user_id = state?.user?.user_id;
+
     // ✅ If user confirms
     if (result?.isConfirmed) {
       let oldCart = state?.wishlist;
+
+      // Guest User
+      if (!user_id) {
+        const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+        const updatedWishlist = wishlist.filter((id) => id !== product_id);
+
+        localStorage.setItem("wishlist", JSON.stringify(updatedWishlist));
+
+        dispatch({
+          type: "WISHLIST_CART",
+          payload: updatedWishlist,
+        });
+
+        dispatch({
+          type: "WISHLIST_RELOAD",
+        });
+
+        showToast({
+          icon: "success",
+          title: "Product removed successfully",
+        });
+
+        return;
+      }
 
       dispatch({
         type: "WISHLIST_CART",
@@ -85,34 +169,22 @@ const OurProducts = ({
       });
       // let check = products?.find((fav) => fav?.product_id === product_id);
       try {
-        let user_id = state?.user?.user_id;
-
         let response = await api.delete(
           `/remove_to_favorite?user_id=${user_id}&product_id=${product_id}`,
         );
         // Success toast
-        Swal.fire({
+
+        showToast({
           icon: "success",
-          title: "Product Removed Successfully",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
+          title: response?.data?.message || "Product Removed Successfully",
         });
         dispatch({ type: "WISHLIST_RELOAD" });
         // delProduct(product_id);
       } catch (error) {
-
-        // Error toast
-        Swal.fire({
+        showToast({
           icon: "error",
-          title: error?.response?.data?.message || "Something went wrong",
-          toast: true,
-          position: "bottom-left",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
+          title:
+            error?.response?.data?.message || "Product Removed Successfully",
         });
 
         dispatch({
@@ -146,24 +218,21 @@ const OurProducts = ({
       try {
         let response = await api.delete(`/product/${id}`);
 
-       
-      showToast({
-        icon:"success",
-        title:"Product deleted successfully"
-      });
-
-       
         showToast({
-          icon:"success",
-          title: "Product deleted successfully"
+          icon: "success",
+          title: "Product deleted successfully",
+        });
 
-        })
+        showToast({
+          icon: "success",
+          title: "Product deleted successfully",
+        });
         delProduct(id);
       } catch (error) {
         showToast({
-        icon:"error",
-        title:error?.data?.message || "something went wrong"
-      })
+          icon: "error",
+          title: error?.response?.data?.message || "something went wrong",
+        });
       }
     }
   };
@@ -250,73 +319,73 @@ const OurProducts = ({
   //     setcartLoading(false);
   //   }
   // };
-  
 
   const addtoCart = async (product) => {
-  setcartLoading(true);
+    setcartLoading(true);
 
-  try {
-    // Guest User
-    if (!state?.user?.user_id) {
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    try {
+      // Guest User
+      if (!state?.user?.user_id) {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-      const existingProduct = cart.find(
-        (item) => item.productId === product.product_id
-      );
+        const existingProduct = cart.find(
+          (item) => item.product_id === product.product_id,
+        );
 
-      if (existingProduct) {
-        existingProduct.quantity += 1;
-      } else {
-        cart.push({
-          productId: product.product_id,
-          productName: product.name,
-          productPrice: product.price,
-          productDiscount: product.discount,
-          productImage: product?.image_urls[0],
-          productSize: product?.sizes[0],
-          productColor: product?.colors[0],
-          quantity: 1,
+        if (existingProduct) {
+          existingProduct.quantity += 1;
+        } else {
+          cart.push({
+            product_id: product.product_id,
+            name: product.name,
+            category_name: product?.category_name,
+            price: product.price,
+            discount: product.discount,
+            image_url: product?.image_urls[0],
+            sizes: product?.sizes[0],
+            colors: product?.colors[0],
+            quantity: 1,
+          });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        dispatch({ type: "TOGGLE_CART" });
+
+        return showToast({
+          icon: "success",
+          title: "Product added to cart",
         });
       }
 
-      localStorage.setItem("cart", JSON.stringify(cart));
+      // Logged In User
+      const response = await api.post("/add-cart", {
+        productId: product.product_id,
+        productName: product.name,
+        productPrice: product.price,
+        productDiscount: product.discount,
+        productImage: product?.image_urls[0],
+        productSize: product?.sizes[0],
+        productColor: product?.colors[0],
+        quantity: 1,
+        user_id: state.user.user_id,
+      });
 
       dispatch({ type: "TOGGLE_CART" });
 
-      return showToast({
+      showToast({
         icon: "success",
-        title: "Product added to cart",
+        title: response?.data?.message,
       });
+    } catch (e) {
+      showToast({
+        icon: "error",
+        title: e?.response?.data?.message || "Something went wrong",
+      });
+    } finally {
+      setcartLoading(false);
     }
-
-    // Logged In User
-    const response = await api.post("/add-cart", {
-      productId: product.product_id,
-      productName: product.name,
-      productPrice: product.price,
-      productDiscount: product.discount,
-      productImage: product?.image_urls[0],
-      productSize: product?.sizes[0],
-      productColor: product?.colors[0],
-      quantity: 1,
-      user_id: state.user.user_id,
-    });
-
-    dispatch({ type: "TOGGLE_CART" });
-
-    showToast({
-      icon: "success",
-      title: response?.data?.message,
-    });
-  } catch (e) {
-    showToast({
-      icon: "error",
-      title: e?.response?.data?.message || "Something went wrong",
-    });
-  } finally {
-    setcartLoading(false);
-  }
-};
+  };
 
   // const products = [
   //   {
@@ -386,7 +455,13 @@ const OurProducts = ({
                   {/* Image & hover */}
                   <div className="relative w-full  h-64 aspect-square overflow-hidden   flex justify-center items-center   bg-slate-100  ">
                     <img
-                      src={product?.main_image || product?.image_urls[0] || ""}
+                      src={
+                        product?.main_image ||
+                        (product?.image_urls?.length > 0
+                          ? product?.image_urls[0]
+                          : "") ||
+                        ""
+                      }
                       alt={product?.name}
                       className=" h-[50%]  object-cover group-hover:scale-105 transition "
                       // className="h-full w-full object-contain group-hover:scale-105 transition"

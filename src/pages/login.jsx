@@ -44,10 +44,38 @@ export const Login = () => {
     });
 
     localStorage.removeItem("cart");
-  } catch (err) {
-    console.log(err);
+  } catch (error) {
+    showToast({
+      icon:"error",
+      title:error?.response?.data?.message || "Faild to sync cart"
+    })
   }
 };
+
+const syncWishlist = async (user_id) => {
+  try {
+    const guestWishlist =
+  JSON.parse(localStorage.getItem("wishlist")) || [];
+
+if (guestWishlist.length > 0) {
+  await api.post("/sync-wishlist", {
+    user_id: user_id,
+    wishlist: guestWishlist,
+  });
+
+  localStorage.removeItem("wishlist");
+}
+    
+  } catch (error) {
+    showToast({
+      icon:"error",
+      title:error?.response?.data?.message || "Faild to sync wishlist"
+    })
+    
+  }
+}
+
+
 
   const loginValidation = yup.object({
     email: yup.string().trim().email().required("Email is required"),
@@ -103,7 +131,10 @@ export const Login = () => {
         } else {
           navigate(from || "/", { replace: true });
         }
-        await syncCart(response?.data?.user?.user_id);
+
+        const user_id = response?.data?.user?.user_id;
+        await syncCart(user_id);
+        await syncWishlist(user_id);
         
       } catch (error) {
         setloading(false);

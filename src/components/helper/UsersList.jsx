@@ -362,7 +362,7 @@ const UsersList = ({
         setUsers(previosOrders);
         showToast({
           icon: "error",
-          title: error?.data?.message || "Failed to Delete",
+          title: error?.response?.data?.message || "Failed to Delete",
         });
       } finally {
         setBulkUpdLoading(false);
@@ -419,7 +419,7 @@ const UsersList = ({
       } catch (error) {
         showToast({
           icon: "error",
-          title: error?.data?.message || "Failed to Delete",
+          title: error?.response?.data?.message || "Failed to Delete",
         });
 
         setUsers(previousOrders);
@@ -506,7 +506,7 @@ const UsersList = ({
       
       showToast({
         icon: "error",
-        title: error?.data?.message || "Failed to Update Status",
+        title: error?.response?.data?.message || "Failed to Update Status",
       });
     } finally {
       setLoadingId(null);
@@ -557,7 +557,7 @@ const UsersList = ({
 
         showToast({
           icon: "error",
-          title: error?.data?.message || "Failed to Delete",
+          title: error?.response?.data?.message || "Failed to Delete",
         });
       }
     }

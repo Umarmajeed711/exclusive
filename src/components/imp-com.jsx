@@ -79,7 +79,7 @@ const App = () => {
       dispatch({ type: "USER_LOGOUT" });
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     }
   };
@@ -127,7 +127,7 @@ useEffect(() => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     }
     finally{
@@ -143,7 +143,7 @@ useEffect(() => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       dispatch({ type: "WISHLIST_LODING_CART",payload:false});

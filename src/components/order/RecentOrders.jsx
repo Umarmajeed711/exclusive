@@ -54,7 +54,7 @@ const RecentOrders = () => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       setloading(false);
@@ -118,7 +118,7 @@ const RecentOrders = () => {
 
         showToast({
           icon: "error",
-          title: error?.data?.message || "Failed to delete Order",
+          title: error?.response?.data?.message || "Failed to delete Order",
         });
       }
     }

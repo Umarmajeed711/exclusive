@@ -338,7 +338,7 @@ const OrderList = ({
         } catch (error) {
           showToast({
             icon: "error",
-            title: error?.data?.message || "Something went wrong",
+            title: error?.response?.data?.message || "Something went wrong",
           });
           setOrders(previousOrders);
         } finally {

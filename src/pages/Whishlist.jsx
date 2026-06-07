@@ -17,10 +17,6 @@ const Whishlist = () => {
 
   let isAdmin = state?.isAdmin;
 
-  
-
-  
-
   const [products, setProducts] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,27 +31,28 @@ const Whishlist = () => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       setLoading(false);
     }
   };
 
-  const getWishlist = async () => {
-    try {
-      setLoadWhishlist(true);
-      let result = await api.get(`/wishlist?user_id=${state?.user.user_id}`);
-      setWishlist(result.data.products);
-    } catch (error) {
-      showToast({
-        icon:"error",
-        title:error?.data?.message || "something went wrong"
-      })
-    } finally {
-      setLoadWhishlist(false);
-    }
-  };
+  // const getWishlist = async () => {
+  //   const user_id = state?.user?.user_id;
+  //   try {
+  //     setLoadWhishlist(true);
+  //     let result = await api.get(`/wishlist?user_id=${user_id}`);
+  //     setWishlist(result.data.products);
+  //   } catch (error) {
+  //     showToast({
+  //       icon:"error",
+  //       title:error?.response?.data?.message || "something went wrong"
+  //     })
+  //   } finally {
+  //     setLoadWhishlist(false);
+  //   }
+  // };
 
     useEffect(() => {
     setWishlist(state?.wishlist);

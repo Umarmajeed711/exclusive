@@ -45,7 +45,7 @@ const ProductDetail = () => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       setProductLoading(false);
@@ -69,7 +69,7 @@ const ProductDetail = () => {
     } catch (error) {
        showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     }
   };
@@ -171,7 +171,7 @@ const ProductDetail = () => {
     } catch (error) {
        showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       setRatingLoading(false);
@@ -207,57 +207,74 @@ const ProductDetail = () => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     }
   };
 
   // function for add to cart
-  const addtoCart = async () => {
+ const addtoCart = async (product) => {
     setcartLoading(true);
-    try {
-      let response = await api.post("/add-cart", {
-        productId: Product.product_id,
-        productName: Product.name,
-        productPrice: Product.price,
-        productDiscount: Product.discount,
-        productImage: Product?.image_urls[0],
-        productSize: selectedSize,
-        productColor: selectedColor,
-        quantity: counter,
-        user_id: state?.user.user_id,
-      });
-      dispatch({ type: "TOGGLE_CART" });
-      // const Toast = Swal.mixin({
-      //   toast: true,
-      //   position: "bottem-left",
-      //   showConfirmButton: false,
-      //   timer: 3000,
-      //   timerProgressBar: true,
-      //   didOpen: (toast) => {
-      //     toast.onmouseenter = Swal.stopTimer;
-      //     toast.onmouseleave = Swal.resumeTimer;
-      //   },
-      // });
-      // Toast.fire({
-      //   icon: "success",
-      //   title: "Add product successfully",
-      // });
-      
-      showToast({
-        icon:"success",
-        title:response?.date?.message || "Add product successfully"
-      })
 
-      setSelectedColor(Product?.colors[0]);
-      setSelectedSize(Product?.sizes[0]);
-      setCounter("1");
-    } catch (e) {
-      console.error("Error adding document: ", e);
+    try {
+      // Guest User
+      if (!state?.user?.user_id) {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+        const existingProduct = cart.find(
+          (item) => item.product_id === product?.product_id,
+        );
+
+        if (existingProduct) {
+          existingProduct.quantity += 1;
+        } else {
+          cart.push({
+            product_id: product.product_id,
+            name: product.name,
+            category_name: product?.category_name,
+            price: product.price,
+            discount: product.discount,
+            image_url: product?.image_urls[0],
+            sizes: product?.sizes[0],
+            colors: product?.colors[0],
+            quantity: 1,
+          });
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        dispatch({ type: "TOGGLE_CART" });
+
+        return showToast({
+          icon: "success",
+          title: "Product added to cart",
+        });
+      }
+
+      // Logged In User
+      const response = await api.post("/add-cart", {
+        productId: product.product_id,
+        productName: product.name,
+        productPrice: product.price,
+        productDiscount: product.discount,
+        productImage: product?.image_urls[0],
+        productSize: product?.sizes[0],
+        productColor: product?.colors[0],
+        quantity: 1,
+        user_id: state.user.user_id,
+      });
+
+      dispatch({ type: "TOGGLE_CART" });
+
       showToast({
-        icon:"error",
-        title:e?.data?.message || "Something went wrong"
-      })
+        icon: "success",
+        title: response?.data?.message,
+      });
+    } catch (e) {
+      showToast({
+        icon: "error",
+        title: e?.response?.data?.message || "Something went wrong",
+      });
     } finally {
       setcartLoading(false);
     }
@@ -541,7 +558,11 @@ const ProductDetail = () => {
                 </div>
                 <button
                   className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded-md px-6 hover:shadow-xl  text-base sm:text-xl  "
-                  onClick={addtoCart}
+                   onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addtoCart(Product);
+                      }}
                   disabled={cartloading}
                   type="submit"
                 >

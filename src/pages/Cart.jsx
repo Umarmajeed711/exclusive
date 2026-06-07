@@ -74,82 +74,218 @@ const Cart = () => {
     setDeliveryFee(deliveryFeeAmount);
   }, [productCart]);
 
-  const deleteCart = async (user_id, cart_id) => {
+  // const deleteCart = async (user_id, cart_id) => {
 
-    let oldCart = state?.cart;
+  //   let oldCart = state?.cart;
 
-    dispatch({type:"UPDATE_CART",
-      payload:state?.cart?.filter((item) => item.cart_id !== cart_id)
-    })
-    try {
-      let response = await api.post("/remove-cart", {
-        user_id: user_id,
-        cart_id: cart_id,
-      });
-      // setToggleCart(!toggleCart);
-      Swal.fire("Deleted!", "Product removed successfully", "success");
-      dispatch({ type: "TOGGLE_CART" });
-      // dispatch({
-      //   type: "UPDATE_CART",
-      //   payload: state?.cart.filter((item) => item?.cart_id !== cart_id),
-      // });
-    } catch (error) {
-       Swal.fire("Error!", "Something went wrong", "error");
-      dispatch({
+  //   dispatch({type:"UPDATE_CART",
+  //     payload:state?.cart?.filter((item) => item.cart_id !== cart_id)
+  //   })
+  //   try {
+  //     let response = await api.post("/remove-cart", {
+  //       user_id: user_id,
+  //       cart_id: cart_id,
+  //     })
+
+  //     showToast({
+  //       icon:"success",
+  //       title:"Product removed successfully"
+  //     });
+
+  //     dispatch({ type: "TOGGLE_CART" });
+      
+  //   } catch (error) {
+  //     showToast({
+  //       icon:"success",
+  //       title:error?.response?.data?.message || "Product removed successfully"
+  //     });
+
+  //     dispatch({
+  //     type: "UPDATE_CART",
+  //     payload: oldCart,
+  //   });
+
+  //   }
+  // };
+
+  const deleteCart = async (user_id, cart) => {
+  const oldCart = state?.cart;
+
+  // Guest User
+  if (!user_id) {
+    const updatedCart = state?.cart?.filter(
+      (item) => item.product_id !== cart?.product_id
+    );
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
+    );
+
+    dispatch({
+      type: "UPDATE_CART",
+      payload: updatedCart,
+    });
+
+    showToast({
+      icon: "success",
+      title: "Product removed successfully",
+    });
+
+    return;
+  }
+
+  // Logged In User
+  dispatch({
+    type: "UPDATE_CART",
+    payload: state?.cart?.filter(
+      (item) => item.cart_id !== cart?.cart_id
+    ),
+  });
+
+  try {
+    await api.post("/remove-cart", {
+      user_id :user_id,
+      cart_id:cart?.cart_id,
+    });
+
+    showToast({
+      icon: "success",
+      title: "Product removed successfully",
+    });
+
+    dispatch({ type: "TOGGLE_CART" });
+  } catch (error) {
+    dispatch({
       type: "UPDATE_CART",
       payload: oldCart,
     });
 
-    }
-  };
+    showToast({
+      icon: "error",
+      title:
+        error?.response?.data?.message ||
+        "Something went wrong",
+    });
+  }
+};
 
-  const handleQuantity = async (cartItem, type) => {
+//   const handleQuantity = async (cartItem, type) => {
+//   const oldCart = state.cart;
+
+//   let updatedCart = state?.cart?.map((item) => {
+//     if (item?.cart_id === cartItem?.cart_id) {
+//       let newQty =
+//         type === "increase"
+//           ? item.quantity + 1
+//           : item.quantity - 1;
+
+      
+//       if (newQty < 1) return item;
+
+//       return { ...item, quantity: newQty };
+//     }
+//     return item;
+//   });
+
+//   // ✅ 1. Instant UI update
+//   dispatch({
+//     type: "UPDATE_CART",
+//     payload: updatedCart,
+//   });
+
+//   try {
+//     // ✅ 2. Backend update
+//     await api.put("/update-cart-quantity", {
+//       cart_id: cartItem.cart_id,
+//       quantity:
+//         type === "increase"
+//           ? cartItem.quantity + 1
+//           : cartItem.quantity - 1,
+//     });
+//   } catch (error) {
+
+//     // ❌ rollback
+//     dispatch({
+//       type: "UPDATE_CART",
+//       payload: oldCart,
+//     });
+
+//     Swal.fire("Error!", "Quantity update failed", "error");
+//   }
+// };
+
+const handleQuantity = async (cartItem, type) => {
   const oldCart = state.cart;
 
-  let updatedCart = state?.cart?.map((item) => {
-    if (item?.cart_id === cartItem?.cart_id) {
-      let newQty =
+  let updatedCart = state.cart.map((item) => {
+    const isCurrentItem = state?.user?.user_id
+      ? item.cart_id === cartItem.cart_id
+      : item.product_id === cartItem.product_id;
+
+    if (isCurrentItem) {
+      const newQty =
         type === "increase"
           ? item.quantity + 1
           : item.quantity - 1;
 
-      
       if (newQty < 1) return item;
 
-      return { ...item, quantity: newQty };
+      return {
+        ...item,
+        quantity: newQty,
+      };
     }
+
     return item;
   });
 
-  // ✅ 1. Instant UI update
+  // Optimistic update
   dispatch({
     type: "UPDATE_CART",
     payload: updatedCart,
   });
 
   try {
-    // ✅ 2. Backend update
-    await api.put("/update-cart-quantity", {
-      cart_id: cartItem.cart_id,
-      quantity:
-        type === "increase"
-          ? cartItem.quantity + 1
-          : cartItem.quantity - 1,
-    });
-  } catch (error) {
+    // Guest User
+    if (!state?.user?.user_id) {
+      localStorage.setItem(
+        "cart",
+        JSON.stringify(updatedCart)
+      );
 
-    // ❌ rollback
+      return;
+    }
+
+    const quantity = type === "increase"
+            ? cartItem.quantity + 1
+            : cartItem.quantity - 1
+
+    if(quantity >= 1){
+
+      // Logged In User
+      await api.put("/update-cart-quantity", {
+        cart_id: cartItem.cart_id,
+        quantity:
+         quantity,
+      });
+    }
+
+  } catch (error) {
+    // Rollback
     dispatch({
       type: "UPDATE_CART",
       payload: oldCart,
     });
-
-    Swal.fire("Error!", "Quantity update failed", "error");
+    showToast({
+      icon:"error",
+      title:error?.response?.data?.message || "Quantity update failed"
+    })
   }
 };
 
   const handleCheckout = () => {
-    if (!isActiveUser(state?.user)){
+    if (!isActiveUser(state?.user) && state?.isLogin){
       return showToast({
                 icon: "error",
                 title: `Your account is  ${state?.user?.status}`,
@@ -239,18 +375,28 @@ const Cart = () => {
                         {cart.quantity}
                       </div> */}
                       <div className="col-span-1 flex items-center gap-3">
-  <button onClick={() => handleQuantity(cart, "decrease")} className={`shadow p-1 py-2 ${cart.quantity <= 1 ? "cursor-not-allowed" : "cursor-pointer"}`}><PiMinus  /></button>
+  <button onClick={() => handleQuantity(cart, "decrease")} disabled={cart?.quantity <= 1}  className={`shadow p-1 py-2 ${cart?.quantity <= 1 ? "cursor-not-allowed" : "cursor-pointer"}`}><PiMinus  /></button>
   
   <span>{cart.quantity}</span>
   
-  <button onClick={() => handleQuantity(cart, "increase")} className="shadow p-1 py-2 cursor-pointer"><PiPlus /></button>
+  <button
+  onClick={() => handleQuantity(cart, "increase")}
+  disabled={cart?.quantity >= cart?.stock}
+  className={`shadow p-1 py-2 ${
+    cart.quantity >= cart.stock
+      ? "cursor-not-allowed opacity-50"
+      : "cursor-pointer"
+  }`}
+>
+  <PiPlus />
+</button>
 </div>
                       {/* color */}
                       <div className="col-span-1 flex items-center justify-center">
                         <span
                           className="h-5 ms-1 w-5 rounded-full absolute"
                           style={{
-                            backgroundColor: cart.colors.toLowerCase(),
+                            backgroundColor: cart?.colors?.toLowerCase(),
                           }}
                         ></span>
                       </div>
@@ -276,7 +422,7 @@ const Cart = () => {
                             }).then(async (result) => {
                               /* Read more about isConfirmed, isDenied below */
                               if (result.isConfirmed) {
-                               await deleteCart(cart.user_id, cart.cart_id);
+                               await deleteCart(cart.user_id, cart);
                                 // Swal.fire("Delete!", "", "success");
                               }
                             });
@@ -306,7 +452,7 @@ const Cart = () => {
                             }).then((result) => {
                               /* Read more about isConfirmed, isDenied below */
                               if (result.isConfirmed) {
-                                deleteCart(cart.user_id, cart.cart_id);
+                                deleteCart(cart.user_id, cart);
                                 Swal.fire("Delete!", "", "success");
                               }
                             });
@@ -363,7 +509,7 @@ const Cart = () => {
                         <div
                           className="h-5 ms-1 w-5 rounded-full "
                           style={{
-                            backgroundColor: cart.colors.toLowerCase(),
+                            backgroundColor: cart?.colors?.toLowerCase(),
                           }}
                         ></div>
                       </div>
@@ -443,8 +589,8 @@ const Cart = () => {
             <div className="flex justify-end items-center">
               <button
                 type="submit"
-                disabled={!isActiveUser(state?.user)}
-                title={isActiveUser(state?.user)? "Checkout": `Your account is currently ${state?.user?.status}`}
+                disabled={!isActiveUser(state?.user) && state?.isLogin}
+                title={!isActiveUser(state?.user) && state?.isLogin   ?  `Your account is currently ${state?.user?.status}` : "Checkout"}
                 onClick={handleCheckout}
                 className=" bg-theme-primary disabled:cursor-not-allowed transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
               >

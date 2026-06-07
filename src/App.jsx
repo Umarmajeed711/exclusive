@@ -56,16 +56,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (state?.user?.user_id) {
+    // if (state?.user?.user_id) {
       getCartProduct(state.user.user_id);
-    }
-  }, [state?.isReloadCart]);
+    // }
+  }, [state?.isReloadCart,state?.isLogin]);
 
   useEffect(() => {
-    if (state?.user?.user_id) {
+    // if (state?.user?.user_id) {
       getWishlist(state.user.user_id);
-    }
-  }, [state?.isWishlistReload]);
+    // }
+  }, [state?.isWishlistReload,state?.isLogin]);
 
   const getCartProduct = async (user_id) => {
     dispatch({ type: "LODING_CART", payload: true });
@@ -87,7 +87,7 @@ const App = () => {
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       dispatch({ type: "LODING_CART", payload: false });
@@ -96,13 +96,41 @@ const App = () => {
 
   const getWishlist = async (user_id) => {
     dispatch({ type: "WISHLIST_LODING_CART", payload: true });
+    
     try {
+         if (!user_id) {
+      const wishlistIds =
+        JSON.parse(localStorage.getItem("wishlist")) || [];
+
+      if (!wishlistIds.length) {
+        return dispatch({
+          type: "WISHLIST_CART",
+          payload: [],
+        });
+      }
+
+      const response = await api.post(
+        "/wishlist-products",
+        {
+          productIds: wishlistIds,
+        }
+      );
+
+      dispatch({
+        type: "WISHLIST_CART",
+        payload: response.data.products,
+      });
+
+      return;
+    }
+
+
       let result = await api.get(`/wishlist?user_id=${user_id}`);
       dispatch({ type: "WISHLIST_CART", payload: result.data.products });
     } catch (error) {
       showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       dispatch({ type: "WISHLIST_LODING_CART", payload: false });

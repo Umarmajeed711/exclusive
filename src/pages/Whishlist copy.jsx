@@ -31,7 +31,7 @@ const Whishlist = () => {
     } catch (error) {
        showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       setLoading(false);
@@ -46,7 +46,7 @@ const Whishlist = () => {
     } catch (error) {
        showToast({
         icon:"error",
-        title:error?.data?.message || "something went wrong"
+        title:error?.response?.data?.message || "something went wrong"
       })
     } finally {
       setLoadWhishlist(false);
