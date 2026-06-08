@@ -321,6 +321,7 @@ const OurProducts = ({
   // };
 
   const addtoCart = async (product) => {
+    if (product?.quantity <= 0) return;
     setcartLoading(true);
 
     try {
@@ -562,7 +563,7 @@ const OurProducts = ({
                         // alert(`Add ${product?.name} to cart`);
                         addtoCart(product);
                       }}
-                      disabled={cartLoading}
+                      disabled={cartLoading || product?.quantity <= 0}
                       className={`absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition ${cartLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
                     >
                       Add to Cart

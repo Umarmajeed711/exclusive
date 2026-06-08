@@ -214,6 +214,7 @@ const ProductDetail = () => {
 
   // function for add to cart
  const addtoCart = async (product) => {
+   if (product?.quantity <= 0) return;
     setcartLoading(true);
 
     try {
@@ -225,6 +226,7 @@ const ProductDetail = () => {
           (item) => item.product_id === product?.product_id,
         );
 
+      
         if (existingProduct) {
           existingProduct.quantity += 1;
         } else {
@@ -235,9 +237,9 @@ const ProductDetail = () => {
             price: product.price,
             discount: product.discount,
             image_url: product?.image_urls[0],
-            sizes: product?.sizes[0],
-            colors: product?.colors[0],
-            quantity: 1,
+            sizes: selectedSize,
+            colors: selectedColor,
+            quantity: counter,
           });
         }
 
@@ -258,9 +260,9 @@ const ProductDetail = () => {
         productPrice: product.price,
         productDiscount: product.discount,
         productImage: product?.image_urls[0],
-        productSize: product?.sizes[0],
-        productColor: product?.colors[0],
-        quantity: 1,
+        productSize: selectedSize,
+        productColor: selectedColor,
+        quantity: counter,
         user_id: state.user.user_id,
       });
 
@@ -557,13 +559,13 @@ const ProductDetail = () => {
                   </button>
                 </div>
                 <button
-                  className="flex-grow transition-all duration-300 bg-theme-primary border border-transparent text-white py-2 rounded-md px-6 hover:shadow-xl  text-base sm:text-xl  "
+                  className="flex-grow transition-all duration-300 disabled:cursor-not-allowed bg-theme-primary border border-transparent text-white py-2 rounded-md px-6 hover:shadow-xl  text-base sm:text-xl  "
                    onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         addtoCart(Product);
                       }}
-                  disabled={cartloading}
+                  disabled={cartloading || Product?.quantity <= 0}
                   type="submit"
                 >
                   {cartloading ? (
