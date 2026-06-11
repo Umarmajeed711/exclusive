@@ -330,10 +330,19 @@ const OurProducts = ({
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
         const existingProduct = cart.find(
-          (item) => item.product_id === product.product_id,
+          (item) =>
+            item.product_id === product.product_id &&
+            item.sizes === product?.sizes[0] &&
+            item.colors === product?.colors[0],
         );
 
         if (existingProduct) {
+          if (existingProduct.quantity + 1 > product.quantity) {
+            return showToast({
+              icon: "error",
+              title: `Only ${product.quantity} item(s) available in stock`,
+            });
+          }
           existingProduct.quantity += 1;
         } else {
           cart.push({
