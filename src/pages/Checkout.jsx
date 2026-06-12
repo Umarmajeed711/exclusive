@@ -7,6 +7,7 @@ import api from "../components/helper/api";
 import { loadStripe } from "@stripe/stripe-js";
 import Breadcrums from "../components/helper/Breadcrums";
 import Swal from "sweetalert2";
+import { showToast } from "../components/helper/types";
 
 const stripePromise = loadStripe(
   "pk_test_51RzAxGPWEiSO1R9cQzeOZ1uKA3zhy3I3k3TXdRRAyioYt52AJH1qCeRgWQoLBrXVcunvUZjo2vK0rqezkM8fi7Bx00dNeqyJXf",
@@ -99,7 +100,10 @@ const Checkout = () => {
             navigate("/orderComplete");
           }
         } catch (error) {
-          Swal.fire("Error!", "Something went wrong", "error");
+          showToast({
+            icon:"error",
+            title:error?.response?.data?.message || ""
+          })
         }
         finally{
           setloading(false);

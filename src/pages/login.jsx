@@ -32,23 +32,33 @@ export const Login = () => {
     setShowPassword(!showPassword);
   };
 
-  const syncCart = async (user_id) => {
+const syncCart = async (user_id) => {
   const guestCart = JSON.parse(localStorage.getItem("cart")) || [];
 
   if (!guestCart.length) return;
 
   try {
-    await api.post("/sync-cart", {
-      cartItems: guestCart,
-       user_id: user_id,
-    });
+   const response = await api.post("/sync-cart", {
+  cartItems: guestCart,
+});
 
-    localStorage.removeItem("cart");
+const { failedItems } = response.data;
+
+if (failedItems.length > 0) {
+  localStorage.setItem(
+    "cart",
+    JSON.stringify(failedItems)
+  );
+
+  showToast({
+    icon: "warning",
+    title: `${failedItems.length} item(s) could not be synced`,
+  });
+} else {
+  localStorage.removeItem("cart");
+}
   } catch (error) {
-    showToast({
-      icon:"error",
-      title:error?.response?.data?.message || "Faild to sync cart"
-    })
+    
   }
 };
 

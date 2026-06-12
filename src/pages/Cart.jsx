@@ -114,7 +114,7 @@ const Cart = () => {
   // Guest User
   if (!user_id) {
     const updatedCart = state?.cart?.filter(
-      (item) => item.product_id !== cart?.product_id
+      (item) => item.cart_id !== cart?.cart_id
     );
 
     localStorage.setItem(
@@ -215,13 +215,87 @@ const Cart = () => {
 //   }
 // };
 
+
+useEffect(() => {
+  if (state?.user?.user_id) return;
+
+  const guestCart =
+    JSON.parse(localStorage.getItem("cart")) || [];
+
+  if (!guestCart.length) return;
+
+  fetchGuestStock(guestCart);
+}, []);
+
+const fetchGuestStock = async (guestCart) => {
+  try {
+    const productIds = [
+      ...new Set(
+        guestCart.map(
+          (item) => item.product_id
+        )
+      ),
+    ];
+
+    const response = await api.post(
+      "/guest-cart-stock",
+      {
+        productIds,
+      }
+    );
+
+    const stockMap = {};
+
+    response.data.forEach((product) => {
+      stockMap[product.product_id] =
+        product.stock;
+    });
+
+    const updatedCart = guestCart.map(
+      (item) => ({
+        ...item,
+        stock:
+          stockMap[item.product_id] || 0,
+      })
+    );
+
+    dispatch({
+      type: "UPDATE_CART",
+      payload: updatedCart,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const handleQuantity = async (cartItem, type) => {
-  const oldCart = state.cart;
+
+   const oldCart = state.cart;
+
+
+  const nextQuantity =
+  type === "increase"
+    ? cartItem.quantity + 1
+    : cartItem.quantity - 1;
+
+if (nextQuantity < 1) return;
+
+if (
+  type === "increase" &&
+  nextQuantity > cartItem.stock
+) {
+  return showToast({
+    icon: "error",
+    title: `Only ${cartItem.stock} item(s) available`,
+  });
+}
+
+ 
 
   let updatedCart = state.cart.map((item) => {
-    const isCurrentItem = state?.user?.user_id
-      ? item.cart_id === cartItem.cart_id
-      : item.product_id === cartItem.product_id;
+    const isCurrentItem = 
+       item.cart_id === cartItem.cart_id;
+      
 
     if (isCurrentItem) {
       const newQty =

@@ -250,6 +250,7 @@ const ProductDetail = () => {
   }
 
           cart.push({
+            cart_id: crypto.randomUUID(),
             product_id: product.product_id,
             name: product.name,
             category_name: product?.category_name,

@@ -337,7 +337,7 @@ const OurProducts = ({
         );
 
         if (existingProduct) {
-          if (existingProduct.quantity + 1 > product.quantity) {
+          if ((existingProduct.quantity + 1) > product.quantity) {
             return showToast({
               icon: "error",
               title: `Only ${product.quantity} item(s) available in stock`,
@@ -346,6 +346,7 @@ const OurProducts = ({
           existingProduct.quantity += 1;
         } else {
           cart.push({
+            cart_id: crypto.randomUUID(),
             product_id: product.product_id,
             name: product.name,
             category_name: product?.category_name,
@@ -474,10 +475,7 @@ const OurProducts = ({
                       }
                       alt={product?.name}
                       className=" h-[50%]  object-cover group-hover:scale-105 transition "
-                      // className="h-full w-full object-contain group-hover:scale-105 transition"
                     />
-
-                    {/* <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition" /> */}
 
                     {/* Favorite & Quick View */}
                     <div className="absolute top-2 right-2 z-10 flex flex-col gap-2">
@@ -487,7 +485,6 @@ const OurProducts = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            // alert("Remove to favorite");
                             removeToFavorite(product?.product_id);
                           }}
                         >
@@ -499,7 +496,6 @@ const OurProducts = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            // alert("Add to favorite");
                             addToFavorite(product?.product_id);
                           }}
                         >
@@ -564,19 +560,26 @@ const OurProducts = ({
                       </div>
                     ) : null}
 
-                    {/* Add to Cart on hover */}
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        // alert(`Add ${product?.name} to cart`);
-                        addtoCart(product);
-                      }}
-                      disabled={cartLoading || product?.quantity <= 0}
-                      className={`absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition ${cartLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
-                    >
-                      Add to Cart
-                    </button>
+                    {product?.quantity < 1 ? (
+                      <button
+                        className={`absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-red-300 text py-2 opacity-0 group-hover:opacity-90 transition "cursor-not-allowed" `}
+                      >
+                        SOLD OUT
+                      </button>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          // alert(`Add ${product?.name} to cart`);
+                          addtoCart(product);
+                        }}
+                        disabled={cartLoading || product?.quantity <= 0}
+                        className={`absolute bottom-0 w-full text-center rounded-0 overflow-hidden bg-black text-white py-2 opacity-0 group-hover:opacity-90 transition ${cartLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
+                      >
+                        Add to Cart
+                      </button>
+                    )}
                   </div>
 
                   {/* Product Info */}

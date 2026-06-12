@@ -7,7 +7,7 @@ export const reducer = (state, action) => {
         return {...state, isLogin: true , user: action.payload , isAdmin : true}
       }
       case "USER_LOGOUT": {
-        return { ...state, isLogin: false , isAdmin: false } // set this to null on purpose, do not change
+        return { ...state, isLogin: false , isAdmin: false , user: "" } // set this to null on purpose, do not change
       }
       case "CATEGORY_LIST": {
         return { ...state, categoryList:action.payload } // set this to null on purpose, do not change
