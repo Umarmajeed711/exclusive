@@ -144,21 +144,21 @@ const AddProduct = () => {
     setProducts((prev) => prev.filter((p) => p.product_id !== id));
   };
 
-  const onSuccess = ({ position, icon, message, product }) => {
+  const onSuccess = ({icon, title, product }) => {
     getProducts();
     setProjectData({});
     setShowModal(false);
 
     showToast({
       icon: icon,
-      title: message,
+      title: title,
     });
   };
 
-  const OnError = ({ position, icon, message }) => {
+  const OnError = ({icon, title }) => {
     showToast({
       icon: icon,
-      title: message,
+      title: title,
     });
   };
 

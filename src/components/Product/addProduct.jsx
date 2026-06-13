@@ -22,7 +22,7 @@ const DiscountField = ({ originalPrice = 0, formik, loading }) => {
 
   return (
     <div className="space-y-3">
-      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+      <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
         Discount
       </span>
 
@@ -95,7 +95,7 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
 
   return (
     <div className="relative">
-      <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+      <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
         Category
       </span>
 
@@ -405,23 +405,28 @@ const AddProductForm = ({
       {/*Add Project Form */}
 
       <div
-        className="border  w-full   overflow-hidden h-full  bg-gray-200"
-        style={{ boxShadow: "0 0 10px #03A9F4  " }}
+        className=" w-full
+  h-full
+  overflow-hidden
+  bg-gray-100
+  border
+  border-gray-200
+  shadow-xl"
       >
         <div className="flex justify-center items-center flex-col h-full ">
           <form
             onSubmit={addProjectFormik.handleSubmit}
-            className=" px-4   flex flex-col gap-4  overflow-hidden h-full w-full "
+            className=" flex flex-col overflow-hidden h-full w-full "
           >
-            <p className="jetBranis text-xl sm:text-2xl  font-medium sm:font-semibold mt-2 ">
+            <p className="jetBranis text-xl sm:text-2xl font-mono font-semibold sm:font-semibold py-3 border-b  px-4 ">
               {productData?.product_id ? "Update" : "Add"} Product
             </p>
 
-            <div className="flex flex-col gap-4 w-full overflow-x-hidden overflow-y-auto  h-full custom-scrollbar p-1">
+            <div className="flex flex-col gap-4 py-3 px-4 w-full overflow-x-hidden  overflow-y-auto  h-full custom-scrollbar ">
               {/* productName */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                  <span className="flex items-center gap-1 text-sm font-semibold text-gray-800">
                     {/* <FolderKanban /> */}
                     Name
                   </span>
@@ -454,7 +459,7 @@ const AddProductForm = ({
               {/* productQuantity */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                     {/* <ExternalLink />  */}
                     Quantity
                   </span>
@@ -487,7 +492,7 @@ const AddProductForm = ({
               {/* productCostPrice */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                   Cost Price
                   </span>
                 </label>
@@ -517,7 +522,7 @@ const AddProductForm = ({
 
                <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                    Selling Price
                   </span>
                 </label>
@@ -554,7 +559,7 @@ const AddProductForm = ({
               {/* Sizes */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                     {/* <ExternalLink /> */}
                     Sizes
                   </span>
@@ -580,7 +585,7 @@ const AddProductForm = ({
                       </p>
                     ) : (
                       <p className="text-xs">
-                        <span className="font-medium"> Note:</span> Sizes should
+                        <span className="font-semibold"> Note:</span> Sizes should
                         be ( <span className="font-semibold text-sm">,</span> )
                         seperated.
                       </p>
@@ -591,7 +596,7 @@ const AddProductForm = ({
               {/* productColor */}
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                     {/* <ExternalLink />  */}
                     Color
                   </span>
@@ -617,7 +622,7 @@ const AddProductForm = ({
                       </p>
                     ) : (
                       <p className="text-xs">
-                        <span className="font-medium"> Note:</span> Colors
+                        <span className="font-semibold"> Note:</span> Colors
                         should be ({" "}
                         <span className="font-semibold text-sm">,</span> )
                         seperated.
@@ -635,7 +640,7 @@ const AddProductForm = ({
               {/* Description */}
               <div className="flex gap-3 flex-col justify-center">
                 <label>
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                     {/* <AlignLeft />  */}
                     Description
                   </span>
@@ -668,8 +673,8 @@ const AddProductForm = ({
                 onClick={() => fileInputRef.current.click()}
                 onDrop={handleDrop}
                 onDragOver={(e) => e.preventDefault()}
-                className={`w-full border-2 border-dashed  border-gray-400 rounded-xl p-3 text-center cursor-pointer 
-             hover:border-theme-primary transition `}
+                className={`w-full border-2 border-dashed  border-gray-300 rounded-xl p-3 text-center cursor-pointer 
+             hover:border-theme-primary transition  `}
               >
                 {newImages?.length > 0 || oldImages.length > 0 ? (
                   // <div className="grid grid-cols-3 gap-2">
@@ -834,15 +839,16 @@ const AddProductForm = ({
 
             
 
-                  <div className=" flex gap-3 w-full my-2">
+            <div className=" flex gap-3 w-full p-3 border-t">
               <button
                 onClick={() => {
                 addProjectFormik.resetForm();
+                onClose()
               }}
                 type="button"
                 className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
               >
-                Close
+                Cancel
               </button>
                 <button
                   disabled={loading}

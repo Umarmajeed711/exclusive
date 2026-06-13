@@ -175,10 +175,13 @@ const Checkout = () => {
     setDeliveryFee(deliveryFeeAmount);
   }, [productCart]);
   let Styles = {
-    fieldName: "text-base sm:text-xl text-slate-500",
+    fieldName: "text-base sm:text-xl text-slate-500 mb-[2px]",
     inputField:
-      "bg-slate-100 p-2 sm:p-3 w-full outline-none focus:bg-slate-200 focus:animate-pulse focus:shadow-xl",
+      // "bg-slate-100 p-2 sm:p-3 w-full outline-none focus:bg-slate-200 focus:animate-pulse focus:shadow-xl",
+      "border-b-2 p-2  bg-gray-200 outline-none w-full rounded-xl px-3 py-2 focus:border-theme-primary transition disabled:cursor-not-allowed disabled:opacity-50",
+
   };
+
 
   return (
     <div className="px-5 md:px-8 lg:px-14  w-full">
@@ -195,7 +198,7 @@ const Checkout = () => {
           <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-8  ">
             {/* Billing Details */}
             <div className="col-span-2 sm:col-span-1  sm:py-4  md:py-8">
-              <p className=" text-3xl sm:text-4xl md:text-5xl  bli">
+              <p className="text-3xl sm:text-4xl   bli font-bold">
                 Billing Details
               </p>
 
@@ -333,7 +336,9 @@ const Checkout = () => {
 
             {/* products Detail */}
             <div className="col-span-2 sm:col-span-1 place-content-center">
-              <div className=" px-4 py-2  md:py-4 shadow-md bg-slate-100    ">
+              <div className=" px-4 py-2 my-4 md:py-4  bg-slate-100   rounded-2xl
+    border border-gray-100
+    shadow-[0_10px_40px_rgba(0,0,0,0.2)]  ">
                 {/* product details */}
                 <div className="">
                   <div className="p-3">

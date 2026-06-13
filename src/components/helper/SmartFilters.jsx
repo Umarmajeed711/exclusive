@@ -248,20 +248,27 @@ const SmartFilter = ({
       >
         <div className="overflow-auto h-full w-full bg-transparent">
           <div
-            className="border  w-full overflow-hidden h-full  bg-gray-200"
-            style={{ boxShadow: "0 0 10px #03A9F4" }}
+            // className="border  w-full overflow-hidden h-full  bg-gray-200"
+            // style={{ boxShadow: "0 0 10px #03A9F4" }}
+             className=" w-full
+  h-full
+  overflow-hidden
+  bg-gray-100
+  border
+  border-gray-200
+  shadow-xl"
           >
             {/* <div className="w-full max-w-2xl  bg-gray-200 p-4 h-full flex flex-col gap-2  justify-between"
          style={{ boxShadow: "0 0 10px #03A9F4" }}> */}
 
             <div className="flex justify-center items-center flex-col h-full">
-              <div className="px-4 flex flex-col gap-4  overflow-hidden h-full w-full">
-                <h3 className="jetBranis text-xl sm:text-2xl font-semibold mt-3">
+              <div className=" flex flex-col  overflow-hidden h-full w-full">
+                <h3 className="jetBranis text-xl sm:text-2xl font-mono font-semibold py-3 border-b  px-4">
                   Filters
                 </h3>
 
-                <div className="w-full h-full overflow-auto flex flex-col items-center justify-between">
-                  <div className="w-full h-full overflow-hidden overflow-y-auto custom-scrollbar p-1">
+                <div className="w-full h-full overflow-auto flex flex-col items-center justify-between py-3 px-4">
+                  <div className="w-full h-full overflow-hidden overflow-y-auto custom-scrollbar">
                     {/* ACTIVE FILTER ROWS */}
                     <div className="space-y-3 ">
                       {activeFilters.map((f) => (
@@ -318,7 +325,7 @@ const SmartFilter = ({
                             <span
                               key={f.key}
                               onClick={() => addFilter(f)}
-                              className="cursor-pointer rounded-full bg-gray-50 px-3 py-1 text-xs transition-all hover:text-white hover:bg-theme-primary hover:shadow-theme-primary hover:shadow roboto"
+                              className="cursor-pointer rounded-full bg-gray-200 px-3 py-1 text-xs transition-all hover:text-white hover:bg-theme-primary hover:shadow-theme-primary hover:shadow roboto"
                             >
                               + {f.label}
                             </span>
@@ -330,7 +337,7 @@ const SmartFilter = ({
                 </div>
                 {/* FOOTER */}
                 {activeFilters?.length > 0 && (
-                  <div className="my-2 w-full flex  gap-3">
+                  <div className="w-full flex  gap-3 p-3 border-t">
                     <button
                       onClick={clearFilters}
                       className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"

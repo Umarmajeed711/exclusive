@@ -237,15 +237,21 @@ const OurProducts = ({
     }
   };
 
-  const onSuccess = ({ position, icon, message, product }) => {
+  const onSuccess = ({ position, icon, title, product }) => {
     updateProduct(product);
     setProjectData({});
     setShowModal(false);
-    dynamicToast({ position, icon, message });
+    showToast({
+          icon: icon,
+          title: title,
+        });
   };
 
-  const OnError = ({ position, icon, message }) => {
-    dynamicToast({ position, icon, message });
+  const OnError = ({ position, icon, title }) => {
+    showToast({
+          icon: icon,
+          title: title,
+        });
   };
 
   const dynamicToast = ({

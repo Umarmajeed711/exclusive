@@ -299,7 +299,7 @@ const ProductListView = ({
     setSelectedProducts([]);
   };
 
-  const onSuccess = ({ position, icon, message, product }) => {
+  const onSuccess = ({ position, icon, title, product }) => {
     updateProduct(product);
     setProjectData({});
     setShowModal(false);
@@ -307,27 +307,27 @@ const ProductListView = ({
     setSelectedProducts([]);
     showToast({
       icon: icon,
-      title: message,
+      title: title,
     });
   };
 
-  const onBulkSuccess = ({ position, icon, message }) => {
+  const onBulkSuccess = ({ position, icon, title }) => {
     onBulkUpdate();
 
     setShowBulkModal(false);
     setSelectedProducts([]);
     showToast({
       icon: icon,
-      title: message,
+      title: title,
     });
   };
 
   
 
-  const OnError = ({ position, icon, message }) => {
+  const OnError = ({ position, icon, title }) => {
     showToast({
       icon: icon,
-      title: message,
+      title: title,
     });
   };
 

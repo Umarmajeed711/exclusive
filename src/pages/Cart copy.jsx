@@ -1,0 +1,679 @@
+import { useState } from "react";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import api from "../components/helper/api";
+import { useContext } from "react";
+import { GlobalContext } from "../context/Context";
+import { RiDeleteBin6Fill } from "react-icons/ri";
+import Swal from "sweetalert2";
+import { IoMdClose } from "react-icons/io";
+import Breadcrums from "../components/helper/Breadcrums";
+import { PiMinus, PiPlus } from "react-icons/pi";
+import { isActiveUser, showToast } from "../components/helper/types";
+
+const Cart = () => {
+  let { state, dispatch } = useContext(GlobalContext);
+  // let user_id = state?.user.user_id;
+
+  const [productCart, setProductCart] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [deliveryFee, setDeliveryFee] = useState(0);
+  // const [toggleCart, setToggleCart] = useState(false);
+  const [cartLoading, setCartLoading] = useState(true);
+
+  // const getCartProduct = async () => {
+  //   try {
+  //     let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
+  //     setProductCart(cart_products.data.products);
+  //     dispatch({type: "UPDATE_CART", payload: cart_products.data.products})
+  //     console.log(cart_products.data.products);
+  //   } catch (error) {
+  //     console.log(error)
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   getCartProduct();
+  // }, [toggleCart]);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     console.log("Cart product from context after 5s", state?.cart);
+  //     setProductCart(state?.cart);
+  //     setCartLoading(false);
+  //   }, 5000);
+  // }, [toggleCart]);
+
+  useEffect(() => {
+    setProductCart(state?.cart);
+  }, [state?.cart]);
+
+  useEffect(() => {
+    let calculatedTotal = 0;
+    // let calculatedDeliveryFee = 0;
+
+    productCart?.forEach((product) => {
+      const discountedPrice =
+        product.price - product.price * (product.discount / 100);
+      calculatedTotal += discountedPrice * product.quantity;
+      // Add a fixed delivery fee for each product (adjust if necessary)
+      // calculatedDeliveryFee += 5; // Example of a fixed delivery fee per product or total
+    });
+
+    // Example dynamic delivery fee logic
+    let deliveryFeeAmount = 0;
+    if (calculatedTotal < 200) {
+      deliveryFeeAmount = 5; // $5
+    } else if (calculatedTotal < 500) {
+      deliveryFeeAmount = 3; // $3
+    } else {
+      deliveryFeeAmount = 0; // Free delivery
+    }
+
+    setTotal(calculatedTotal);
+    setDeliveryFee(deliveryFeeAmount);
+  }, [productCart]);
+
+  // const deleteCart = async (user_id, cart_id) => {
+
+  //   let oldCart = state?.cart;
+
+  //   dispatch({type:"UPDATE_CART",
+  //     payload:state?.cart?.filter((item) => item.cart_id !== cart_id)
+  //   })
+  //   try {
+  //     let response = await api.post("/remove-cart", {
+  //       user_id: user_id,
+  //       cart_id: cart_id,
+  //     })
+
+  //     showToast({
+  //       icon:"success",
+  //       title:"Product removed successfully"
+  //     });
+
+  //     dispatch({ type: "TOGGLE_CART" });
+      
+  //   } catch (error) {
+  //     showToast({
+  //       icon:"success",
+  //       title:error?.response?.data?.message || "Product removed successfully"
+  //     });
+
+  //     dispatch({
+  //     type: "UPDATE_CART",
+  //     payload: oldCart,
+  //   });
+
+  //   }
+  // };
+
+  const deleteCart = async (user_id, cart) => {
+  const oldCart = state?.cart;
+
+  // Guest User
+  if (!user_id) {
+    const updatedCart = state?.cart?.filter(
+      (item) => item.cart_id !== cart?.cart_id
+    );
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
+    );
+
+    dispatch({
+      type: "UPDATE_CART",
+      payload: updatedCart,
+    });
+
+    showToast({
+      icon: "success",
+      title: "Product removed successfully",
+    });
+
+    return;
+  }
+
+  // Logged In User
+  dispatch({
+    type: "UPDATE_CART",
+    payload: state?.cart?.filter(
+      (item) => item.cart_id !== cart?.cart_id
+    ),
+  });
+
+  try {
+    await api.post("/remove-cart", {
+      user_id :user_id,
+      cart_id:cart?.cart_id,
+    });
+
+    showToast({
+      icon: "success",
+      title: "Product removed successfully",
+    });
+
+    dispatch({ type: "TOGGLE_CART" });
+  } catch (error) {
+    dispatch({
+      type: "UPDATE_CART",
+      payload: oldCart,
+    });
+
+    showToast({
+      icon: "error",
+      title:
+        error?.response?.data?.message ||
+        "Something went wrong",
+    });
+  }
+};
+
+//   const handleQuantity = async (cartItem, type) => {
+//   const oldCart = state.cart;
+
+//   let updatedCart = state?.cart?.map((item) => {
+//     if (item?.cart_id === cartItem?.cart_id) {
+//       let newQty =
+//         type === "increase"
+//           ? item.quantity + 1
+//           : item.quantity - 1;
+
+      
+//       if (newQty < 1) return item;
+
+//       return { ...item, quantity: newQty };
+//     }
+//     return item;
+//   });
+
+//   // ✅ 1. Instant UI update
+//   dispatch({
+//     type: "UPDATE_CART",
+//     payload: updatedCart,
+//   });
+
+//   try {
+//     // ✅ 2. Backend update
+//     await api.put("/update-cart-quantity", {
+//       cart_id: cartItem.cart_id,
+//       quantity:
+//         type === "increase"
+//           ? cartItem.quantity + 1
+//           : cartItem.quantity - 1,
+//     });
+//   } catch (error) {
+
+//     // ❌ rollback
+//     dispatch({
+//       type: "UPDATE_CART",
+//       payload: oldCart,
+//     });
+
+//     Swal.fire("Error!", "Quantity update failed", "error");
+//   }
+// };
+
+
+useEffect(() => {
+  if (state?.user?.user_id) return;
+
+  const guestCart =
+    JSON.parse(localStorage.getItem("cart")) || [];
+
+  if (!guestCart.length) return;
+
+  fetchGuestStock(guestCart);
+}, []);
+
+const fetchGuestStock = async (guestCart) => {
+  try {
+    const productIds = [
+      ...new Set(
+        guestCart.map(
+          (item) => item.product_id
+        )
+      ),
+    ];
+
+    const response = await api.post(
+      "/guest-cart-stock",
+      {
+        productIds,
+      }
+    );
+
+    const stockMap = {};
+
+    response.data.forEach((product) => {
+      stockMap[product.product_id] =
+        product.stock;
+    });
+
+    const updatedCart = guestCart.map(
+      (item) => ({
+        ...item,
+        stock:
+          stockMap[item.product_id] || 0,
+      })
+    );
+
+    dispatch({
+      type: "UPDATE_CART",
+      payload: updatedCart,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const handleQuantity = async (cartItem, type) => {
+
+   const oldCart = state.cart;
+
+
+  const nextQuantity =
+  type === "increase"
+    ? cartItem.quantity + 1
+    : cartItem.quantity - 1;
+
+if (nextQuantity < 1) return;
+
+if (
+  type === "increase" &&
+  nextQuantity > cartItem.stock
+) {
+  return showToast({
+    icon: "error",
+    title: `Only ${cartItem.stock} item(s) available`,
+  });
+}
+
+ 
+
+  let updatedCart = state.cart.map((item) => {
+    const isCurrentItem = 
+       item.cart_id === cartItem.cart_id;
+      
+
+    if (isCurrentItem) {
+      const newQty =
+        type === "increase"
+          ? item.quantity + 1
+          : item.quantity - 1;
+
+      if (newQty < 1) return item;
+
+      return {
+        ...item,
+        quantity: newQty,
+      };
+    }
+
+    return item;
+  });
+
+  // Optimistic update
+  dispatch({
+    type: "UPDATE_CART",
+    payload: updatedCart,
+  });
+
+  try {
+    // Guest User
+    if (!state?.user?.user_id) {
+      localStorage.setItem(
+        "cart",
+        JSON.stringify(updatedCart)
+      );
+
+      return;
+    }
+
+    const quantity = type === "increase"
+            ? cartItem.quantity + 1
+            : cartItem.quantity - 1
+
+    if(quantity >= 1){
+
+      // Logged In User
+      await api.put("/update-cart-quantity", {
+        cart_id: cartItem.cart_id,
+        quantity:
+         quantity,
+      });
+    }
+
+  } catch (error) {
+    // Rollback
+    dispatch({
+      type: "UPDATE_CART",
+      payload: oldCart,
+    });
+    showToast({
+      icon:"error",
+      title:error?.response?.data?.message || "Quantity update failed"
+    })
+  }
+};
+
+  const handleCheckout = () => {
+    if (!isActiveUser(state?.user) && state?.isLogin){
+      return showToast({
+                icon: "error",
+                title: `Your account is  ${state?.user?.status}`,
+              });
+    }
+    if (productCart.length > 0) {
+      // If there are items in the cart, redirect to the checkout page
+      window.location.href = "/checkout";
+    } else {
+      // If the cart is empty, show an alert or message
+      Swal.fire({
+        title: "Your cart is empty",
+        text: "Add some product to start Shopping.",
+        icon: "warning",
+      });
+    }
+  };
+
+  return (
+    <div className="mx-5  md:mx-8 lg:mx-14">
+      {/* BreadCrums */}
+
+      <Breadcrums currentPage="Cart" />
+      <h1 className="text-xl md:text-4xl blii font-bold mt-3 sm:mt-5">
+        YOUR CART
+      </h1>
+
+      <div>
+        {state?.cardLoading ? (
+          <div className="flex justify-center items-center min-h-56 sm:min-h-[350px] h-full">
+            <div className="loading"></div>
+          </div>
+        ) : productCart?.length > 0 ? (
+          <>
+            <div className="hidden md:block">
+              <div className="grid  grid-cols-1 md:grid-cols-10 bg-white shadow-xl p-5 text-center text-base lg:text-xl font-medium">
+                <div className="col-span-3 text-start">Product</div>
+                <div className="col-span-2 text-start">Price</div>
+                <div className="col-span-1">Quantity </div>
+                <div className="col-span-1">Color</div>
+                <div className="col-span-1">Size</div>
+                <div className="col-span-1">SubTotal</div>
+                <div className="col-span-1">Remove</div>
+              </div>
+            </div>
+
+            {productCart?.map((cart, i) => {
+              let newPrice = cart?.price * (cart?.discount / 100);
+              return (
+                <div key={i}>
+                  {/* show on Tablet and PCs */}
+                  <div className="hidden md:block" key={i}>
+                    <div className="grid  grid-cols-1 md:grid-cols-10 my-2 bg-white shadow-xl p-5 border">
+                      {/* Product */}
+                      <div className="col-span-3 flex gap-3  items-center">
+                        <div>
+                          <img
+                            src={cart.image_url}
+                            alt=""
+                            className="h-12 w-12"
+                          />
+                        </div>
+                        <span className="font-normal">{cart.name}</span>
+                      </div>
+
+                      {/* Price */}
+
+                      <div className="col-span-2 flex items-center  gap-2">
+                        <p className="text-base lg:text-xl font-semibold   ">
+                          ${Math.round(cart.price - newPrice)}
+                        </p>
+
+                        {cart.discount > 0 ? (
+                          <div className="flex gap-2 items-center">
+                            <p className="text-base lg:text-xl font-semibold  text-[rgba(0,0,0,0.4)] line-through  ">
+                              ${cart.price}
+                            </p>
+                            <span className="text-white bg-theme-secondary px-1 italic text-base lg:text-xl lg:px-2 rounded-xl">
+                              -{cart.discount}%
+                            </span>
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {/* quantity */}
+                      {/* <div className="col-span-1 flex items-center justify-center">
+                        {cart.quantity}
+                      </div> */}
+                      <div className="col-span-1 flex items-center gap-3">
+  <button onClick={() => handleQuantity(cart, "decrease")} disabled={cart?.quantity <= 1}  className={`shadow p-1 py-2 ${cart?.quantity <= 1 ? "cursor-not-allowed" : "cursor-pointer"}`}><PiMinus  /></button>
+  
+  <span>{cart.quantity}</span>
+  
+  <button
+  onClick={() => handleQuantity(cart, "increase")}
+  disabled={cart?.quantity >= cart?.stock}
+  className={`shadow p-1 py-2 ${
+    cart.quantity >= cart.stock
+      ? "cursor-not-allowed opacity-50"
+      : "cursor-pointer"
+  }`}
+>
+  <PiPlus />
+</button>
+</div>
+                      {/* color */}
+                      <div className="col-span-1 flex items-center justify-center">
+                        <span
+                          className="h-5 ms-1 w-5 rounded-full absolute"
+                          style={{
+                            backgroundColor: cart?.colors?.toLowerCase(),
+                          }}
+                        ></span>
+                      </div>
+                      {/* sizes */}
+                      <div className="col-span-1 flex items-center justify-center">
+                        {cart.sizes}
+                      </div>
+                      {/* subTotal */}
+                      <div className="col-span-1 flex items-center justify-center">
+                        <p className="text-base lg:text-xl font-semibold">
+                          ${Math.round((cart.price - newPrice) * cart.quantity)}
+                        </p>
+                      </div>
+                      <div className="col-span-1 flex items-center justify-center">
+                        <RiDeleteBin6Fill
+                          className="text-red-500 cursor-pointer text-xl sm:text-2xl"
+                          onClick={()  => {
+                            Swal.fire({
+                              title: "Do you want delete this product?",
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonText: "Delete",
+                            }).then(async (result) => {
+                              /* Read more about isConfirmed, isDenied below */
+                              if (result.isConfirmed) {
+                               await deleteCart(cart.user_id, cart);
+                                // Swal.fire("Delete!", "", "success");
+                              }
+                            });
+                          }}
+                          
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Show on mobiles */}
+
+                  <div className="block md:hidden">
+                    <div
+                      className="flex justify-center flex-col my-2 bg-white shadow-xl p-5 border relative"
+                      key={i}
+                    >
+                      <div className="col-span-1 flex items-center justify-between absolute top-0 right-0 p-3">
+                        <IoMdClose
+                          className="text-black hover:text-red-500 cursor-pointer text-xl sm:text-2xl"
+                          onClick={() => {
+                            Swal.fire({
+                              title: "Do you want delete this product?",
+                              icon: "warning",
+                              showCancelButton: true,
+                              confirmButtonText: "Delete",
+                            }).then((result) => {
+                              /* Read more about isConfirmed, isDenied below */
+                              if (result.isConfirmed) {
+                                deleteCart(cart.user_id, cart);
+                                Swal.fire("Delete!", "", "success");
+                              }
+                            });
+                          }}
+                        />
+                      </div>
+
+                      {/* Product */}
+
+                      <div className="flex justify-center items-center">
+                        <img
+                          src={cart.image_url}
+                          alt=""
+                          className="h-20 w-20"
+                        />
+                      </div>
+
+                      <div className="col-span-3 flex gap-3  items-center justify-between">
+                        <div>name:</div>
+                        <span className="font-normal">{cart.name}</span>
+                      </div>
+
+                      {/* Price */}
+
+                      <div className="col-span-2 flex items-center justify-between  ">
+                        <div>Price:</div>
+
+                        <div className="flex gap-2">
+                          <p className="text-base lg:text-xl font-semibold   ">
+                            ${Math.round(cart.price - newPrice)}
+                          </p>
+
+                          {cart.discount > 0 ? (
+                            <div className="flex gap-2 items-center">
+                              <p className="text-base lg:text-xl font-semibold  text-[rgba(0,0,0,0.4)] line-through  ">
+                                ${cart.price}
+                              </p>
+                              <span className="text-red-600 bg-red-200 px-1 italic text-base lg:text-xl lg:px-2 rounded-xl">
+                                -{cart.discount}%
+                              </span>
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+
+                      {/* quantity */}
+                      <div className="col-span-1 flex items-center justify-between ">
+                        <div>Quantity:</div>
+                        {cart.quantity}
+                      </div>
+                      {/* color */}
+                      <div className="col-span-1 flex items-center justify-between">
+                        <div>Color:</div>
+                        <div
+                          className="h-5 ms-1 w-5 rounded-full "
+                          style={{
+                            backgroundColor: cart?.colors?.toLowerCase(),
+                          }}
+                        ></div>
+                      </div>
+                      {/* sizes */}
+                      <div className="col-span-1 flex items-center justify-between">
+                        <div>Sizes:</div>
+                        {cart.sizes}
+                      </div>
+                      {/* subTotal */}
+                      <div className="col-span-1 flex items-center justify-between">
+                        <div>SubTotal:</div>
+                        <p className="text-base lg:text-xl font-semibold">
+                          ${Math.round((cart.price - newPrice) * cart.quantity)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        ) : (
+          <div className="flex justify-center flex-col items-center text-base sm:text-2xl sm:min-h-80 h-[70vh] my-10 ">
+            <p className="text-center font-bold text-xl sm:text-4xl md:text-5xl  ">
+              YOUR CART IS EMPTY.
+            </p>
+            <p className="text-normal text-center text-base sm:text-lg py-4 text-gray-400">
+              Must add items to the cart before you proceed to checkout
+            </p>
+            <Link
+              to={"/Shop"}
+              className=" bg-theme-primary transition-all duration-200 rounded flex justify-center p-2 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+            >
+              Shop Now
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* order Summary */}
+
+      {productCart?.length > 0 ? (
+        <div className="w-full items-center  max-h-96 bg-white shadow-xl ">
+          <div className="p-5">
+            <p className="text-xl  font-bold sm:text-2xl">Order Summary</p>
+
+            {/* order summary */}
+            <div className="flex flex-col gap-3 mt-2">
+              <div className="flex justify-between">
+                <p className="text-base  sm:text-xl font-normal text-gray-700">
+                  SubTotal
+                </p>
+                <p className="text-base  sm:text-xl font-semibold">
+                  ${Math.round(total)}
+                </p>
+              </div>
+
+              <div className="flex justify-between">
+                <p className="text-base  sm:text-xl font-normal text-gray-700">
+                  Shipping:
+                </p>
+                <p className="text-base  sm:text-xl font-semibold">
+                  {deliveryFee > 0 ? `$` + Math.round(deliveryFee) : "Free"}
+                </p>
+              </div>
+              <hr />
+              <div className="flex justify-between">
+                <p className="text-base  sm:text-xl font-normal ">Total</p>
+                <p className=" text-xl  sm:text-2xl font-bold">
+                  ${Math.round(total + deliveryFee)}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex justify-end items-center">
+              <button
+                type="submit"
+                disabled={!isActiveUser(state?.user) && state?.isLogin}
+                title={!isActiveUser(state?.user) && state?.isLogin   ?  `Your account is currently ${state?.user?.status}` : "Checkout"}
+                onClick={handleCheckout}
+                className=" bg-theme-primary disabled:cursor-not-allowed transition-all duration-200 rounded flex justify-center px-4 py-3 my-4 text-white  hover:shadow-theme-secondary hover:shadow"
+              >
+                Go to Checkout
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+export default Cart;

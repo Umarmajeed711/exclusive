@@ -7,7 +7,7 @@ import Modal from "../components/helper/modal";
 import { GlobalContext } from "../context/Context";
 import { MdOutlineAdd, MdOutlineFilterAlt } from "react-icons/md";
 import SmartFilter from "../components/helper/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES } from "../components/helper/types";
+import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../components/helper/types";
 import { ActiveFilters } from "../components/Product/ActiveFilters";
 import Pagination from "../components/helper/Pagination";
 import AddProductForm from "../components/Product/addProduct";
@@ -101,38 +101,22 @@ const categoryOptions = categoryList?.map((c) => ({
     setProducts((prev) => prev.filter((p) => p.product_id !== id));
   };
 
-  const onSuccess = ({ position, icon, message, product }) => {
+  const onSuccess = ({ position, icon, title, product }) => {
     setProjectData({});
     setShowModal(false);
-    dynamicToast({ position, icon, message });
+    showToast({
+      icon:icon,
+      title:title
+    })
   };
 
-  const OnError = ({ position, icon, message }) => {
-    dynamicToast({ position, icon, message });
+  const OnError = ({ position, icon, title }) => {
+    showToast({
+      icon:icon,
+      title:title
+    })
   };
 
-  const dynamicToast = ({
-    position = "bottom-left",
-    icon = "success",
-    message = "",
-  }) => {
-    const Toast = Swal.mixin({
-      toast: true,
-      position: position,
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-
-      didOpen: (toast) => {
-        toast.onmouseenter = Swal.stopTimer;
-        toast.onmouseleave = Swal.resumeTimer;
-      },
-    });
-    Toast.fire({
-      icon: icon,
-      title: message,
-    });
-  };
 
   const productFilters = [
     {
@@ -313,7 +297,7 @@ const categoryOptions = categoryList?.map((c) => ({
                   <option value="all">All Products</option>
                 </select>
               ) : (
-                <div className="text-xl sm:text-4xl font-medium">
+                <div className="text-xl sm:text-4xl  font-bold">
                   All products
                 </div>
               )}

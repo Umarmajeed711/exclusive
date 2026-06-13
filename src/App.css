@@ -20,14 +20,16 @@
   padding: 10px;
   outline: none;
   border-radius: 10px;
-  border: 1px solid #03A9F4;
+  /* border: 1px solid #03A9F4; */
+  border: 1px solid gray;
   width: 100%;
-  box-shadow: 0 0 2px #03A9F4;
+  box-shadow: 0 0 2px gray;
   transition: all 0.3s;
 }
 
 .inputField:focus {
-  box-shadow: 0 0 10px #4EC3F8;
+  /* box-shadow: 0 0 10px #4EC3F8; */
+  box-shadow: 0 0 10px rgba(0,0,0,.5);
 }
 
 .requiredError {
