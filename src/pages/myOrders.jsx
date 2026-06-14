@@ -541,7 +541,7 @@ const OrdersPage = () => {
                 setShowDetails(false);
               }}
               isOpen={showDetails}
-              className="!w-[95%] !md:w-[1000px] !max-h-[92vh] !max-w-[1000px] !bg-white  !flex !flex-col "
+               className="!w-[95%] !md:w-[1000px]  !max-w-[1000px] !bg-white  !flex !flex-col "
             >
               <OrderDetailsModal
                 order={selectedOrder}

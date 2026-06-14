@@ -322,18 +322,58 @@ const OrderDetailsModal = ({
           {/* CUSTOMER */}
           <div className="bg-white p-5 rounded-xl border">
             <h3 className="font-semibold mb-3">Customer</h3>
+            
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+              <span>Name</span>
 
             <p className="font-medium">{order.shipping_name}</p>
+            </div>
+               {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+              <span>Email</span>
+
+            <p className="font-medium">{order.email}</p>
+            </div> */}
+               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+              <span>Phone</span>
+
             <p className="text-sm text-gray-500">{order.shipping_phone}</p>
+            </div>
+               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+              <span>Address</span>
+
             <p className="text-sm text-gray-500">{order.shipping_address}</p>
+            </div>
+            
+           
           </div>
 
           {/* ORDER */}
           <div className="bg-white p-5 rounded-xl border">
             <h3 className="font-semibold mb-3">Order Info</h3>
 
+             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+              <span>Payment Method</span>
+
+             <div className="flex items-center">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium border
+      ${
+        order.payment_method === "cod"
+          ? "bg-yellow-100 text-yellow-700 border-yellow-300"
+          : "bg-blue-100 text-blue-700 border-blue-300"
+      }
+    `}
+            >
+              {order.payment_method === "cod"
+                ? "💵 Cash on Delivery"
+                : "💳 Online Payment"}
+            </span>
+          </div>
+            </div>
+
+
             {/* PAYMENT */}
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
               <span>Payment</span>
 
               {isAdmin ? (
@@ -421,7 +461,7 @@ const OrderDetailsModal = ({
       </div>
 
       {/* ================= ACTIONS ================= */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-5 rounded-xl border">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-white p-4 sm:p-5 border">
         <p className="text-lg font-semibold">Total: ${order.total_price}</p>
 
         <button

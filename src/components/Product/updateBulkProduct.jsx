@@ -148,14 +148,14 @@ const BulkUpdateProductForm = ({
 
         OnSuccess({
           icon: "success",
-          message: response?.data?.message || "Products Updated Successfully",
+          title: response?.data?.message || "Products Updated Successfully",
         });
 
         formik.resetForm();
       } catch (error) {
         OnError({
           icon: "warning",
-          message: error?.response?.data?.message || "Something went wrong",
+          title: error?.response?.data?.message || "Something went wrong",
         });
       } finally {
         setLoading(false);
@@ -182,16 +182,23 @@ const BulkUpdateProductForm = ({
   return (
     <div className="overflow-auto h-full w-full bg-transparent">
       <div
-        className="border  w-full overflow-hidden h-full  bg-gray-200"
-        style={{ boxShadow: "0 0 10px #03A9F4" }}
+        // className="border  w-full overflow-hidden h-full  bg-gray-200"
+        // style={{ boxShadow: "0 0 10px #03A9F4" }}
+         className=" w-full
+  h-full
+  overflow-hidden
+  bg-gray-100
+  border
+  border-gray-200
+  shadow-xl"
       >
         <div className="flex justify-center items-center flex-col h-full">
           <form
             onSubmit={formik.handleSubmit}
-            className="px-4 flex flex-col gap-4  overflow-hidden h-full w-full"
+            className="flex flex-col gap-4  overflow-hidden h-full w-full"
           >
-            <div>
-            <p className="jetBranis text-xl sm:text-2xl font-semibold mt-3">
+            <div className="py-3 border-b  px-4">
+            <p className="jetBranis text-xl sm:text-2xl font-mono font-semibold ">
               Bulk Update Products
             </p>
 
@@ -201,7 +208,7 @@ const BulkUpdateProductForm = ({
 
             </div>
 
-            <div className="flex flex-col gap-5 w-full overflow-y-auto h-full custom-scrollbar p-1">
+            <div className="flex flex-col gap-5 w-full overflow-y-auto h-full custom-scrollbar py-3 px-4">
               {/* STATUS */}
               <div className="bg-white rounded-lg p-4 space-y-4">
                 <Checkbox
@@ -494,7 +501,7 @@ const BulkUpdateProductForm = ({
 
             {/* SUBMIT */}
 
-             <div className=" flex gap-3 w-full my-2">
+             <div className=" flex gap-3 w-full p-3 border-t">
               <button
                 onClick={() => {
                 formik.resetForm();

@@ -111,19 +111,26 @@ const UserUpdateForm = ({
       {/*Add Project Form */}
 
       <div
-        className="border   w-full   overflow-hidden h-full  bg-gray-200"
-        style={{ boxShadow: "0 0 10px #03A9F4  " }}
+        // className="border   w-full   overflow-hidden h-full  bg-gray-200"
+        // style={{ boxShadow: "0 0 10px #03A9F4  " }}
+                     className=" w-full
+  h-full
+  overflow-hidden
+  bg-gray-100
+  border
+  border-gray-200
+  shadow-xl"
       >
         <div className="flex justify-center items-center flex-col h-full ">
           <form
             onSubmit={userFormik.handleSubmit}
-            className=" px-4   flex flex-col gap-2   overflow-hidden h-full w-full "
+            className="flex flex-col gap-2   overflow-hidden h-full w-full "
           >
-            <p className=" text-xl sm:text-2xl font-medium sm:font-semibold mt-2   ">
+            <p className=" text-xl sm:text-2xl font-medium sm:font-semibold font-mono  py-3 border-b  px-4  ">
               Update User
             </p>
 
-            <div className="flex flex-col gap-5 w-full overflow-y-auto h-full custom-scrollbar p-1">
+            <div className="flex flex-col gap-5 w-full overflow-y-auto h-full custom-scrollbar py-3 px-4">
 
             {/* Profile Image */}
             <div className="flex justify-center items-center">
@@ -291,7 +298,7 @@ const UserUpdateForm = ({
 
             {/* Submit */}
 
-              <div className=" flex gap-3 w-full my-2">
+              <div className=" flex gap-3 w-full p-3 border-t">
               <button
                 onClick={() => {
                 userFormik.resetForm();
@@ -300,7 +307,7 @@ const UserUpdateForm = ({
                 type="button"
                 className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
               >
-                Close
+                Cancel
               </button>
               
               <button
