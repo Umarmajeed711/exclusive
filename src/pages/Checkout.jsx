@@ -42,17 +42,17 @@ const Checkout = () => {
 
   // billing Validation
   const billingValidation = yup.object({
-    name: yup.string().required("name is required"),
-    email: yup
-      .string()
-      .email("enter a valid email")
-      .required("Email is required"),
-    address: yup.string().required("address is required"),
-    city: yup.string().required("city name is required"),
+    name: yup.string().required("This field is required"),
+    // email: yup
+    //   .string()
+    //   .email("enter a valid email")
+    //   .required("Email is required"),
+    address: yup.string().required("This field is required"),
+    city: yup.string().required("This field is required"),
     // number: yup.number().required("phone number is required").min(11),
     number: yup
       .string()
-      .required("Phone number is required")
+      .required("This field is required")
       .matches(/^[0-9]+$/, "Phone number must contain only digits")
       .min(11, "Phone number must be at least 11 digits")
       .max(13, "Phone number is too long"),
@@ -65,7 +65,7 @@ const Checkout = () => {
       address: "",
       city: "",
       number: "",
-      email: "",
+      // email: "",
     },
     validationSchema: billingValidation,
 
@@ -78,10 +78,12 @@ const Checkout = () => {
         let address = `${values.address},${values.city}`;
         try {
           let response = await api.post("/create-order", {
-            user_id: state?.user.user_id,
+            user_id: state?.user?.user_id,
             shipping_name: values.name,
+            shipping_email: state?.user?.email,
             shipping_phone: values.number,
             shipping_address: address,
+            city:values?.city,
             payment_status: "unpaid",
             payment_method: paymentMethod,
             delivery_status: "pending",
@@ -192,7 +194,7 @@ const Checkout = () => {
         prevPages={[{ name: "cart", url: "/cart" }]}
       />
 
-      <div className=" ">
+      <div className="min-h-[600px] flex items-center">
         {/* container mx-auto px-2 sm:px-4  flex justify-center */}
         <form onSubmit={billingFormik.handleSubmit}>
           <div className="grid grid-cols-2 gap-3 sm:gap-5 md:gap-8  ">
@@ -284,7 +286,7 @@ const Checkout = () => {
               <div className="mt-2 ">
                 <label htmlFor="phoneNumber">
                   <p className={Styles.fieldName}>
-                    Phone number <span className="text-red-500">*</span>
+                    Phone <span className="text-red-500">*</span>
                   </p>
                   <input
                     type="tel"
@@ -308,7 +310,7 @@ const Checkout = () => {
               </div>
 
               {/* Email address */}
-              <div className="mt-2  ">
+              {/* <div className="mt-2  ">
                 <label htmlFor="emailAddress">
                   <p className={Styles.fieldName}>
                     Email address <span className="text-red-500">*</span>
@@ -331,7 +333,7 @@ const Checkout = () => {
                       </p>
                     )}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* products Detail */}

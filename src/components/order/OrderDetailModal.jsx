@@ -323,22 +323,22 @@ const OrderDetailsModal = ({
           <div className="bg-white p-5 rounded-xl border">
             <h3 className="font-semibold mb-3">Customer</h3>
             
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-1">
               <span>Name</span>
 
             <p className="font-medium">{order.shipping_name}</p>
             </div>
-               {/* <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-1">
               <span>Email</span>
 
-            <p className="font-medium">{order.email}</p>
-            </div> */}
-               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+            <p className="text-sm text-gray-500">{order.shipping_email}</p>
+            </div>
+               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-1">
               <span>Phone</span>
 
             <p className="text-sm text-gray-500">{order.shipping_phone}</p>
             </div>
-               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
+               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-1">
               <span>Address</span>
 
             <p className="text-sm text-gray-500">{order.shipping_address}</p>

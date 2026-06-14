@@ -456,6 +456,12 @@ const Orders = () => {
       operators: [FILTER_OPERATORS.BETWEEN],
       inputType: INPUT_TYPES.DATE,
     },
+     {
+      key: "city",
+      label: "City",
+      operators: [FILTER_OPERATORS.IS],
+      inputType: INPUT_TYPES.TEXT,
+    },
   ];
 
   const [filters, setFilters] = useState([]);
