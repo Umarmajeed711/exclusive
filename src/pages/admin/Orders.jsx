@@ -459,7 +459,7 @@ const Orders = () => {
      {
       key: "city",
       label: "City",
-      operators: [FILTER_OPERATORS.IS],
+      operators: [FILTER_OPERATORS.CONTAINS,FILTER_OPERATORS.IS],
       inputType: INPUT_TYPES.TEXT,
     },
   ];

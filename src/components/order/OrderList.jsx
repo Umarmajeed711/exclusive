@@ -23,6 +23,7 @@ const DEFAULT_COLUMNS = [
   { key: "payment_method", label: "Payment Method", visible: true },
   { key: "payment_status", label: "Payment", visible: true },
   { key: "delivery_status", label: "Delivery", visible: true },
+  { key: "city", label: "City", visible: true },
   { key: "order_date", label: "Date", visible: true },
   { key: "actions", label: "Actions", visible: true },
 ];
@@ -197,7 +198,8 @@ const OrderList = ({
         ) : (
           <b>{formatText(order.delivery_status)}</b>
         );
-
+      case "city":
+        return <span className="font-semibold">{order?.city}</span>;
       case "order_date":
         return new Date(order.order_date).toLocaleDateString();
 
