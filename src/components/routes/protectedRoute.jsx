@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
 
   return (
 
-    state?.isLogin && isActiveUser(state?.user) && state?.user?.email_verified ? <Outlet /> : state?.isLogin == null  ? <Loader/> : <Navigate to="/login" state={{ from: null }} replace />
+    state?.isLogin && isActiveUser(state?.user) ? <Outlet /> : state?.isLogin == null  ? <Loader/> : <Navigate to="/login" state={{ from: null }} replace />
   )
   
 };

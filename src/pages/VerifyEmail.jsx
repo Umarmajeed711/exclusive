@@ -158,7 +158,9 @@ const VerifyEmail = () => {
   // AUTO VERIFY ON LOAD
   // =========================
   useEffect(() => {
-    if (!token || hasRun.current) return;
+    if (!token || hasRun.current) 
+    setStatus("error");
+    return;
 
     hasRun.current = true;
     verifyEmail();

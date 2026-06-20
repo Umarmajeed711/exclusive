@@ -10,6 +10,7 @@ import { IoMdClose } from "react-icons/io";
 import Breadcrums from "../components/helper/Breadcrums";
 import { PiMinus, PiPlus } from "react-icons/pi";
 import { isActiveUser, showToast } from "../components/helper/types";
+import { VerifyEmailModal } from "../components/helper/VerifyBanner";
 
 const Cart = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -246,6 +247,9 @@ const Cart = () => {
     }
   };
 
+   const [showVerifyModal, setShowVerifyModal] =
+    useState(false);
+
   const handleCheckout = () => {
     if (!isActiveUser(state?.user) && state?.isLogin) {
       return showToast({
@@ -254,6 +258,16 @@ const Cart = () => {
       });
     }
     if (productCart.length > 0) {
+       if (!state?.user?.user_id) {
+      window.location.href = "/login";
+      return;
+    }
+
+    // user login hai but email verify nahi hai
+    if (!state?.user?.email_verified) {
+      setShowVerifyModal(true);
+      return;
+    }
       // If there are items in the cart, redirect to the checkout page
       window.location.href = "/checkout";
     } else {
@@ -265,6 +279,25 @@ const Cart = () => {
       });
     }
   };
+
+   const handleVerifiedClick = () => {
+    setShowVerifyModal(false);
+
+    if (state?.user?.email_verified) {
+      setShowVerifyModal(false);
+      window.location.href = "/checkout";
+    } else {
+      showToast({
+        icon: "info",
+        title:
+          "If you’ve already verified your email, please  logIn again.",
+      });
+      setTimeout(() => {
+        window.location.href = "/login";
+      },500)
+    }
+  };
+
 
   return (
     <div className="mx-5 md:mx-8 lg:mx-14 pb-10">
@@ -531,6 +564,12 @@ const Cart = () => {
           </Link>
         </div>
       )}
+
+      <VerifyEmailModal
+        isOpen={showVerifyModal}
+        onClose={() => setShowVerifyModal(false)}
+        onVerified={handleVerifiedClick}
+      />
     </div>
   );
 };
