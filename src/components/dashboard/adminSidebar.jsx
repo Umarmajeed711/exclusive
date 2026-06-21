@@ -19,8 +19,8 @@ const AdminSidebar = () => {
     { name: "Dashboard", path: "/admin", icon: LayoutDashboard },
     { name: "Users", path: "/admin/users", icon: Users },
     { name: "Orders", path: "/admin/orders", icon: ShoppingCart },
-    // { name: "Products", path: "/admin/products", icon: Boxes },
     { name: "Products", path: "/admin/addProduct", icon: PackagePlus },
+     { name: "Categories", path: "/admin/categories", icon: Boxes },
 
     // ✅ IMPORTANT (back to website)
     { name: "View Store", path: "/", icon: Home , nextTab:true},

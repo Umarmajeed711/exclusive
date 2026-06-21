@@ -4,7 +4,7 @@ import { Signup } from "../pages/signup";
 import { Login } from "../pages/login";
 import Home from "../pages/Home";
 import { GlobalContext } from "../context/Context";
-import Category from "./Product/Category";
+// import Category from "./Product/Category";
 import Products from "../pages/admin/Products";
 import Contact from "../pages/Contact";
 import NotFound from "../pages/NotFound";
@@ -33,10 +33,9 @@ const Myroute = () => {
       {state?.isLogin === true ? (
         <Routes>
           <Route path="/" index element={<Home />}></Route>
-          <Route path="/category" element={<Category />}></Route>
+          {/* <Route path="/category" element={<Category />}></Route> */}
           {/* <Route path="/Contact" element={<Contact />}></Route> */}
           <Route path="/cart" element={<Cart />}></Route>
-          <Route path="/category" element={<Category />}></Route>
           <Route path="/productDetail/:id" element={<ProductDetail />}></Route>
           {/* <Route path="/Product" element={<Products />}></Route> */}
           <Route path="/contact" element={<Contact />}></Route>

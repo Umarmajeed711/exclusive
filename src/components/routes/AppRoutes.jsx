@@ -29,7 +29,7 @@ import OrdersPage from "../../pages/myOrders";
 import { OrderTrackingWrapper } from "../../pages/OrderTrack";
 import OrderConfirmation from "../../pages/OrderComplete";
 import Whishlist from "../../pages/Whishlist";
-import Category from "../Product/Category";
+import Category from "../../pages/admin/Category";
 import Dashboard from "../../pages/admin/Dashboard";
 import ProductDetail from "../Product/ProductDetail";
 import { useContext } from "react";
@@ -90,6 +90,7 @@ const AppRoutes = () => {
           <Route path="users" element={<Users />} />
           <Route path="orders" element={<Orders />} />
           {/* <Route path="products" element={<Products />} /> */}
+          <Route path="categories" element={<Category />}></Route>
           <Route path="addProduct" element={<AddProduct />} />
         </Route>
       </Route>
