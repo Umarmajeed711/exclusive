@@ -24,15 +24,17 @@ const Shop = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [viewType, setViewType] = useState("grid");
 
-  const [categoryList, setCategoryList] = useState([]);
+  // const [categoryList, setCategoryList] = useState([]);
 
-  const getCategory = async () => {
-    try {
-      let result = await api.get(`/categories`);
+  const categoryList = state?.categoryList;
 
-      setCategoryList(result.data.categories);
-    } catch (error) {}
-  };
+  // const getCategory = async () => {
+  //   try {
+  //     let result = await api.get(`/categories`);
+
+  //     setCategoryList(result.data.data);
+  //   } catch (error) {}
+  // };
 
 const categoryOptions = categoryList?.map((c) => ({
   label: c?.category_name,
@@ -77,7 +79,7 @@ const categoryOptions = categoryList?.map((c) => ({
   };
 
   useEffect(() => {
-    getCategory();
+    // getCategory();
     getProducts();
   }, [toggle]);
 

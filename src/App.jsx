@@ -62,6 +62,10 @@ const App = () => {
   }, [state?.isReloadCart,state?.isLogin]);
 
   useEffect(() => {
+      getCategory();
+  }, [state?.isReloadCategory]);
+
+  useEffect(() => {
     // if (state?.user?.user_id) {
       getWishlist(state.user.user_id);
     // }
@@ -139,9 +143,8 @@ const App = () => {
 
   const getCategory = async () => {
     try {
-      let result = await api.get(`/categories`);
-
-      dispatch({ type: "CATEGORY_LIST", payload: result.data.categories });
+      let result = await api.get(`/categories/dropdown`);
+      dispatch({ type: "CATEGORY_LIST", payload: result?.data?.data });
     } catch (error) {}
   };
 

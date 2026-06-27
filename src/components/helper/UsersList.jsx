@@ -701,7 +701,7 @@ const UsersList = ({
               <h2 className="text-xl font-semibold">Users</h2>
 
               {selectedUsers.length > 0 && isAdmin && (
-                <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-4 items-center z-50">
+                <div className="bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-4 items-center z-50">
                   <span className="text-sm font-medium">
                     {selectedUsers.length + 1 == users?.length
                       ? "All"

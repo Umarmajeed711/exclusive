@@ -21,6 +21,9 @@ export const reducer = (state, action) => {
       case "TOGGLE_CART": {
         return{...state , isReloadCart : !state.isReloadCart}
       }
+      case "TOGGLE_CATEGORY": {
+        return{...state , isReloadCategory : !state.isReloadCategory}
+      }
       case "LODING_CART": {
         return{...state , cardLoading : action.payload}
       }

@@ -274,7 +274,7 @@ const CategoryList = ({
 
             <button
               title="Delete Category"
-              onClick={() => onDelete(category.category_id, category)}
+              onClick={() => onDelete([category?.category_id])}
               className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition"
             >
               <RiDeleteBin6Fill size={16} />
@@ -303,7 +303,7 @@ const CategoryList = ({
           <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
             <h2 className="text-xl font-semibold">Categories</h2>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            {/* <div className="flex items-center gap-2 flex-wrap"> */}
               {selectedCategories.length > 0 && (
                 <div className="bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-4 items-center">
                   <span className="text-sm font-medium">
@@ -343,6 +343,9 @@ const CategoryList = ({
                 </div>
               )}
 
+               <div className="flex gap-1">
+
+                <div>
               {/* Export dropdown */}
               <ExportDropdown
                 exportOptions={exportOptions}
@@ -351,6 +354,8 @@ const CategoryList = ({
                 exportToCSV={exportToCSV}
                 filters={filters}
               />
+
+                </div>
 
               {/* Columns */}
               <div className="relative" ref={menuRef}>
@@ -393,7 +398,9 @@ const CategoryList = ({
                   </div>
                 )}
               </div>
-            </div>
+               </div>
+
+            {/* </div> */}
           </div>
 
           {/* TABLE */}

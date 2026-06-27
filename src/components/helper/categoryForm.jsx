@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import api from "../helper/api";
 import { showToast } from "./types";
+import { GlobalContext } from "../../context/Context";
 
 const CategoryForm = ({
   onClose = () => {},
@@ -11,6 +12,13 @@ const CategoryForm = ({
   OnError = () => {},
 }) => {
   const [loading, setLoading] = useState(false);
+
+  const {state,dispatch} = useContext(GlobalContext);
+
+  // const [categoryCount,setCategoryCount] = useState(null);
+
+
+  
 
   const isEdit = Boolean(categoryData?.category_id);
 
@@ -32,8 +40,8 @@ const CategoryForm = ({
     },
     validationSchema,
     onSubmit: async (values) => {
+      if(!categoryReched) return;
       setLoading(true);
-      // setApiError("");
 
       try {
         let res;
@@ -52,6 +60,7 @@ const CategoryForm = ({
 
         const response = res?.data?.data ?? "";
 
+        
         OnSuccess({
           icon: "success",
           message:
@@ -67,6 +76,8 @@ const CategoryForm = ({
               created_at:response?.created_at
             } : {},
         });
+        // dispatch({ type: "TOGGLE_CATEGORY"});
+        
 
         formik.resetForm();
       } catch (err) {
@@ -97,6 +108,12 @@ const CategoryForm = ({
     }
   }, [categoryData]);
 
+  const minRequired = 20;
+  const countCategory = Math.round(formik.values.category_description.length);
+  const categoryReched = countCategory >= minRequired;
+
+
+
   return (
     <div className="overflow-auto h-full w-full bg-transparent">
       <div className="w-full h-full overflow-hidden bg-gray-100 border border-gray-200 shadow-xl">
@@ -122,7 +139,7 @@ const CategoryForm = ({
               {/* Category Name */}
               <div className="flex flex-col gap-2 w-full">
                 <label className="text-sm font-medium text-gray-700">
-                  Category Name
+                  Category Name <span className="text-red-500">*</span>
                 </label>
 
                 <input
@@ -147,7 +164,7 @@ const CategoryForm = ({
               {/* Category Description */}
               <div className="flex flex-col gap-2 w-full">
                 <label className="text-sm font-medium text-gray-700">
-                  Description
+                  Description <span className="text-red-500">*</span>
                 </label>
 
                 <textarea
@@ -156,18 +173,34 @@ const CategoryForm = ({
                   placeholder="Enter category description"
                   value={formik.values.category_description}
                   onChange={formik.handleChange}
+                  //  onChange={(e) => {formik.setFieldValue("category_description", e.target.value);setCategoryCount(e.target.value)}}
                   onBlur={formik.handleBlur}
                   className="inputField min-h-[130px] resize-none"
                 />
+                <div className="flex justify-between items-center m-0 p-0 text-xs">
+                  <div className={!categoryReched ? `text-theme-secondary` : `text-green-400`}>
+                    {
+                      !categoryReched ?
+                      `Minimum ${minRequired} characters required`
+                      : `Minimum Reached`
+                    }
 
-                <div className="error-wrapper">
+                  </div>
+                  <div>
+                    
+                     <span className="text-gray-500">{countCategory} </span>/<span>  {minRequired}</span>
+                    
+                  </div>
+                </div>
+
+                {/* <div className="error-wrapper">
                   {formik.submitCount > 0 &&
                     formik.errors.category_description && (
                       <p className="requiredError">
                         {formik.errors.category_description}
                       </p>
                     )}
-                </div>
+                </div> */}
               </div>
             </div>
 

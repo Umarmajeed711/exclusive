@@ -35,15 +35,17 @@ const AddProduct = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [viewType, setViewType] = useState("grid");
 
-  const [categoryList, setCategoryList] = useState([]);
+  // const [categoryList, setCategoryList] = useState([]);
 
-  const getCategory = async () => {
-    try {
-      let result = await api.get(`/categories`);
+  // const getCategory = async () => {
+  //   try {
+  //     let result = await api.get(`/categories`);
 
-      setCategoryList(result.data.categories);
-    } catch (error) {}
-  };
+  //     setCategoryList(result.data.data);
+  //   } catch (error) {}
+  // };
+
+  const categoryList = state?.categoryList;
 
   const categoryOptions = categoryList?.map((c) => ({
   label: c?.category_name,
@@ -120,7 +122,7 @@ const AddProduct = () => {
   };
 
   useEffect(() => {
-    getCategory();
+    // getCategory();
     getProducts();
   }, [toggle]);
 

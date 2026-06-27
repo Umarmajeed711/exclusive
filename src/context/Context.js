@@ -11,6 +11,7 @@ let data = {
     cart: [],
     cardLoading:true,
     isReloadCart: false,
+    isReloadCategory:false,
     wishlist:[],
     wishlistLoading:true,
     isWishlistReload:false,

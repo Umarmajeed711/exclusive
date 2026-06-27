@@ -96,7 +96,7 @@ const CategorySelect = ({ formik, categoryList, loading }) => {
   return (
     <div className="relative">
       <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-        Category
+        Category <span className="text-red-500">*</span>
       </span>
 
       <button
@@ -201,8 +201,8 @@ const AddProductForm = ({
     productCostPrice: yup.number().required("This field is required"),
     productQuantity: yup.number().required("This field is required"),
     productCategory: yup.string().required("This field is required"),
-    productSizes: yup.string().required("This field is required"),
-    productColor: yup.string().required("This field is required"),
+    // productSizes: yup.string().required("This field is required"),
+    // productColor: yup.string().required("This field is required"),
   });
 
   const addProjectFormik = useFormik({
@@ -220,6 +220,7 @@ const AddProductForm = ({
     validationSchema: ProductValidation,
 
     onSubmit: async (values) => {
+      if (!descriptionReached) return;
       setloading(true);
 
       let productSizes = values.productSizes.split(",");
@@ -287,6 +288,10 @@ const AddProductForm = ({
       }
     },
   });
+
+  const minRequired = 20;
+  const descriptionCount = addProjectFormik?.values?.productDescription?.length;
+  const descriptionReached = descriptionCount >= minRequired;
 
   // const handleFile = (file) => {
   //   if (!file) return;
@@ -428,7 +433,7 @@ const AddProductForm = ({
                 <label>
                   <span className="flex items-center gap-1 text-sm font-semibold text-gray-800">
                     {/* <FolderKanban /> */}
-                    Name
+                    Name <span className="text-red-500">*</span>
                   </span>
                 </label>
                 <div>
@@ -461,7 +466,7 @@ const AddProductForm = ({
                 <label>
                   <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                     {/* <ExternalLink />  */}
-                    Quantity
+                    Quantity <span className="text-red-500">*</span>
                   </span>
                 </label>
                 <div>
@@ -493,7 +498,7 @@ const AddProductForm = ({
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
                   <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                  Cost Price
+                  Cost Price <span className="text-red-500">*</span>
                   </span>
                 </label>
                 <div>
@@ -523,7 +528,7 @@ const AddProductForm = ({
                <div className="flex gap-3 flex-col justify-center ">
                 <label>
                   <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                   Selling Price
+                   Selling Price <span className="text-red-500">*</span>
                   </span>
                 </label>
                 <div>
@@ -642,7 +647,7 @@ const AddProductForm = ({
                 <label>
                   <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
                     {/* <AlignLeft />  */}
-                    Description
+                    Description <span className="text-red-500">*</span>
                   </span>
                 </label>
 
@@ -658,14 +663,30 @@ const AddProductForm = ({
                     className="inputField !h-28 resize-none"
                     placeholder="Write product Description..."
                   />
-                  <div className="error-wrapper">
+                  {/* <div className="error-wrapper">
                     {addProjectFormik.submitCount > 0 &&
                       addProjectFormik.errors.productDescription && (
                         <p className="requiredError">
                           {addProjectFormik.errors.productDescription}
                         </p>
                       )}
+                  </div> */}
+
+                   <div className="flex justify-between items-center m-0 p-0 text-xs">
+                  <div className={!descriptionReached ? `text-theme-secondary` : `text-green-400`}>
+                    {
+                      !descriptionReached ?
+                      `Minimum ${minRequired} characters required`
+                      : `Minimum Reached`
+                    }
+
                   </div>
+                  <div>
+                    
+                     <span className="text-gray-500">{descriptionCount} </span>/<span>  {minRequired}</span>
+                    
+                  </div>
+                </div>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { MdOutlineFilterAlt } from "react-icons/md";
 import Swal from "sweetalert2";
 import api from "../../components/helper/api";
@@ -14,9 +14,11 @@ import CategoryForm from "../../components/helper/categoryForm";
 import CategoryList from "../../components/helper/CategoryList";
 import Modal from "../../components/helper/modal";
 import { PlusIcon } from "lucide-react";
+import { GlobalContext } from "../../context/Context";
 
 const Category = () => {
   const [loading, setLoading] = useState(false);
+  const {dispatch} = useContext(GlobalContext);
 
   const [showFilter, setShowFilter] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -75,6 +77,7 @@ const Category = () => {
   }, []);
 
     const onSuccess = ({ position, icon, message, category }) => {
+      getCategories();
       handleCategoryUpdate(category);
       setSelectedCategory("")
       setShowCategoryModal(false)
@@ -192,6 +195,7 @@ const Category = () => {
     });
 
     setCategoriesByPage({});
+    dispatch({ type: "TOGGLE_CATEGORY" });
   };
 
   /* =========================
@@ -216,12 +220,14 @@ const Category = () => {
     const previousCategories = [...categories];
 
     setCategories((prev) =>
-      prev.filter((item) => item.category_id !== categoryId),
+      prev.filter((item) => item.category_id !== categoryId[0]),
     );
     setTotalCategories((prev) => Math.max(prev - 1, 0));
 
     try {
-      await api.delete(`/category/${categoryId}`);
+      await api.delete(`/categories/delete`, {
+        data: { ids:categoryId },
+      });
 
       showToast({
         icon: "success",
@@ -229,6 +235,7 @@ const Category = () => {
       });
 
       setCategoriesByPage({});
+      dispatch({ type: "TOGGLE_CATEGORY" });
     } catch (error) {
       setCategories(previousCategories);
       setTotalCategories((prev) => prev + 1);
@@ -239,6 +246,8 @@ const Category = () => {
       });
     }
   };
+
+
 
   /* =========================
      BULK DELETE CATEGORY
@@ -274,6 +283,8 @@ const Category = () => {
         icon: "success",
         title: "Selected categories deleted successfully",
       });
+
+      dispatch({ type: "TOGGLE_CATEGORY" });
 
       setCategoriesByPage({});
     } catch (error) {
