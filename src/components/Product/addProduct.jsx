@@ -171,10 +171,10 @@ const AddProductForm = ({
       productData?.description,
     );
     addProjectFormik.setFieldValue("productPrice", productData?.price);
-     addProjectFormik.setFieldValue("productCostPrice", productData?.cost_price);
+    addProjectFormik.setFieldValue("productCostPrice", productData?.cost_price);
     addProjectFormik.setFieldValue("productQuantity", productData?.quantity);
     addProjectFormik.setFieldValue("productCategory", productData?.category_id);
-    
+
     addProjectFormik.setFieldValue("productSizes", sizes);
     addProjectFormik.setFieldValue("productColor", colors);
     addProjectFormik.setFieldValue("productDiscount", productData?.discount);
@@ -210,7 +210,7 @@ const AddProductForm = ({
       productName: "",
       productDescription: "",
       productPrice: "",
-      productCostPrice:"",
+      productCostPrice: "",
       productQuantity: "",
       productDiscount: 0,
       productCategory: "",
@@ -221,10 +221,28 @@ const AddProductForm = ({
 
     onSubmit: async (values) => {
       if (!descriptionReached) return;
+
+      console.log("Add PRodcut ffffff", values);
+
       setloading(true);
 
-      let productSizes = values.productSizes.split(",");
-      let productColor = values.productColor.split(",");
+      // let productSizes = productSizes ? values.productSizes.split(",") : "";
+      // let productColor = productColor ? values.productColor.split(",") : "";
+
+      const productSizes = values.productSizes?.trim()
+        ? values.productSizes
+            .split(",")
+            .map((size) => size.trim())
+            .filter(Boolean)
+        : [];
+
+      const productColors = values.productColor?.trim()
+        ? values.productColor
+            .split(",")
+            .map((color) => color.trim())
+            .filter(Boolean)
+        : [];
+      console.log("Loading True here ");
 
       const formData = new FormData();
       formData.append("name", values.productName);
@@ -234,8 +252,8 @@ const AddProductForm = ({
       formData.append("quantity", values.productQuantity);
       formData.append("discount", values.productDiscount);
       formData.append("category_id", values.productCategory);
-      formData.append("sizes", productSizes);
-      formData.append("colors", productColor);
+      formData.append("sizes", JSON.stringify(productSizes));
+      formData.append("colors", JSON.stringify(productColors));
       Array.from(newImages).forEach((files) => {
         formData.append("images", files);
       });
@@ -255,7 +273,6 @@ const AddProductForm = ({
         return;
       }
 
-
       try {
         let response = productData.product_id
           ? await api.put(`/products/${productData?.product_id}`, formData)
@@ -264,7 +281,6 @@ const AddProductForm = ({
                 "Content-Type": "multipart/form-data",
               },
             });
-
 
         setloading(false);
 
@@ -498,7 +514,7 @@ const AddProductForm = ({
               <div className="flex gap-3 flex-col justify-center ">
                 <label>
                   <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                  Cost Price <span className="text-red-500">*</span>
+                    Cost Price <span className="text-red-500">*</span>
                   </span>
                 </label>
                 <div>
@@ -525,10 +541,10 @@ const AddProductForm = ({
                 </div>
               </div>
 
-               <div className="flex gap-3 flex-col justify-center ">
+              <div className="flex gap-3 flex-col justify-center ">
                 <label>
                   <span className="text-sm font-semibold text-gray-800 flex items-center gap-1">
-                   Selling Price <span className="text-red-500">*</span>
+                    Selling Price <span className="text-red-500">*</span>
                   </span>
                 </label>
                 <div>
@@ -590,8 +606,9 @@ const AddProductForm = ({
                       </p>
                     ) : (
                       <p className="text-xs">
-                        <span className="font-semibold"> Note:</span> Sizes should
-                        be ( <span className="font-semibold text-sm">,</span> )
+                        <span className="font-semibold"> Note:</span> Sizes
+                        should be ({" "}
+                        <span className="font-semibold text-sm">,</span> )
                         seperated.
                       </p>
                     )}
@@ -672,21 +689,23 @@ const AddProductForm = ({
                       )}
                   </div> */}
 
-                   <div className="flex justify-between items-center m-0 p-0 text-xs">
-                  <div className={!descriptionReached ? `text-theme-secondary` : `text-green-400`}>
-                    {
-                      !descriptionReached ?
-                      `Minimum ${minRequired} characters required`
-                      : `Minimum Reached`
-                    }
-
+                  <div className="flex justify-between items-center m-0 p-0 text-xs">
+                    <div
+                      className={
+                        !descriptionReached
+                          ? `text-theme-secondary`
+                          : `text-green-400`
+                      }
+                    >
+                      {!descriptionReached
+                        ? `Minimum ${minRequired} characters required`
+                        : `Minimum Reached`}
+                    </div>
+                    <div>
+                      <span className="text-gray-500">{descriptionCount} </span>
+                      /<span> {minRequired}</span>
+                    </div>
                   </div>
-                  <div>
-                    
-                     <span className="text-gray-500">{descriptionCount} </span>/<span>  {minRequired}</span>
-                    
-                  </div>
-                </div>
                 </div>
               </div>
 
@@ -854,41 +873,36 @@ const AddProductForm = ({
                   No file selected
                 </p>
               )}
-
-             
             </div>
-
-            
 
             <div className=" flex gap-3 w-full p-3 border-t">
               <button
                 onClick={() => {
-                addProjectFormik.resetForm();
-                onClose()
-              }}
+                  addProjectFormik.resetForm();
+                  onClose();
+                }}
                 type="button"
                 className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
               >
                 Cancel
               </button>
-                <button
-                  disabled={loading}
-                  className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md w-full py-2  text-white  hover:shadow-theme-secondary hover:shadow-md"
-                  type="submit"
-                >
-                  {loading ? (
-                    <div className="flex items-center px-1 py-2 gap-2 bg-transparent">
-                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
-                    </div>
-                  ) : productData?.product_id ? (
-                    "Update Product"
-                  ) : (
-                    "Add Product"
-                  )}
-                </button>
-              
+              <button
+                disabled={loading}
+                className=" bg-theme-primary transition-all duration-200 flex justify-center rounded-md w-full py-2  text-white  hover:shadow-theme-secondary hover:shadow-md"
+                type="submit"
+              >
+                {loading ? (
+                  <div className="flex items-center px-1 py-2 gap-2 bg-transparent">
+                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
+                  </div>
+                ) : productData?.product_id ? (
+                  "Update Product"
+                ) : (
+                  "Add Product"
+                )}
+              </button>
             </div>
           </form>
         </div>
