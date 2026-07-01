@@ -532,11 +532,12 @@ const ProductDetail = () => {
                     </div>
                   </div>
                   <div className="mt-10"></div>
+                  <hr />
                 </>
               ) : null}
 
               {/* Size Selection */}
-              <hr />
+              
               {Product?.sizes?.length > 0 ? (
                 <div>
                   <p className="font-normal mb-2 text-xl">Sizes</p>
@@ -555,11 +556,13 @@ const ProductDetail = () => {
                       </button>
                     ))}
                   </div>
+                  <hr />
                 </div>
+                
               ) : null}
 
               {/* Quantity and Add to Cart */}
-              <hr />
+              
               <div className="flex space-x-4">
                 {/* counter */}
                 <div className="grid grid-cols-3 place-content-center place-items-center border rounded bg-White">
