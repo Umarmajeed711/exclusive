@@ -13,6 +13,7 @@ import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../components/helper/t
 import { generateInvoice } from "../components/helper/generateInvoice";
 import Modal from "../components/helper/modal";
 import { useNavigate } from "react-router-dom";
+import { TableLayout } from "../components/helper/table";
 
 const OrdersPage = () => {
   const { state, dispatch } = useContext(GlobalContext);
@@ -321,7 +322,7 @@ const OrdersPage = () => {
   return (
     <div className="mx-5  md:mx-8 lg:mx-14 py-4 min-h-screen">
       {/* <h2 className="text-3xl font-bold mb-8 tracking-tight">My Orders</h2> */}
-      <div className="flex flex-col  gap-5 my-5 sm:my-10">
+      <div className="flex flex-col  gap-5 my-5 ">
         <div className="flex flex-row justify-between h-full md:items-center">
           <div className="flex gap-5 items-center">
             <p className="h-10 w-5 rounded bg-theme-primary"></p>
@@ -350,6 +351,9 @@ const OrdersPage = () => {
           }}
         />
       </div>
+
+      <TableLayout>
+
 
       <div className="sticky top-0 z-40 backdrop-blur bg-gray-50/80 py-3 mb-2">
         <div className="flex flex-wrap gap-3  bg-white p-2 rounded-xl shadow-sm w-fit">
@@ -596,6 +600,7 @@ const OrdersPage = () => {
           )}
         </div>
       )}
+      </TableLayout>
     </div>
   );
 };

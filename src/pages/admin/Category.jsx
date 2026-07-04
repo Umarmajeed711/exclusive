@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { MdOutlineFilterAlt } from "react-icons/md";
+import { MdOutlineAdd, MdOutlineFilterAlt } from "react-icons/md";
 import Swal from "sweetalert2";
 import api from "../../components/helper/api";
 import {
@@ -315,20 +315,20 @@ const Category = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex  gap-2 h-8">
             <button
               title="Add Category"
-              className="button !p-[3px] text-xl"
+              className="button text-xl h-full"
               onClick={() => {
                 setSelectedCategory(null);
                 setShowCategoryModal(true);
               }}
             >
-              <PlusIcon />
+              <MdOutlineAdd />
             </button>
 
             <button
-              className={`button !p-[5px] text-xl ${
+              className={`button  text-xl h-full ${
                 filters?.length > 0 ? "active" : ""
               }`}
               onClick={() => setShowFilter(!showFilter)}

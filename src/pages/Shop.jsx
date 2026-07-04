@@ -230,7 +230,7 @@ const categoryOptions = categoryList?.map((c) => ({
   };
 
   return (
-    <div className="mx-5  md:mx-8 lg:mx-14">
+    <div className="mx-5  md:mx-8 lg:mx-14 mb-4">
       {/* Form Modal */}
       {/* <div className="flex gap-1 items-center text-sm text-theme-secondary ibm my-2 md:my-5">
         Add your new project now...

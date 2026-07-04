@@ -5,6 +5,7 @@ import api from "../helper/api";
 import { showToast } from "../helper/types";
 import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
+import { TableLayout } from "../helper/table";
 
 // const orders = [
 //   { id: 1, name: "Ali", total: "$120", status: "Delivered" },
@@ -127,7 +128,7 @@ const RecentOrders = () => {
   return (
     <div className="flex flex-col">
       {/* <h3 className="font-semibold mb-4"></h3> */}
-
+       <TableLayout>
       <OrderList
         title="Recent Orders"
         products={Orders}
@@ -137,6 +138,8 @@ const RecentOrders = () => {
         updateOrderStatus={updateOrderStatus}
         deleteOrder={deleteOrder}
       />
+
+       </TableLayout>
 
       {Orders?.length > 0 ? (
         <Link
