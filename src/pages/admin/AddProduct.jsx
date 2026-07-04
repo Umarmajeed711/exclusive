@@ -22,6 +22,7 @@ import SmartFilter from "../../components/helper/SmartFilters";
 import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../../components/helper/types";
 import { ActiveFilters } from "../../components/Product/ActiveFilters";
 import Pagination from "../../components/helper/Pagination";
+import { TableLayout } from "../../components/helper/table";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -414,6 +415,8 @@ const AddProduct = () => {
           </div>
         </div>
       </div>
+
+       <TableLayout>
       {viewType === "grid" ? (
         <OurProducts
           products={Products}
@@ -433,17 +436,7 @@ const AddProduct = () => {
         />
       )}
 
-      {/* <p className="text-sm text-gray-600">
-        Showing page {currentPage} of {totalPages} ({Products?.length} products)
-      </p> */}
-      {/* <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        isLoading={loading}
-        Products={Products?.length}
-        
-      /> */}
+
       <Pagination
         currentPage={currentPage}
         totalPages={Math.ceil(totalProducts / limit)}
@@ -452,6 +445,8 @@ const AddProduct = () => {
         isLoading={loading}
         onPageChange={handlePageChange}
       />
+
+       </TableLayout>
       {showModal && (
         <Modal
           onClose={() => {

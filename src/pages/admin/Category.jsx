@@ -15,6 +15,7 @@ import CategoryList from "../../components/helper/CategoryList";
 import Modal from "../../components/helper/modal";
 import { PlusIcon } from "lucide-react";
 import { GlobalContext } from "../../context/Context";
+import { TableLayout } from "../../components/helper/table";
 
 const Category = () => {
   const [loading, setLoading] = useState(false);
@@ -381,7 +382,9 @@ const Category = () => {
         </div>
       </div>
 
-      {/* Category List */}
+      <TableLayout>
+        <div>
+           {/* Category List */}
       <CategoryList
         categories={categories}
         loading={loading}
@@ -403,6 +406,13 @@ const Category = () => {
         isLoading={loading}
         onPageChange={handlePageChange}
       />
+      </div>
+
+
+      </TableLayout>
+
+     
+
 
       {/* Filters */}
       {showFilter && (

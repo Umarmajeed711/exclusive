@@ -11,6 +11,7 @@ import { MdOutlineFilterAlt } from "react-icons/md";
 import Swal from "sweetalert2";
 import UsersList from "../../components/helper/UsersList";
 import Breadcrumbs from "../../components/helper/Breadcrums";
+import { TableLayout } from "../../components/helper/table";
 
 const Users = () => {
   const { state } = useContext(GlobalContext);
@@ -254,6 +255,8 @@ const Users = () => {
         </div>
       </div>
 
+      <TableLayout>
+
       <UsersList
         users={Users}
         loading={loading}
@@ -273,6 +276,8 @@ const Users = () => {
         isLoading={loading}
         onPageChange={handlePageChange}
       />
+
+      </TableLayout>
 
       {showFilter && (
         <SmartFilter

@@ -1,8 +1,6 @@
 // const Pagination = ({ currentPage, totalPages, onPageChange,isLoading,Products }) => {
 //   if (totalPages < 1) return null;
 
-
-
 //   return (
 //     <div className="mt-6 flex items-center justify-between gap-2">
 //       {isLoading ? (
@@ -56,8 +54,7 @@
 
 // export default Pagination;
 
-
-  const getPaginationRange = (currentPage, totalPages, delta = 2) => {
+const getPaginationRange = (currentPage, totalPages, delta = 2) => {
   const range = [];
   const rangeWithDots = [];
 
@@ -91,7 +88,7 @@ const Pagination = ({
   pageSize,
   totalProducts,
 }) => {
-  if (totalPages <= 1) return null;
+  if (totalPages <= 1 && !isLoading) return null;
 
   const pages = getPaginationRange(currentPage, totalPages);
 
@@ -99,7 +96,7 @@ const Pagination = ({
   const endProduct = Math.min(currentPage * pageSize, totalProducts);
 
   return (
-    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="pt-4 border-t  flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {/* Product Count */}
       {isLoading ? (
         <div className="h-4 w-48 rounded bg-gray-200 animate-pulse" />
@@ -109,47 +106,67 @@ const Pagination = ({
         </p>
       )}
 
-      {/* Pagination Controls */}
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Prev */}
-        <button
-          disabled={currentPage === 1 || isLoading}
-          onClick={() => onPageChange(currentPage - 1)}
-          className="rounded border px-3 py-1 text-sm disabled:opacity-50"
-        >
-          Prev
-        </button>
+      {isLoading ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Prev */}
+          <div className="rounded border h-7 w-16 px-3 py-1 text-sm disabled:opacity-50 bg-gray-200 animate-pulse" />
 
-        {pages.map((page, index) =>
-          page === "..." ? (
-            <span key={index} className="px-2 text-gray-500">
-              ...
-            </span>
-          ) : (
-            <button
-              key={page}
-              disabled={isLoading}
-              onClick={() => onPageChange(page)}
-              className={`rounded px-3 py-1 text-sm ${
-                currentPage === page
-                  ? "bg-[#03A9F4] text-white"
-                  : "border hover:bg-gray-100"
-              }`}
-            >
-              {page}
-            </button>
-          )
-        )}
+          {[1].map((page, index) =>
+            page === "..." ? (
+              <div
+                key={index}
+                className="px-2 text-gray-500 h-4 w-5 bg-gray-200 animate-pulse"
+              />
+            ) : (
+              <div className="rounded border h-7 w-4 px-3 py-1 text-sm disabled:opacity-50 bg-gray-200 animate-pulse" />
+            ),
+          )}
 
-        {/* Next */}
-        <button
-          disabled={currentPage === totalPages || isLoading}
-          onClick={() => onPageChange(currentPage + 1)}
-          className="rounded border px-3 py-1 text-sm disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+          {/* Next */}
+          <div className="rounded border h-7 w-16 px-3 py-1 text-sm disabled:opacity-50 bg-gray-200 animate-pulse" />
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Prev */}
+          <button
+            disabled={currentPage === 1 || isLoading}
+            onClick={() => onPageChange(currentPage - 1)}
+            className="rounded border px-3 py-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Prev
+          </button>
+
+          {pages.map((page, index) =>
+            page === "..." ? (
+              <span key={index} className="px-2 text-gray-500">
+                ...
+              </span>
+            ) : (
+              <button
+                key={page}
+                disabled={isLoading}
+                onClick={() => onPageChange(page)}
+                className={`rounded px-3 py-1 text-sm ${
+                  currentPage === page
+                    ? "bg-[#03A9F4] text-white"
+                    : "border hover:bg-gray-100"
+                }`}
+              >
+                {page}
+              </button>
+            ),
+          )}
+
+          {/* Next */}
+          <button
+            disabled={currentPage === totalPages || isLoading}
+            onClick={() => onPageChange(currentPage + 1)}
+            className="rounded border px-3 py-1 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

@@ -13,6 +13,7 @@ import ExportDropdown from "../export/exportDrop";
 import { X } from "lucide-react";
 import { ProductDetailSkeleton } from "./productCardSkeleton";
 import BulkUpdateProductForm from "./updateBulkProduct";
+import { TableSkeleton } from "../helper/table";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -41,7 +42,7 @@ const ProductListView = ({
   delProduct,
   loading = true,
   filters = [],
-  onBulkUpdate = () => {}
+  onBulkUpdate = () => {},
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
   let isAdmin = state?.isAdmin;
@@ -137,7 +138,6 @@ const ProductListView = ({
       case "price":
         return <span className="font-medium">${product.price}</span>;
 
-
       case "discount":
         return product.discount ? (
           <span className="text-green-600">{product.discount}%</span>
@@ -213,8 +213,6 @@ const ProductListView = ({
     setShowModal(true);
   };
 
-  
-
   const deleteProduct = async (id) => {
     // 🔥 Show confirmation alert first
     const result = await Swal.fire({
@@ -244,7 +242,6 @@ const ProductListView = ({
         });
         delProduct(id);
       } catch (error) {
-
         showToast({
           icon: "error",
           title: error?.response?.data?.message || "Something went wrong",
@@ -274,7 +271,7 @@ const ProductListView = ({
 
       setProducts((prev) =>
         prev.filter((o) => !selectedProducts.includes(o.product_id)),
-      );   
+      );
 
       try {
         await api.delete("/products/delete", {
@@ -321,8 +318,6 @@ const ProductListView = ({
       title: title,
     });
   };
-
-  
 
   const OnError = ({ position, icon, title }) => {
     showToast({
@@ -453,9 +448,12 @@ const ProductListView = ({
   // Render
   return (
     <>
-      <div className="bg-white rounded-xl shadow p-4">
+      <div>
         {loading ? (
-          <Loader />
+          <TableSkeleton
+            rows={5}
+            columns={columns.filter((c) => c.visible).length} // checkbox + user
+          />
         ) : Products.length === 0 ? (
           <div className="flex justify-center items-center h-[50vh]">
             <div className="text-md sm:text-xl font-medium  drop-shadow">
@@ -477,14 +475,14 @@ const ProductListView = ({
                     selected
                   </span>
 
-                    <button
-              title="update Bulk Product"
-              onClick={() => setShowBulkModal(true)}
-              className="flex gap-1 items-center px-4 py-1.5 text-sm font-medium  
+                  <button
+                    title="update Bulk Product"
+                    onClick={() => setShowBulkModal(true)}
+                    className="flex gap-1 items-center px-4 py-1.5 text-sm font-medium  
               rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-[1.02] transition"
-            >
-               <FiEdit2 size={14} />  Bulk Update
-            </button>
+                  >
+                    <FiEdit2 size={14} /> Bulk Update
+                  </button>
 
                   {/* Export  */}
 
@@ -516,7 +514,10 @@ const ProductListView = ({
                     className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg
                                      hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
                                  duration-200 transition-all  
-                                 ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""
+                                 ${
+                                   bulkDelLoading
+                                     ? "opacity-50 cursor-not-allowed"
+                                     : ""
                                  }`}
                   >
                     Delete
@@ -594,10 +595,10 @@ const ProductListView = ({
             {/* TABLE */}
             <div className="overflow-x-auto w-full h-full max-h-[500px] custom-scrollbar">
               <table className="w-full border-collapse">
-                <thead className="bg-gray-100 text-sm">
+                <thead className="bg-gray-100 text-sm sticky top-0 z-20">
                   <tr>
                     {/* FIXED PRODUCT COLUMN */}
-                    <th className="p-3 sticky left-0 z-20 ">
+                    <th className="p-3">
                       <input
                         type="checkbox"
                         checked={
@@ -608,17 +609,14 @@ const ProductListView = ({
                       />
                     </th>
 
-                    <th className="p-3 text-left sticky left-0 z-30 bg-gray-100 top-0 w-full">
+                    <th className="p-3 text-left sticky left-0 z-30 bg-gray-100 top-0">
                       Product
                     </th>
 
                     {columns
                       .filter((c) => c.visible)
                       .map((col) => (
-                        <th
-                          key={col.key}
-                          className="p-3 text-left z-20 sticky top-0 bg-gray-100"
-                        >
+                        <th key={col.key} className="p-3 text-left">
                           {col.label}
                         </th>
                       ))}
@@ -629,9 +627,9 @@ const ProductListView = ({
                   {Products?.map((product) => (
                     <tr
                       key={product.product_id}
-                      className="border-b hover:bg-gray-50 transition-all"
+                      className="border-b last:border-b-0 group hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td className="p-3 sticky left-0 z-10 bg-white cursor-pointer">
+                      <td className="p-3 sticky left-0 z-10 bg-white cursor-pointer group-hover:bg-gray-50 ">
                         <input
                           type="checkbox"
                           checked={selectedProducts?.includes(
@@ -643,14 +641,17 @@ const ProductListView = ({
                         />
                       </td>
                       {/* FIXED PRODUCT CELL */}
-                      <td className="p-3 sticky left-0 z-10 bg-white">
+                      <td className="p-3 sticky left-0 z-10 bg-white group-hover:bg-gray-50">
                         {renderProductCell(product)}
                       </td>
 
                       {columns.map(
                         (col) =>
                           col.visible && (
-                            <td key={col.key} className="p-3">
+                            <td
+                              key={col.key}
+                              className="p-3 group-hover:bg-gray-50"
+                            >
                               {renderCell(col.key, product)}
                             </td>
                           ),
@@ -703,7 +704,6 @@ const ProductListView = ({
           />
         </Modal>
       )}
-      
     </>
   );
 };

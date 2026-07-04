@@ -19,6 +19,7 @@ import UserUpdateForm from "./updateUser";
 import { X } from "lucide-react";
 import { exportToCSV } from "../export/exportToCSV";
 import ExportDropdown from "../export/exportDrop";
+import { TableSkeleton } from "./table";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -455,7 +456,6 @@ const UsersList = ({
   const updateUserStatus = async ({ userId, field, value, user = null }) => {
     const prevOrders = Users;
 
-
     try {
       if (user?.user_role === 1) {
         Swal.fire({
@@ -503,7 +503,7 @@ const UsersList = ({
       return res.data;
     } catch (error) {
       setUsers(prevOrders);
-      
+
       showToast({
         icon: "error",
         title: error?.response?.data?.message || "Failed to Update Status",
@@ -551,8 +551,6 @@ const UsersList = ({
           title: "Deleted Successfully",
         });
       } catch (error) {
-        
-
         setUsers(previousOrders);
 
         showToast({
@@ -663,33 +661,34 @@ const UsersList = ({
     }
   };
 
-   const exportOptions = [
+  const exportOptions = [
     {
-      type:'current-page',
-      icon:"FileSpreadsheet",
-      label:"Current Page",
-      description:"Visible users only"
+      type: "current-page",
+      icon: "FileSpreadsheet",
+      label: "Current Page",
+      description: "Visible users only",
     },
     {
-     type:'filtered-users',
-     icon:"Filter",
-     label:"Filtered Users",
-     description:"Based on applied filters"
-   },
-     {
-      type:"all-users",
-      icon:"Database",
-      label:"All Users",
-      description:"Complete database export"
-    }
-   ]
+      type: "filtered-users",
+      icon: "Filter",
+      label: "Filtered Users",
+      description: "Based on applied filters",
+    },
+    {
+      type: "all-users",
+      icon: "Database",
+      label: "All Users",
+      description: "Complete database export",
+    },
+  ];
   return (
     <>
-      <div className="bg-white rounded-xl shadow p-4">
+      <div>
         {loading ? (
-          <div className="flex justify-center items-center h-48 sm:h-96">
-            <div className="loading"></div>
-          </div>
+          <TableSkeleton
+            rows={5}
+            columns={columns.filter((c) => c.visible).length} // checkbox + user
+          />
         ) : Users?.length == 0 ? (
           <div className="flex justify-center items-center min-h-[500px] h-[50vh]">
             <p className="text-lg font-medium">No Users Found</p>
@@ -725,7 +724,7 @@ const UsersList = ({
                     isBulk={true}
                   /> */}
 
-                   {/* Export  */}
+                  {/* Export  */}
 
                   <button
                     className="
@@ -758,8 +757,6 @@ const UsersList = ({
                   >
                     Delete
                   </button>
-
-                 
 
                   <div
                     className="text-black bg-theme-background  hover:bg-gray-200 transition-all p-1 rounded cursor-pointer"
@@ -864,13 +861,10 @@ const UsersList = ({
                   {Users?.map((user) => (
                     <tr
                       key={user?.user_id}
-                      className="border-b hover:bg-gray-50"
-                      // onClick={() => {
-                      //   navigate(`/orders/${order.order_id}`);
-                      // }}
+                      className="border-b last:border-b-0 group hover:bg-gray-50 transition-colors duration-200"
                     >
                       {user?.user_role !== 1 ? (
-                        <td className="p-3 sticky left-0 z-10 bg-white disabled:opacity-50 disabled:cursor-not-allowed">
+                        <td className="p-3 sticky left-0 z-10 group-hover:bg-gray-50 bg-white disabled:opacity-50 disabled:cursor-not-allowed">
                           <input
                             type="checkbox"
                             checked={selectedUsers.includes(user?.user_id)}
@@ -882,7 +876,7 @@ const UsersList = ({
                         <td></td>
                       )}
 
-                      <td className="p-3 sticky left-0 z-10 bg-white">
+                      <td className="p-3 sticky left-0 z-10 bg-white group-hover:bg-gray-50">
                         {renderProductCell(user)}
                       </td>
                       {columns.map(
@@ -890,7 +884,7 @@ const UsersList = ({
                           col.visible && (
                             <td
                               key={col.key}
-                              className="p-3 hover:bg-gray-50 transition "
+                              className="p-3 group-hover:bg-gray-50 transition "
                             >
                               {renderCell(col.key, user)}
                             </td>

@@ -13,6 +13,7 @@ import SmartFilter from "../../components/helper/SmartFilters";
 import { ActiveFilters } from "../../components/Product/ActiveFilters";
 import { MdOutlineFilterAlt } from "react-icons/md";
 import Swal from "sweetalert2";
+import { TableLayout } from "../../components/helper/table";
 
 const Orders = () => {
   const { state } = useContext(GlobalContext);
@@ -577,6 +578,8 @@ const Orders = () => {
         </div>
       </div>
 
+      <TableLayout>
+
       <OrderList
         products={Orders}
         loading={loading}
@@ -595,6 +598,9 @@ const Orders = () => {
         isLoading={loading}
         onPageChange={handlePageChange}
       />
+
+      </TableLayout>
+
 
       {showFilter && (
         <SmartFilter

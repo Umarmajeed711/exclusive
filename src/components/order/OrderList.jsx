@@ -6,12 +6,16 @@ import useOutsideClick from "../helper/outSideClick";
 import OrderDetailsModal from "./OrderDetailModal";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import { formatText, showToast } from "../helper/types";
-import { DeliveryStatusDropdown, PaymentStatusDropdown } from "../helper/statusOptions";
+import {
+  DeliveryStatusDropdown,
+  PaymentStatusDropdown,
+} from "../helper/statusOptions";
 import Modal from "../helper/modal";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { exportToCSV } from "../export/exportToCSV";
 import ExportDropdown from "../export/exportDrop";
+import { TableSkeleton } from "../helper/table";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -280,7 +284,6 @@ const OrderList = ({
           ),
         );
         try {
-
           await api.put("/orders/bulk-status", {
             ids: selectedOrders,
             [field]: value,
@@ -307,48 +310,47 @@ const OrderList = ({
   };
 
   const handleBulkDelete = async () => {
-     
-      const result = await Swal.fire({
-        title: "Are You Sure?",
-        text: "Do you want to delete All this Order?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#d33",
-        cancelButtonColor: "#3085d6",
-        confirmButtonText: "Delete",
-        cancelButtonText: "Cancel",
-      });
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete All this Order?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+    });
 
-      if (result?.isConfirmed) {
-        setBulkDelLoading(true);
+    if (result?.isConfirmed) {
+      setBulkDelLoading(true);
 
-        const previousOrders = Orders;
+      const previousOrders = Orders;
 
-        setOrders((prev) =>
-          prev.filter((o) => !selectedOrders.includes(o.order_id)),
-        );
+      setOrders((prev) =>
+        prev.filter((o) => !selectedOrders.includes(o.order_id)),
+      );
 
-        try {
-          await api.delete("/orders/bulk-delete", {
-            data: { ids: selectedOrders },
-          });
+      try {
+        await api.delete("/orders/bulk-delete", {
+          data: { ids: selectedOrders },
+        });
 
-          showToast({
-            icon: "success",
-            title: "Deleted Successfully",
-          });
-        } catch (error) {
-          showToast({
-            icon: "error",
-            title: error?.response?.data?.message || "Something went wrong",
-          });
-          setOrders(previousOrders);
-        } finally {
-          setBulkDelLoading(false);
-        }
+        showToast({
+          icon: "success",
+          title: "Deleted Successfully",
+        });
+      } catch (error) {
+        showToast({
+          icon: "error",
+          title: error?.response?.data?.message || "Something went wrong",
+        });
+        setOrders(previousOrders);
+      } finally {
+        setBulkDelLoading(false);
       }
-    
-      setSelectedOrders([]);
+    }
+
+    setSelectedOrders([]);
   };
 
   const navigate = useNavigate();
@@ -373,9 +375,9 @@ const OrderList = ({
 
     const finalColumns = [...fixedColumns, ...visibleColumns];
 
-    return finalColumns?.filter(
-      (col) => col.key !== "actions" ,
-    )?.filter((col) =>  col.key !== "customer");
+    return finalColumns
+      ?.filter((col) => col.key !== "actions")
+      ?.filter((col) => col.key !== "customer");
   }, [columns, fixedColumns]);
 
   const exportData = Orders?.filter((order) =>
@@ -450,11 +452,12 @@ const OrderList = ({
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow p-4">
+      <div>
         {loading ? (
-          <div className="flex justify-center items-center h-48 sm:h-96">
-            <div className="loading"></div>
-          </div>
+          <TableSkeleton
+            rows={5}
+            columns={columns.filter((c) => c.visible).length} // checkbox + user
+          />
         ) : Orders?.length == 0 ? (
           <div className="flex justify-center items-center min-h-[500px] h-[50vh]">
             <p className="text-lg font-medium">No Orders Found</p>
@@ -463,12 +466,17 @@ const OrderList = ({
           <>
             {/* HEADER */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{title ? title : "Orders"}</h2>
+              <h2 className="text-xl font-semibold">
+                {title ? title : "Orders"}
+              </h2>
 
               {selectedOrders.length > 0 && isAdmin && (
                 <div className=" bg-white border shadow-lg px-4 py-1 rounded-xl flex gap-3 items-center z-50">
                   <span className="text-sm font-medium">
-                    {selectedOrders.length == Orders?.length ? "All" : selectedOrders?.length} selected
+                    {selectedOrders.length == Orders?.length
+                      ? "All"
+                      : selectedOrders?.length}{" "}
+                    selected
                   </span>
 
                   <DeliveryStatusDropdown
@@ -613,16 +621,9 @@ const OrderList = ({
                   {Orders?.map((order) => (
                     <tr
                       key={order.order_id}
-                      className="border-b hover:bg-gray-50 cursor-pointer  transition"
-                      // onClick={() => {
-                      //   navigate(`/orders/${order.order_id}`);
-                      // }}
+                      className="border-b last:border-b-0 group hover:bg-gray-50 transition-colors duration-200"
                     >
-                      <td
-                        className="p-3 sticky left-0 z-10 bg-white cursor-pointer"
-                        // onClick={(e) => {e.preventDefault();
-                        //   e.stopPropagation();}}
-                      >
+                      <td className="p-3 sticky left-0 z-10 bg-white cursor-pointer group-hover:bg-gray-50">
                         <input
                           type="checkbox"
                           checked={selectedOrders.includes(order.order_id)}
@@ -634,7 +635,10 @@ const OrderList = ({
                       {columns.map(
                         (col) =>
                           col.visible && (
-                            <td key={col.key} className="p-3">
+                            <td
+                              key={col.key}
+                              className="p-3 group-hover:bg-gray-50"
+                            >
                               {renderCell(col.key, order)}
                             </td>
                           ),

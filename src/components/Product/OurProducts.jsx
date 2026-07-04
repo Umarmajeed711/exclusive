@@ -395,6 +395,7 @@ const OurProducts = ({
         title: response?.data?.message,
       });
     } catch (e) {
+
       showToast({
         icon: "error",
         title: e?.response?.data?.message || "Something went wrong",

@@ -7,6 +7,7 @@ import { showToast } from "../helper/types";
 import { exportToCSV } from "../export/exportToCSV";
 import ExportDropdown from "../export/exportDrop";
 import useOutsideClick from "../helper/outSideClick";
+import { TableSkeleton } from "./table";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -288,11 +289,12 @@ const CategoryList = ({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow p-4">
+    <div>
       {loading ? (
-        <div className="flex justify-center items-center h-48 sm:h-96">
-          <div className="loading"></div>
-        </div>
+        <TableSkeleton
+                rows={5}
+                columns={columns.filter(c => c.visible).length} // checkbox + user
+              />
       ) : categoryData?.length === 0 ? (
         <div className="flex justify-center items-center min-h-[500px] h-[50vh]">
           <p className="text-lg font-medium">No Categories Found</p>
@@ -437,8 +439,7 @@ const CategoryList = ({
                 {categoryData.map((category) => (
                   <tr
                     key={category.category_id}
-                    className="border-b hover:bg-gray-50"
-                  >
+                    className="border-b last:border-b-0 group hover:bg-gray-50 transition-colors duration-200">
                     <td className="p-3">
                       <input
                         type="checkbox"
@@ -449,7 +450,7 @@ const CategoryList = ({
                       />
                     </td>
 
-                    <td className="p-3 sticky left-0 z-10 bg-white">
+                    <td className="p-3 sticky left-0 z-10 bg-white group-hover:bg-gray-50">
                       {renderCategoryCell(category)}
                     </td>
 
@@ -458,7 +459,7 @@ const CategoryList = ({
                         col.visible && (
                           <td
                             key={col.key}
-                            className="p-3 hover:bg-gray-50 transition"
+                            className="p-3 griup-hover:bg-gray-50 transition"
                           >
                             {renderCell(col.key, category)}
                           </td>
