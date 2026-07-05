@@ -21,10 +21,10 @@ const Home = () => {
 
       setProducts(result?.data?.products);
     } catch (error) {
-       showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+      //  showToast({
+      //   icon:"error",
+      //   title:error?.response?.data?.message || "something went wrong"
+      // })
     } finally {
       setLoading(false);
     }

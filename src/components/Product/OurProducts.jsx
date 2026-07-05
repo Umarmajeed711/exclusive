@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import ProductCardSkeleton from "./productCardSkeleton";
 import { MdClose } from "react-icons/md";
 import { showToast } from "../helper/types";
+import { DataNotFound } from "../helper/table";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -453,11 +454,13 @@ const OurProducts = ({
           ))}
         </div>
       ) : products?.length === 0 ? (
-        <div className="flex justify-center items-center h-[60vh]">
-          <div className="text-md sm:text-xl font-medium  drop-shadow">
-            No products found
-          </div>
-        </div>
+        // <div className="flex justify-center items-center h-[60vh]">
+        //   <div className="text-md sm:text-xl font-medium  drop-shadow">
+        //     No products found
+        //   </div>
+        // </div>
+            <DataNotFound icon="🛒" title="No Product" message="Curretly No products found"
+         className="h-[60vh]" />
       ) : (
         <>
           {title ? <Title title={title} description={description} /> : null}

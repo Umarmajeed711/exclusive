@@ -13,7 +13,8 @@ import ExportDropdown from "../export/exportDrop";
 import { X } from "lucide-react";
 import { ProductDetailSkeleton } from "./productCardSkeleton";
 import BulkUpdateProductForm from "./updateBulkProduct";
-import { TableSkeleton } from "../helper/table";
+import { DataNotFound, TableSkeleton } from "../helper/table";
+import { useQueryClient } from "@tanstack/react-query";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -42,7 +43,7 @@ const ProductListView = ({
   delProduct,
   loading = true,
   filters = [],
-  onBulkUpdate = () => {},
+  // onBulkUpdate = () => {},
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
   let isAdmin = state?.isAdmin;
@@ -308,8 +309,17 @@ const ProductListView = ({
     });
   };
 
+
+const queryClient = useQueryClient();
+
   const onBulkSuccess = ({ position, icon, title }) => {
-    onBulkUpdate();
+    // onBulkUpdate();
+
+    queryClient.invalidateQueries({
+  queryKey: ["products"],
+});
+
+    
 
     setShowBulkModal(false);
     setSelectedProducts([]);
@@ -455,11 +465,8 @@ const ProductListView = ({
             columns={columns.filter((c) => c.visible).length} // checkbox + user
           />
         ) : Products.length === 0 ? (
-          <div className="flex justify-center items-center h-[50vh]">
-            <div className="text-md sm:text-xl font-medium  drop-shadow">
-              No products found
-            </div>
-          </div>
+           <DataNotFound icon="🛒" title="No Product" message="Curretly No products found"
+                   className="h-[50vh]" />
         ) : (
           <>
             {/* HEADER */}

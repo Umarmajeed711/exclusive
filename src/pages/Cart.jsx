@@ -11,6 +11,7 @@ import Breadcrums from "../components/helper/Breadcrums";
 import { PiMinus, PiPlus } from "react-icons/pi";
 import { isActiveUser, showToast } from "../components/helper/types";
 import { VerifyEmailModal } from "../components/helper/VerifyBanner";
+import { DataNotFound } from "../components/helper/table";
 
 const Cart = () => {
   let { state, dispatch } = useContext(GlobalContext);
@@ -247,8 +248,7 @@ const Cart = () => {
     }
   };
 
-   const [showVerifyModal, setShowVerifyModal] =
-    useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
 
   const handleCheckout = () => {
     if (!isActiveUser(state?.user) && state?.isLogin) {
@@ -258,16 +258,16 @@ const Cart = () => {
       });
     }
     if (productCart.length > 0) {
-       if (!state?.user?.user_id) {
-      window.location.href = "/login";
-      return;
-    }
+      if (!state?.user?.user_id) {
+        window.location.href = "/login";
+        return;
+      }
 
-    // user login hai but email verify nahi hai
-    if (!state?.user?.email_verified) {
-      setShowVerifyModal(true);
-      return;
-    }
+      // user login hai but email verify nahi hai
+      if (!state?.user?.email_verified) {
+        setShowVerifyModal(true);
+        return;
+      }
       // If there are items in the cart, redirect to the checkout page
       window.location.href = "/checkout";
     } else {
@@ -280,7 +280,7 @@ const Cart = () => {
     }
   };
 
-   const handleVerifiedClick = () => {
+  const handleVerifiedClick = () => {
     setShowVerifyModal(false);
 
     if (state?.user?.email_verified) {
@@ -289,15 +289,13 @@ const Cart = () => {
     } else {
       showToast({
         icon: "info",
-        title:
-          "If you’ve already verified your email, please  logIn again.",
+        title: "If you’ve already verified your email, please  logIn again.",
       });
       setTimeout(() => {
         window.location.href = "/login";
-      },500)
+      }, 500);
     }
   };
-
 
   return (
     <div className="mx-5 md:mx-8 lg:mx-14 pb-10">
@@ -547,22 +545,15 @@ const Cart = () => {
           </div>
         </div>
       ) : (
-        <div className="h-[70vh] flex flex-col items-center justify-center">
-          <div className="text-8xl">🛒</div>
-
-          <h2 className="text-4xl font-bold mt-4">Your Cart Is Empty</h2>
-
-          <p className="text-gray-500 mt-3">
-            Looks like you haven't added any products yet.
-          </p>
-
-          <Link
-            to="/shop"
-            className="mt-6 bg-theme-primary text-white px-8 py-3 rounded-xl hover:shadow-lg transition-all"
-          >
-            Continue Shopping
-          </Link>
-        </div>
+        <>
+          <DataNotFound
+            icon="🛒"
+            title="Your Cart Is Empty"
+            message="Looks like you haven't added any products yet."
+            className="h-[70vh]"
+            showShop={true}
+          />
+        </>
       )}
 
       <VerifyEmailModal

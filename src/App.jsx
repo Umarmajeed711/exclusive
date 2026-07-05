@@ -89,10 +89,10 @@ const App = () => {
       let cart_products = await api.get(`/cart-products?user_id=${user_id}`);
       dispatch({ type: "UPDATE_CART", payload: cart_products?.data?.products });
     } catch (error) {
-      showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+      // showToast({
+      //   icon:"error",
+      //   title:error?.response?.data?.message || "something went wrong"
+      // })
     } finally {
       dispatch({ type: "LODING_CART", payload: false });
     }
@@ -132,10 +132,10 @@ const App = () => {
       let result = await api.get(`/wishlist?user_id=${user_id}`);
       dispatch({ type: "WISHLIST_CART", payload: result.data.products });
     } catch (error) {
-      showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+      // showToast({
+      //   icon:"error",
+      //   title:error?.response?.data?.message || "something went wrong"
+      // })
     } finally {
       dispatch({ type: "WISHLIST_LODING_CART", payload: false });
     }

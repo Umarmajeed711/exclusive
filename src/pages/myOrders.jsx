@@ -13,7 +13,7 @@ import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../components/helper/t
 import { generateInvoice } from "../components/helper/generateInvoice";
 import Modal from "../components/helper/modal";
 import { useNavigate } from "react-router-dom";
-import { TableLayout } from "../components/helper/table";
+import { DataNotFound, TableLayout } from "../components/helper/table";
 
 const OrdersPage = () => {
   const { state, dispatch } = useContext(GlobalContext);
@@ -70,7 +70,7 @@ const OrdersPage = () => {
         [page]: result?.data,
       }));
     } catch (error) {
-      Swal.fire("Error", "Failed to load orders", "error");
+      // Swal.fire("Error", "Failed to load orders", "error");
       console.error(error);
     } finally {
       setLoading(false);
@@ -313,9 +313,7 @@ const OrdersPage = () => {
 
   if (orders.length === 0) {
     return (
-      <div className="flex justify-center items-center h-[60vh] text-xl">
-        No Orders Found
-      </div>
+      <DataNotFound icon="🛒" title="My Orders" message="currently no orders found" className="h-[90vh]" showShop={true} />
     );
   }
 
@@ -389,9 +387,10 @@ const OrdersPage = () => {
       </div>
 
       {filteredOrders.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-[50vh] text-gray-500">
-          <p className="text-lg">No {activeTab} orders</p>
-        </div>
+        // <div className="flex flex-col items-center justify-center h-[50vh] text-gray-500">
+        //   <p className="text-lg">No {activeTab} orders</p>
+        // </div>
+        <DataNotFound />
       ) : (
         <div className="grid gap-4 sm:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredOrders.map((order) => {

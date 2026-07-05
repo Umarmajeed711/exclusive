@@ -1,3 +1,6 @@
+import { AlertCircle, User } from "lucide-react";
+import { Link } from "react-router-dom";
+
 export const TableLayout = ({ children, className = "" }) => {
   return (
     <div className={`bg-white rounded-xl shadow p-4 ${className || ""}`}>
@@ -66,6 +69,35 @@ export const TableSkeleton = ({
           </tbody>
         </table>
       </div>
+    </div>
+  );
+};
+
+export const DataNotFound = ({
+  icon = <AlertCircle />,
+  title = "Data Not Found",
+  message = "no data found in this filter",
+  showShop = false,
+  className = "",
+}) => {
+  return (
+    <div
+      className={`flex justify-center items-center flex-col h-[50vh] gap-3 ${className || ""} `}
+    >
+      <div className="bg-gray-200 p-2 rounded-md text-2xl">{icon ?? ""}</div>
+      <div className="text-2xl font-semibold leading-5 capitalize">{title}</div>
+      <div className="text-sm text-gray-500 font-semibold leading-5 capitalize">
+        {message}
+      </div>
+
+      {showShop && (
+        <Link
+          to="/shop"
+          className="mt-3 bg-theme-primary text-white px-8 py-3 rounded-xl hover:shadow-lg transition-all"
+        >
+          Shop Now
+        </Link>
+      )}
     </div>
   );
 };

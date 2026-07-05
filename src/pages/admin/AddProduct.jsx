@@ -19,10 +19,15 @@ import {
 } from "react-icons/md";
 import ProductListView from "../../components/Product/ProductList";
 import SmartFilter from "../../components/helper/SmartFilters";
-import { FILTER_OPERATORS, INPUT_TYPES, showToast } from "../../components/helper/types";
+import {
+  FILTER_OPERATORS,
+  INPUT_TYPES,
+  showToast,
+} from "../../components/helper/types";
 import { ActiveFilters } from "../../components/Product/ActiveFilters";
 import Pagination from "../../components/helper/Pagination";
 import { TableLayout } from "../../components/helper/table";
+import { useProducts } from "../../hooks/queries/useProducts";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -30,7 +35,7 @@ const AddProduct = () => {
   let isAdmin = state?.isAdmin;
 
   const [showModal, setShowModal] = useState(false);
-  const [loading, setloading] = useState(false);
+  // const [isloading, setloading] = useState(false);
   const [projectData, setProjectData] = useState({});
   const [toggle, setToggle] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
@@ -49,106 +54,87 @@ const AddProduct = () => {
   const categoryList = state?.categoryList;
 
   const categoryOptions = categoryList?.map((c) => ({
-  label: c?.category_name,
-  value: c?.category_id,
-}));
+    label: c?.category_name,
+    value: c?.category_id,
+  }));
 
-  const [Products, setProducts] = useState([]);
-  const [productsByPage, setProductsByPage] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
+  // const [Products, setProducts] = useState([]);
+  // const [productsByPage, setProductsByPage] = useState({});
+  const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
-  const [totalProducts, setTotalProducts] = useState(0);
+    const [filters, setFilters] = useState([]);
+  const [filterquery, setFilterQuery] = useState([]);
 
-  // const getProducts = async () => {
-  //   setloading(true);
-  //   try {
-  //     let result = await api.get(`/products`);
+  // const [totalProducts, setTotalProducts] = useState(0);
 
-  //     setProducts(result.data.products);
-  //   } catch (error) {
-  //   } finally {
-  //     setloading(false);
-  //   }
-  // };
-
-  // const getProducts = async (filters = {}) => {
+  // const getProducts = async ({ filters = {}, page = 1, limit = 12 } = {}) => {
   //   setloading(true);
 
   //   try {
-  //     const result = await api.get("/products", {
+  //     const result = await api.get(isAdmin ? "/admin/products" : "/products", {
   //       params: {
+  //         page,
+  //         limit,
   //         filters: JSON.stringify(filters),
   //       },
   //     });
 
   //     setProducts(result?.data?.products);
+  //     setPage(result?.data?.page);
+  //     setTotalPages(result?.data?.totalPages);
+  //     setTotalProducts(result?.data?.totalProducts);
+  //     setProductsByPage((prev) => ({
+  //       ...prev,
+  //       [page]: result?.data.products,
+  //     }));
+
   //   } catch (error) {
-  //     console.error(error);
   //   } finally {
   //     setloading(false);
   //   }
   // };
 
-  const getProducts = async ({ filters = {}, page = 1, limit = 12 } = {}) => {
-    setloading(true);
+  // useEffect(() => {
+  //   getProducts();
+  // }, [toggle]);
 
-    try {
-      const result = await api.get(isAdmin ? "/admin/products" : "/products", {
-        params: {
-          page,
-          limit,
-          filters: JSON.stringify(filters),
-        },
-      });
+  const { data, isLoading, isFetching, error } = useProducts({
+    filters,
+    page,
+    limit,
+    isAdmin,
+  });
 
-      setProducts(result?.data?.products);
-      setCurrentPage(result?.data?.currentPage);
-      setTotalPages(result?.data?.totalPages);
-      setTotalProducts(result?.data?.totalProducts);
-      setProductsByPage((prev) => ({
-        ...prev,
-        [page]: result?.data.products,
-      }));
+  const Products = data?.products ?? [];
 
-    } catch (error) {
-      showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
-    } finally {
-      setloading(false);
-    }
-  };
+  // const currentddPage = data?.currentddPage;
 
-  useEffect(() => {
-    // getCategory();
-    getProducts();
-  }, [toggle]);
+  const totalPages = data?.totalPages;
+
+  const totalProducts = data?.totalProducts;
 
   const handleProductUpdate = (product) => {
-    setProducts((prev) => {
-      const exists = prev?.some((p) => p?.product_id == product?.product_id);
+    // setProducts((prev) => {
+    //   const exists = prev?.some((p) => p?.product_id == product?.product_id);
 
-      if (exists) {
-        // UPDATE
-        return prev?.map((p) =>
-          p.product_id === product.product_id ? product : p,
-        );
-      }
+    //   if (exists) {
+    //     // UPDATE
+    //     return prev?.map((p) =>
+    //       p.product_id === product.product_id ? product : p,
+    //     );
+    //   }
 
-      // ADD
-      return [product, ...prev];
-    });
+    //   // ADD
+    //   return [product, ...prev];
+    // });
   };
 
   const handleProductDelete = (id) => {
-    setProducts((prev) => prev.filter((p) => p.product_id !== id));
+    // setProducts((prev) => prev.filter((p) => p.product_id !== id));
   };
 
-  const onSuccess = ({icon, title, product }) => {
-    getProducts();
+  const onSuccess = ({ icon, title, product }) => {
+    // getProducts();
     setProjectData({});
     setShowModal(false);
 
@@ -158,7 +144,7 @@ const AddProduct = () => {
     });
   };
 
-  const OnError = ({icon, title }) => {
+  const OnError = ({ icon, title }) => {
     showToast({
       icon: icon,
       title: title,
@@ -250,50 +236,48 @@ const AddProduct = () => {
     },
   ];
 
-  const [filters, setFilters] = useState([]);
-  const [filterquery, setFilterQuery] = useState([]);
 
   // useEffect(() => {
 
-  //   getProducts({ filters:filterquery, page: currentPage, limit });
-  // }, [currentPage]);
+  //   getProducts({ filters:filterquery, page: page, limit });
+  // }, [page]);
 
   const handleFilterApply = (query, activeFilters) => {
     setFilters(activeFilters);
-    setProductsByPage({});
-    setCurrentPage(1);
+    // setProductsByPage({});
+    setPage(1);
     setFilterQuery(query);
     // getProducts(query);
 
-    getProducts({ filters: query, page: 1, limit });
+    // getProducts({ filters: query, page: 1, limit });
   };
 
   const removeFilter = (index) => {
     const updated = filters?.filter((_, i) => i !== index);
     setFilters(updated);
     // getProducts(updated);
-    getProducts({ filters: updated, page: 1, limit });
+    // getProducts({ filters: updated, page: 1, limit });
   };
 
   const clearAllFilters = () => {
     setFilters([]);
     // getProducts([]);
-    getProducts({ filters: [], page: 1, limit });
+    // getProducts({ filters: [], page: 1, limit });
   };
 
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    if (productsByPage[page]) {
-      setCurrentPage(page);
-      setProducts(productsByPage[page] || []);
-      return;
-    }
+    setPage(page);
+    // if (productsByPage[page]) {
+    //   setPage(page);
+    //   setProducts(productsByPage[page] || []);
+    //   return;
+    // }
 
-    getProducts({
-      filters: filterquery,
-      page,
-      limit,
-    });
+    // getProducts({
+    //   filters: filterquery,
+    //   page,
+    //   limit,
+    // });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -371,7 +355,7 @@ const AddProduct = () => {
             <div className="flex items-center gap-2">
               {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
 
-              {totalProducts > 50 ? (
+              {totalProducts > 10 ? (
                 <select
                   defaultValue={limit == totalProducts ? "All Products" : limit}
                   onChange={(e) => {
@@ -380,15 +364,15 @@ const AddProduct = () => {
                         ? Number(totalProducts)
                         : Number(e.target.value);
                     setLimit(newLimit);
-                    setCurrentPage(1);
+                    setPage(1);
 
-                    getProducts({
-                      filters: filterquery,
-                      page: 1,
-                      limit: newLimit,
-                    });
+                    // getProducts({
+                    //   filters: filterquery,
+                    //   page: 1,
+                    //   limit: newLimit,
+                    // });
                   }}
-                  disabled={loading}
+                  disabled={isLoading}
                   className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
                focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
                hover:border-gray-400 transition"
@@ -416,37 +400,35 @@ const AddProduct = () => {
         </div>
       </div>
 
-       <TableLayout>
-      {viewType === "grid" ? (
-        <OurProducts
-          products={Products}
-          skeletonProducts={12}
-          loading={loading}
-          updateProduct={handleProductUpdate}
-          delProduct={handleProductDelete}
+      <TableLayout>
+        {viewType === "grid" ? (
+          <OurProducts
+            products={Products}
+            skeletonProducts={12}
+            loading={isLoading}
+            updateProduct={handleProductUpdate}
+            delProduct={handleProductDelete}
+          />
+        ) : (
+          <ProductListView
+            products={Products}
+            loading={isLoading}
+            updateProduct={handleProductUpdate}
+            delProduct={handleProductDelete}
+            filters={filters}
+            // onBulkUpdate={getProducts}
+          />
+        )}
+
+        <Pagination
+          page={page}
+          totalPages={Math.ceil(totalProducts / limit)}
+          totalProducts={totalProducts}
+          pageSize={limit}
+          isLoading={isLoading}
+          onPageChange={handlePageChange}
         />
-      ) : (
-        <ProductListView
-          products={Products}
-          loading={loading}
-          updateProduct={handleProductUpdate}
-          delProduct={handleProductDelete}
-          filters={filters}
-          onBulkUpdate={getProducts}
-        />
-      )}
-
-
-      <Pagination
-        currentPage={currentPage}
-        totalPages={Math.ceil(totalProducts / limit)}
-        totalProducts={totalProducts}
-        pageSize={limit}
-        isLoading={loading}
-        onPageChange={handlePageChange}
-      />
-
-       </TableLayout>
+      </TableLayout>
       {showModal && (
         <Modal
           onClose={() => {
