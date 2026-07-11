@@ -36,21 +36,10 @@ const AddProduct = () => {
   let isAdmin = state?.isAdmin;
 
   const [showModal, setShowModal] = useState(false);
-  // const [isloading, setloading] = useState(false);
   const [projectData, setProjectData] = useState({});
   const [toggle, setToggle] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [viewType, setViewType] = useState("grid");
-
-  // const [categoryList, setCategoryList] = useState([]);
-
-  // const getCategory = async () => {
-  //   try {
-  //     let result = await api.get(`/categories`);
-
-  //     setCategoryList(result.data.data);
-  //   } catch (error) {}
-  // };
 
   const categoryList = state?.categoryList;
 
@@ -59,8 +48,6 @@ const AddProduct = () => {
     value: c?.category_name,
   }));
 
-  // const [Products, setProducts] = useState([]);
-  // const [productsByPage, setProductsByPage] = useState({});
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
   const [filters, setFilters] = useState([]);
@@ -108,12 +95,7 @@ const AddProduct = () => {
     isAdmin,
   });
 
-  // console.log("datadata",data);
-  // console.log("error",error)
-
   const Products = data?.products ?? [];
-
-  // const currentddPage = data?.currentddPage;
 
   const totalPages = data?.totalPages;
 
@@ -123,30 +105,15 @@ const AddProduct = () => {
     queryClient.invalidateQueries({
       queryKey: ["products"],
     });
-    // setProducts((prev) => {
-    //   const exists = prev?.some((p) => p?.product_id == product?.product_id);
-
-    //   if (exists) {
-    //     // UPDATE
-    //     return prev?.map((p) =>
-    //       p.product_id === product.product_id ? product : p,
-    //     );
-    //   }
-
-    //   // ADD
-    //   return [product, ...prev];
-    // });
   };
 
   const handleProductDelete = (id) => {
     queryClient.invalidateQueries({
       queryKey: ["products"],
     });
-    // setProducts((prev) => prev.filter((p) => p.product_id !== id));
   };
 
   const onSuccess = ({ icon, title, product }) => {
-    // getProducts();
     setProjectData({});
     setShowModal(false);
 
@@ -163,28 +130,6 @@ const AddProduct = () => {
     });
   };
 
-  // const dynamicToast = ({
-  //   position = "bottom-left",
-  //   icon = "success",
-  //   message = "",
-  // }) => {
-  //   const Toast = Swal.mixin({
-  //     toast: true,
-  //     position: position,
-  //     showConfirmButton: false,
-  //     timer: 3000,
-  //     timerProgressBar: true,
-
-  //     didOpen: (toast) => {
-  //       toast.onmouseenter = Swal.stopTimer;
-  //       toast.onmouseleave = Swal.resumeTimer;
-  //     },
-  //   });
-  //   Toast.fire({
-  //     icon: icon,
-  //     title: message,
-  //   });
-  // };
 
   const productFilters = [
     {
@@ -248,50 +193,25 @@ const AddProduct = () => {
     },
   ];
 
-  // useEffect(() => {
-
-  //   getProducts({ filters:filterquery, page: page, limit });
-  // }, [page]);
-
   const handleFilterApply = (query, activeFilters) => {
     setFilters(activeFilters);
-    // setProductsByPage({});
     setPage(1);
     setFilterQuery(query);
-    // getProducts(query);
-
-    // getProducts({ filters: query, page: 1, limit });
   };
 
   const removeFilter = (index) => {
     const updated = filters?.filter((_, i) => i !== index);
     setFilters(updated);
     setFilterQuery(updated);
-    // getProducts(updated);
-    // getProducts({ filters: updated, page: 1, limit });
   };
 
   const clearAllFilters = () => {
     setFilters([]);
     setFilterQuery([]);
-    // getProducts([]);
-    // getProducts({ filters: [], page: 1, limit });
   };
 
   const handlePageChange = (page) => {
     setPage(page);
-    // if (productsByPage[page]) {
-    //   setPage(page);
-    //   setProducts(productsByPage[page] || []);
-    //   return;
-    // }
-
-    // getProducts({
-    //   filters: filterquery,
-    //   page,
-    //   limit,
-    // });
-
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -360,15 +280,10 @@ const AddProduct = () => {
               </div>
             </div>
           </div>
-          {/* <div className="text-3xl sm:text-4xl font-medium">{props.description}</div> */}
           <div className="flex justify-between items-center h-full">
-            {/* <div className="text-xl sm:text-4xl font-medium">
-              Explore All products
-            </div> */}
             <div className="flex items-center gap-2">
-              {/* <span className="text-sm font-medium text-gray-600">Rows:</span> */}
 
-              {totalProducts > 10 ? (
+              {totalProducts > 100 ? (
                 <select
                   defaultValue={limit == totalProducts ? "All Products" : limit}
                   onChange={(e) => {
@@ -395,9 +310,7 @@ const AddProduct = () => {
                   <option value={100}>100 Products</option>
                   <option value="all">All Products</option>
                 </select>
-              ) : // <div className="text-xl sm:text-4xl font-medium py-1">
-              //   Explore All products
-              // </div>
+              ) : 
               null}
             </div>
 
@@ -429,7 +342,6 @@ const AddProduct = () => {
             updateProduct={handleProductUpdate}
             delProduct={handleProductDelete}
             filters={filters}
-            // onBulkUpdate={getProducts}
           />
         )}
 

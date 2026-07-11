@@ -222,8 +222,6 @@ const AddProductForm = ({
     onSubmit: async (values) => {
       if (!descriptionReached) return;
 
-      console.log("Add PRodcut ffffff", values);
-
       setloading(true);
 
       // let productSizes = productSizes ? values.productSizes.split(",") : "";
