@@ -28,6 +28,7 @@ import { ActiveFilters } from "../../components/Product/ActiveFilters";
 import Pagination from "../../components/helper/Pagination";
 import { TableLayout } from "../../components/helper/table";
 import { useProducts } from "../../hooks/queries/useProducts";
+import { useQueryClient } from "@tanstack/react-query";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -55,14 +56,14 @@ const AddProduct = () => {
 
   const categoryOptions = categoryList?.map((c) => ({
     label: c?.category_name,
-    value: c?.category_id,
+    value: c?.category_name,
   }));
 
   // const [Products, setProducts] = useState([]);
   // const [productsByPage, setProductsByPage] = useState({});
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(12);
-    const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState([]);
   const [filterquery, setFilterQuery] = useState([]);
 
   // const [totalProducts, setTotalProducts] = useState(0);
@@ -98,12 +99,17 @@ const AddProduct = () => {
   //   getProducts();
   // }, [toggle]);
 
+  const queryClient = useQueryClient();
+
   const { data, isLoading, isFetching, error } = useProducts({
-    filters,
+    filters:filterquery,
     page,
     limit,
     isAdmin,
   });
+
+  // console.log("datadata",data);
+  // console.log("error",error)
 
   const Products = data?.products ?? [];
 
@@ -114,6 +120,9 @@ const AddProduct = () => {
   const totalProducts = data?.totalProducts;
 
   const handleProductUpdate = (product) => {
+    queryClient.invalidateQueries({
+      queryKey: ["products"],
+    });
     // setProducts((prev) => {
     //   const exists = prev?.some((p) => p?.product_id == product?.product_id);
 
@@ -130,6 +139,9 @@ const AddProduct = () => {
   };
 
   const handleProductDelete = (id) => {
+    queryClient.invalidateQueries({
+      queryKey: ["products"],
+    });
     // setProducts((prev) => prev.filter((p) => p.product_id !== id));
   };
 
@@ -236,7 +248,6 @@ const AddProduct = () => {
     },
   ];
 
-
   // useEffect(() => {
 
   //   getProducts({ filters:filterquery, page: page, limit });
@@ -255,12 +266,14 @@ const AddProduct = () => {
   const removeFilter = (index) => {
     const updated = filters?.filter((_, i) => i !== index);
     setFilters(updated);
+    setFilterQuery(updated);
     // getProducts(updated);
     // getProducts({ filters: updated, page: 1, limit });
   };
 
   const clearAllFilters = () => {
     setFilters([]);
+    setFilterQuery([]);
     // getProducts([]);
     // getProducts({ filters: [], page: 1, limit });
   };
@@ -421,8 +434,8 @@ const AddProduct = () => {
         )}
 
         <Pagination
-          page={page}
-          totalPages={Math.ceil(totalProducts / limit)}
+          currentPage={page}
+          totalPages={totalPages}
           totalProducts={totalProducts}
           pageSize={limit}
           isLoading={isLoading}

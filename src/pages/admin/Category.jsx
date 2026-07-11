@@ -16,20 +16,22 @@ import Modal from "../../components/helper/modal";
 import { PlusIcon } from "lucide-react";
 import { GlobalContext } from "../../context/Context";
 import { TableLayout } from "../../components/helper/table";
+import { useCategories } from "../../hooks/queries/useCategories";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Category = () => {
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const {dispatch} = useContext(GlobalContext);
 
   const [showFilter, setShowFilter] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
 
-  const [categories, setCategories] = useState([]);
-  const [categoriesByPage, setCategoriesByPage] = useState({});
+  // const [categories, setCategories] = useState([]);
+  // const [categoriesByPage, setCategoriesByPage] = useState({});
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCategories, setTotalCategories] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [page, setPage] = useState(1);
+  // const [totalCategories, setTotalCategories] = useState(0);
+  // const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
 
   const [filters, setFilters] = useState([]);
@@ -40,45 +42,61 @@ const Category = () => {
   /* =========================
      GET CATEGORIES
   ========================= */
-  const getCategories = async ({ filters = [], page = 1, limit = 10 } = {}) => {
-    setLoading(true);
+  // const getCategories = async ({ filters = [], page = 1, limit = 10 } = {}) => {
+  //   setLoading(true);
 
-    try {
-      const result = await api.get("/categories", {
-        params: {
-          page,
-          limit,
-          filters: JSON.stringify(filters),
-        },
-      });
+  //   try {
+  //     const result = await api.get("/categories", {
+  //       params: {
+  //         page,
+  //         limit,
+  //         filters: JSON.stringify(filters),
+  //       },
+  //     });
 
-      const data = result?.data;
+  //     const data = result?.data;
 
-      setCategories(data?.data || []);
-      setCurrentPage(data?.currentPage || 1);
-      setTotalPages(data?.totalPages || 1);
-      setTotalCategories(data?.totalCategories || 0);
+  //     setCategories(data?.data || []);
+  //     setPage(data?.page || 1);
+  //     setTotalPages(data?.totalPages || 1);
+  //     setTotalCategories(data?.totalCategories || 0);
 
-      setCategoriesByPage((prev) => ({
-        ...prev,
-        [page]: data?.data || [],
-      }));
-    } catch (error) {
-      showToast({
-        icon: "error",
-        title: error?.response?.data?.message || "Something went wrong",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setCategoriesByPage((prev) => ({
+  //       ...prev,
+  //       [page]: data?.data || [],
+  //     }));
+  //   } catch (error) {
+  //     showToast({
+  //       icon: "error",
+  //       title: error?.response?.data?.message || "Something went wrong",
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    getCategories();
-  }, []);
+  // useEffect(() => {
+  //   getCategories();
+  // }, []);
+
+     const queryClient = useQueryClient();
+   
+     const { data, isLoading, isFetching, error } = useCategories({
+       filters,
+       page,
+       limit
+     });
+
+    const categories = data?.data ?? [];
+
+  // const currentddPage = data?.currentddPage;
+
+  const totalPages = data?.totalPages;
+
+  const totalCategories = data?.totalCategories;
 
     const onSuccess = ({ position, icon, message, category }) => {
-      getCategories();
+      // getCategories();
       handleCategoryUpdate(category);
       setSelectedCategory("")
       setShowCategoryModal(false)
@@ -122,57 +140,57 @@ const Category = () => {
   const handleFilterApply = (query, activeFilters) => {
     setFilters(activeFilters);
     setFilterQuery(query);
-    setCategoriesByPage({});
-    setCurrentPage(1);
+    // setCategoriesByPage({});
+    setPage(1);
 
-    getCategories({
-      filters: query,
-      page: 1,
-      limit,
-    });
+    // getCategories({
+    //   filters: query,
+    //   page: 1,
+    //   limit,
+    // });
   };
 
   const removeFilter = (index) => {
     const updatedFilters = filters.filter((_, i) => i !== index);
     setFilters(updatedFilters);
     setFilterQuery(updatedFilters);
-    setCategoriesByPage({});
+    // setCategoriesByPage({});
 
-    getCategories({
-      filters: updatedFilters,
-      page: 1,
-      limit,
-    });
+    // getCategories({
+    //   filters: updatedFilters,
+    //   page: 1,
+    //   limit,
+    // });
   };
 
   const clearAllFilters = () => {
     setFilters([]);
     setFilterQuery([]);
-    setCategoriesByPage({});
+    // setCategoriesByPage({});
 
-    getCategories({
-      filters: [],
-      page: 1,
-      limit,
-    });
+    // getCategories({
+    //   filters: [],
+    //   page: 1,
+    //   limit,
+    // });
   };
 
   /* =========================
      PAGINATION
   ========================= */
   const handlePageChange = (page) => {
-    setCurrentPage(page);
+    setPage(page);
 
-    if (categoriesByPage[page]) {
-      setCategories(categoriesByPage[page]);
-      return;
-    }
+    // if (categoriesByPage[page]) {
+    //   setCategories(categoriesByPage[page]);
+    //   return;
+    // }
 
-    getCategories({
-      filters: filterQuery,
-      page,
-      limit,
-    });
+    // getCategories({
+    //   filters: filterQuery,
+    //   page,
+    //   limit,
+    // });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -181,21 +199,21 @@ const Category = () => {
      ADD / UPDATE CATEGORY IN UI
   ========================= */
   const handleCategoryUpdate = (category) => {
-    setCategories((prev) => {
-      const exists = prev.some(
-        (item) => item?.category_id === category?.category_id,
-      );
+    // setCategories((prev) => {
+    //   const exists = prev.some(
+    //     (item) => item?.category_id === category?.category_id,
+    //   );
 
-      if (exists) {
-        return prev.map((item) =>
-          item?.category_id === category?.category_id ? category : item,
-        );
-      }
+    //   if (exists) {
+    //     return prev.map((item) =>
+    //       item?.category_id === category?.category_id ? category : item,
+    //     );
+    //   }
 
-      return [category, ...prev];
-    });
+    //   return [category, ...prev];
+    // });
 
-    setCategoriesByPage({});
+    // setCategoriesByPage({});
     dispatch({ type: "TOGGLE_CATEGORY" });
   };
 
@@ -220,10 +238,10 @@ const Category = () => {
 
     const previousCategories = [...categories];
 
-    setCategories((prev) =>
-      prev.filter((item) => item.category_id !== categoryId[0]),
-    );
-    setTotalCategories((prev) => Math.max(prev - 1, 0));
+    // setCategories((prev) =>
+    //   prev.filter((item) => item.category_id !== categoryId[0]),
+    // );
+    // setTotalCategories((prev) => Math.max(prev - 1, 0));
 
     try {
       await api.delete(`/categories/delete`, {
@@ -235,11 +253,11 @@ const Category = () => {
         title: "Category deleted successfully",
       });
 
-      setCategoriesByPage({});
+      // setCategoriesByPage({});
       dispatch({ type: "TOGGLE_CATEGORY" });
     } catch (error) {
-      setCategories(previousCategories);
-      setTotalCategories((prev) => prev + 1);
+      // setCategories(previousCategories);
+      // setTotalCategories((prev) => prev + 1);
 
       showToast({
         icon: "error",
@@ -269,10 +287,10 @@ const Category = () => {
 
     const previousCategories = [...categories];
 
-    setCategories((prev) =>
-      prev.filter((item) => !ids.includes(item.category_id)),
-    );
-    setTotalCategories((prev) => Math.max(prev - ids.length, 0));
+    // setCategories((prev) =>
+    //   prev.filter((item) => !ids.includes(item.category_id)),
+    // );
+    // setTotalCategories((prev) => Math.max(prev - ids.length, 0));
 
     try {
       // backend later create this route
@@ -287,10 +305,10 @@ const Category = () => {
 
       dispatch({ type: "TOGGLE_CATEGORY" });
 
-      setCategoriesByPage({});
+      // setCategoriesByPage({});
     } catch (error) {
-      setCategories(previousCategories);
-      setTotalCategories(previousCategories.length);
+      // setCategories(previousCategories);
+      // setTotalCategories(previousCategories.length);
 
       showToast({
         icon: "error",
@@ -350,16 +368,16 @@ const Category = () => {
                       : Number(e.target.value);
 
                   setLimit(newLimit);
-                  setCurrentPage(1);
-                  setCategoriesByPage({});
+                  setPage(1);
+                  // setCategoriesByPage({});
 
-                  getCategories({
-                    filters: filterQuery,
-                    page: 1,
-                    limit: newLimit,
-                  });
+                  // getCategories({
+                  //   filters: filterQuery,
+                  //   page: 1,
+                  //   limit: newLimit,
+                  // });
                 }}
-                disabled={loading}
+                disabled={isLoading}
                 className="disabled:opacity-50 disabled:cursor-not-allowed rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm
                 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30
                 hover:border-gray-400 transition"
@@ -387,7 +405,7 @@ const Category = () => {
            {/* Category List */}
       <CategoryList
         categories={categories}
-        loading={loading}
+        loading={isLoading}
         filters={filters}
         onEdit={(category) => {
           setSelectedCategory(category);
@@ -399,11 +417,11 @@ const Category = () => {
 
       {/* Pagination */}
       <Pagination
-        currentPage={currentPage}
+        currentPage={page}
         totalPages={Math.ceil(totalCategories / (limit || 10))}
         totalProducts={totalCategories}
         pageSize={limit || 10}
-        isLoading={loading}
+        isLoading={isLoading}
         onPageChange={handlePageChange}
       />
       </div>

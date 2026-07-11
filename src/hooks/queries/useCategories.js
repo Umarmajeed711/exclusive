@@ -1,16 +1,16 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { getProducts } from "../../api/product.api";
 import { queryKeys } from "../../lib/queryKeys";
+import { getCategories } from "../../api/category.api";
 
-export const useProducts = ({
+export const useCategories = ({
   filters = {},
   page = 1,
   limit = 12,
   isAdmin = false,
 }) => {
   return useQuery({
-    queryKey: queryKeys.products({
+    queryKey: queryKeys.categories({
       filters,
       page,
       limit,
@@ -18,7 +18,7 @@ export const useProducts = ({
     }),
 
     queryFn: () =>
-      getProducts({
+      getCategories({
         filters,
         page,
         limit,

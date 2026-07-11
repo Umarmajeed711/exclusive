@@ -144,6 +144,19 @@ const App = () => {
   const getCategory = async () => {
     try {
       let result = await api.get(`/categories/dropdown`);
+      // let newCategoryList = result?.data?.data?.map((e) => {
+      //   return (
+      //     {
+      //       categorName : e.categorName,
+      //       category_id : Number(e.category_id)
+      //     }
+      //   )
+      // });
+
+      // console.log("newCategoryLsit", newCategoryList);
+      // console.log("oldList", result?.data?.data)
+      
+
       dispatch({ type: "CATEGORY_LIST", payload: result?.data?.data });
     } catch (error) {}
   };
