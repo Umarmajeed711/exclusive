@@ -29,6 +29,7 @@ import Pagination from "../../components/helper/Pagination";
 import { TableLayout } from "../../components/helper/table";
 import { useProducts } from "../../hooks/queries/useProducts";
 import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../../lib/queryKeys";
 
 const AddProduct = () => {
   const { state } = useContext(GlobalContext);
@@ -102,15 +103,15 @@ const AddProduct = () => {
   const totalProducts = data?.totalProducts;
 
   const handleProductUpdate = (product) => {
-    queryClient.invalidateQueries({
-      queryKey: ["products"],
-    });
+   queryClient.invalidateQueries({
+    queryKey: queryKeys.products(),
+});
   };
 
   const handleProductDelete = (id) => {
-    queryClient.invalidateQueries({
-      queryKey: ["products"],
-    });
+   queryClient.invalidateQueries({
+    queryKey: queryKeys.products(),
+});
   };
 
   const onSuccess = ({ icon, title, product }) => {

@@ -15,6 +15,8 @@ import { ProductDetailSkeleton } from "./productCardSkeleton";
 import BulkUpdateProductForm from "./updateBulkProduct";
 import { DataNotFound, TableSkeleton } from "../helper/table";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDeleteProducts } from "../../hooks/mutations/useDeleteProducts";
+import { queryKeys } from "../../lib/queryKeys";
 // import useClickOutside from "./OutsideClick";
 
 /* ==============================
@@ -214,87 +216,148 @@ const ProductListView = ({
     setShowModal(true);
   };
 
-  const deleteProduct = async (id) => {
-    // 🔥 Show confirmation alert first
+  // const deleteProduct = async (id) => {
+  //   // 🔥 Show confirmation alert first
+  //   const result = await Swal.fire({
+  //     title: "Are You Sure?",
+  //     text: "Do you want to delete this product?",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#d33",
+  //     cancelButtonColor: "#3085d6",
+  //     confirmButtonText: "Delete",
+  //     cancelButtonText: "Cancel",
+  //   });
+
+  //   // ✅ If user confirms
+  //   if (result?.isConfirmed) {
+  //     try {
+  //       let response = await api.delete(`/products/delete`, {
+  //         data: {
+  //           ids: [id],
+  //         },
+  //       });
+
+  //       // Success toast
+  //       showToast({
+  //         icon: "success",
+  //         title: response?.data?.message || "Product deleted successfully",
+  //       });
+  //       delProduct(id);
+  //     } catch (error) {
+  //       showToast({
+  //         icon: "error",
+  //         title: error?.response?.data?.message || "Something went wrong",
+  //       });
+  //     }
+  //   }
+  // };
+
+  // const [bulkDelLoading, setBulkDelLoading] = useState(false);
+
+  // const handleBulkDelete = async () => {
+  //   const result = await Swal.fire({
+  //     title: "Are You Sure?",
+  //     text: "Do you want to delete All this product?",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#d33",
+  //     cancelButtonColor: "#3085d6",
+  //     confirmButtonText: "Delete",
+  //     cancelButtonText: "Cancel",
+  //   });
+
+  //   if (result?.isConfirmed) {
+  //     setBulkDelLoading(true);
+
+  //     const previousOrders = Products;
+
+  //     setProducts((prev) =>
+  //       prev.filter((o) => !selectedProducts.includes(o.product_id)),
+  //     );
+
+  //     try {
+  //       await api.delete("/products/delete", {
+  //         data: { ids: selectedProducts },
+  //       });
+
+  //       showToast({
+  //         icon: "success",
+  //         title: "Deleted Successfully",
+  //       });
+  //     } catch (error) {
+  //       showToast({
+  //         icon: "error",
+  //         title: error?.response?.data?.message || "Something went wrong",
+  //       });
+  //       setProducts(previousOrders);
+  //     } finally {
+  //       setBulkDelLoading(false);
+  //     }
+  //   }
+
+  //   setSelectedProducts([]);
+  // };
+
+  const { mutate: handleDelete, isPending } = useDeleteProducts();
+
+  const  deleteProduct = async (id) => {
     const result = await Swal.fire({
       title: "Are You Sure?",
       text: "Do you want to delete this product?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
       confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
     });
 
-    // ✅ If user confirms
-    if (result?.isConfirmed) {
-      try {
-        let response = await api.delete(`/products/delete`, {
-          data: {
-            ids: [id],
-          },
-        });
+    if (!result.isConfirmed) return;
 
-        // Success toast
+    handleDelete([id], {
+      onSuccess: (data) => {
         showToast({
           icon: "success",
-          title: response?.data?.message || "Product deleted successfully",
+          title: data.message,
         });
-        delProduct(id);
-      } catch (error) {
+      },
+
+      onError: (error) => {
         showToast({
           icon: "error",
           title: error?.response?.data?.message || "Something went wrong",
         });
-      }
-    }
+      },
+    });
   };
 
-  const [bulkDelLoading, setBulkDelLoading] = useState(false);
+  const { mutate: deleteProducts, isPending: bulkDelLoading } =  useDeleteProducts();
 
   const handleBulkDelete = async () => {
     const result = await Swal.fire({
       title: "Are You Sure?",
-      text: "Do you want to delete All this product?",
+      text: "Delete selected products?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
     });
 
-    if (result?.isConfirmed) {
-      setBulkDelLoading(true);
+    if (!result.isConfirmed) return;
 
-      const previousOrders = Products;
-
-      setProducts((prev) =>
-        prev.filter((o) => !selectedProducts.includes(o.product_id)),
-      );
-
-      try {
-        await api.delete("/products/delete", {
-          data: { ids: selectedProducts },
-        });
+    deleteProducts(selectedProducts, {
+      onSuccess: (data) => {
+        setSelectedProducts([]);
 
         showToast({
           icon: "success",
-          title: "Deleted Successfully",
+          title: data.message,
         });
-      } catch (error) {
+      },
+
+      onError: (error) => {
         showToast({
           icon: "error",
           title: error?.response?.data?.message || "Something went wrong",
         });
-        setProducts(previousOrders);
-      } finally {
-        setBulkDelLoading(false);
-      }
-    }
-
-    setSelectedProducts([]);
+      },
+    });
   };
 
   const onSuccess = ({ position, icon, title, product }) => {
@@ -309,17 +372,14 @@ const ProductListView = ({
     });
   };
 
-
-const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
   const onBulkSuccess = ({ position, icon, title }) => {
     // onBulkUpdate();
 
-    queryClient.invalidateQueries({
-  queryKey: ["products"],
-});
-
-    
+    // queryClient.invalidateQueries({
+    //   queryKey: queryKeys.products(),
+    // });
 
     setShowBulkModal(false);
     setSelectedProducts([]);
@@ -465,8 +525,12 @@ const queryClient = useQueryClient();
             columns={columns.filter((c) => c.visible).length} // checkbox + user
           />
         ) : Products.length === 0 ? (
-           <DataNotFound icon="🛒" title="No Product" message="Curretly No products found"
-                   className="h-[50vh]" />
+          <DataNotFound
+            icon="🛒"
+            title="No Product"
+            message="Curretly No products found"
+            className="h-[50vh]"
+          />
         ) : (
           <>
             {/* HEADER */}

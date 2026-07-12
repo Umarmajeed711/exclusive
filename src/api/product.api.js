@@ -19,3 +19,14 @@ export const getProducts = async ({
 
   return result.data;
 };
+;
+
+export const deleteProducts = async (ids) => {
+  const response = await api.delete("/products/delete", {
+    data: {
+      ids,
+    },
+  });
+
+  return response.data;
+};

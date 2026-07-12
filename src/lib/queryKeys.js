@@ -1,5 +1,5 @@
 export const queryKeys = {
-  products: (params) => ["products", params],
+  products: (params) => params ? ["products", params] : ["products"],
   categories: (params) => ["categories", params],
 
 };

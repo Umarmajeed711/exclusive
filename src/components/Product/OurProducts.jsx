@@ -14,6 +14,7 @@ import ProductCardSkeleton from "./productCardSkeleton";
 import { MdClose } from "react-icons/md";
 import { showToast } from "../helper/types";
 import { DataNotFound } from "../helper/table";
+import { useDeleteProducts } from "../../hooks/mutations/useDeleteProducts";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -201,42 +202,74 @@ const OurProducts = ({
     setShowModal(true);
   };
 
+  const { mutate: handleDelete, isPending } = useDeleteProducts();
+
   const deleteProduct = async (id) => {
-    // 🔥 Show confirmation alert first
-    const result = await Swal.fire({
-      title: "Are You Sure?",
-      text: "Do you want to delete this product?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Delete",
-      cancelButtonText: "Cancel",
-    });
+  const result = await Swal.fire({
+    title: "Are You Sure?",
+    text: "Do you want to delete this product?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Delete",
+  });
 
-    // ✅ If user confirms
-    if (result?.isConfirmed) {
-      try {
-        let response = await api.delete(`/product/${id}`);
+  if (!result.isConfirmed) return;
 
-        showToast({
-          icon: "success",
-          title: "Product deleted successfully",
-        });
+  handleDelete([id], {
+    onSuccess: (data) => {
+      showToast({
+        icon: "success",
+        title: data.message,
+      });
+    },
 
-        showToast({
-          icon: "success",
-          title: "Product deleted successfully",
-        });
-        delProduct(id);
-      } catch (error) {
-        showToast({
-          icon: "error",
-          title: error?.response?.data?.message || "something went wrong",
-        });
-      }
-    }
-  };
+    onError: (error) => {
+      showToast({
+        icon: "error",
+        title:
+          error?.response?.data?.message ||
+          "Something went wrong",
+      });
+    },
+  });
+};
+
+  // const deleteProduct = async (id) => {
+  //   // 🔥 Show confirmation alert first
+  //   const result = await Swal.fire({
+  //     title: "Are You Sure?",
+  //     text: "Do you want to delete this product?",
+  //     icon: "warning",
+  //     showCancelButton: true,
+  //     confirmButtonColor: "#d33",
+  //     cancelButtonColor: "#3085d6",
+  //     confirmButtonText: "Delete",
+  //     cancelButtonText: "Cancel",
+  //   });
+
+  //   // ✅ If user confirms
+  //   if (result?.isConfirmed) {
+  //     try {
+  //       let response = await api.delete(`/product/${id}`);
+
+  //       showToast({
+  //         icon: "success",
+  //         title: "Product deleted successfully",
+  //       });
+
+  //       showToast({
+  //         icon: "success",
+  //         title: "Product deleted successfully",
+  //       });
+  //       delProduct(id);
+  //     } catch (error) {
+  //       showToast({
+  //         icon: "error",
+  //         title: error?.response?.data?.message || "something went wrong",
+  //       });
+  //     }
+  //   }
+  // };
 
   const onSuccess = ({ position, icon, title, product }) => {
     updateProduct(product);
