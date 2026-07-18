@@ -19,7 +19,33 @@ export const getProducts = async ({
 
   return result.data;
 };
-;
+
+
+export const createProduct = async (formData) => {
+    const { data } = await api.post(
+        "/products",
+        formData,
+        {
+            headers:{
+                "Content-Type":"multipart/form-data"
+            }
+        }
+    );
+
+    return data;
+}
+export const updateProduct = async ({
+    id,
+    formData
+})=>{
+
+    const {data}=await api.put(
+        `/products/${id}`,
+        formData
+    )
+
+    return data;
+}
 
 export const deleteProducts = async (ids) => {
   const response = await api.delete("/products/delete", {

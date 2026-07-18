@@ -102,18 +102,6 @@ const AddProduct = () => {
 
   const totalProducts = data?.totalProducts;
 
-  const handleProductUpdate = (product) => {
-   queryClient.invalidateQueries({
-    queryKey: queryKeys.products(),
-});
-  };
-
-  const handleProductDelete = (id) => {
-   queryClient.invalidateQueries({
-    queryKey: queryKeys.products(),
-});
-  };
-
   const onSuccess = ({ icon, title, product }) => {
     setProjectData({});
     setShowModal(false);
@@ -333,15 +321,11 @@ const AddProduct = () => {
             products={Products}
             skeletonProducts={12}
             loading={isLoading}
-            updateProduct={handleProductUpdate}
-            delProduct={handleProductDelete}
           />
         ) : (
           <ProductListView
             products={Products}
             loading={isLoading}
-            updateProduct={handleProductUpdate}
-            delProduct={handleProductDelete}
             filters={filters}
           />
         )}

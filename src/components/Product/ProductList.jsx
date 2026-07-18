@@ -41,11 +41,8 @@ const STORAGE_KEY = "product_table_columns";
 ================================ */
 const ProductListView = ({
   products = [],
-  updateProduct,
-  delProduct,
   loading = true,
   filters = [],
-  // onBulkUpdate = () => {},
 }) => {
   let { state, dispatch } = useContext(GlobalContext);
   let isAdmin = state?.isAdmin;
@@ -169,21 +166,6 @@ const ProductListView = ({
 
       case "actions":
         return (
-          // <div className="flex gap-2 justify-center min-w-[120px]">
-          //   <button
-          //     onClick={() => editProduct(product)}
-          //     className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded"
-          //   >
-          //     Edit
-          //   </button>
-          //   <button
-          //     onClick={() => deleteProduct(product?.product_id)}
-          //     className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded"
-          //   >
-          //     Delete
-          //   </button>
-          // </div>
-
           <div className="flex items-center gap-3">
             {/* Edit Icon */}
             <button
@@ -199,7 +181,7 @@ const ProductListView = ({
               title="Delete"
               // disabled={loadingId === user.user_id}
               className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
-              onClick={() => deleteProduct(product?.product_id)}
+              onClick={() => handleDelete(product?.product_id)}
             >
               <RiDeleteBin6Fill size={16} />
             </button>
@@ -216,103 +198,19 @@ const ProductListView = ({
     setShowModal(true);
   };
 
-  // const deleteProduct = async (id) => {
-  //   // 🔥 Show confirmation alert first
-  //   const result = await Swal.fire({
-  //     title: "Are You Sure?",
-  //     text: "Do you want to delete this product?",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#d33",
-  //     cancelButtonColor: "#3085d6",
-  //     confirmButtonText: "Delete",
-  //     cancelButtonText: "Cancel",
-  //   });
+  const { mutate: deleteProducts, isPending } = useDeleteProducts();
 
-  //   // ✅ If user confirms
-  //   if (result?.isConfirmed) {
-  //     try {
-  //       let response = await api.delete(`/products/delete`, {
-  //         data: {
-  //           ids: [id],
-  //         },
-  //       });
-
-  //       // Success toast
-  //       showToast({
-  //         icon: "success",
-  //         title: response?.data?.message || "Product deleted successfully",
-  //       });
-  //       delProduct(id);
-  //     } catch (error) {
-  //       showToast({
-  //         icon: "error",
-  //         title: error?.response?.data?.message || "Something went wrong",
-  //       });
-  //     }
-  //   }
-  // };
-
-  // const [bulkDelLoading, setBulkDelLoading] = useState(false);
-
-  // const handleBulkDelete = async () => {
-  //   const result = await Swal.fire({
-  //     title: "Are You Sure?",
-  //     text: "Do you want to delete All this product?",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#d33",
-  //     cancelButtonColor: "#3085d6",
-  //     confirmButtonText: "Delete",
-  //     cancelButtonText: "Cancel",
-  //   });
-
-  //   if (result?.isConfirmed) {
-  //     setBulkDelLoading(true);
-
-  //     const previousOrders = Products;
-
-  //     setProducts((prev) =>
-  //       prev.filter((o) => !selectedProducts.includes(o.product_id)),
-  //     );
-
-  //     try {
-  //       await api.delete("/products/delete", {
-  //         data: { ids: selectedProducts },
-  //       });
-
-  //       showToast({
-  //         icon: "success",
-  //         title: "Deleted Successfully",
-  //       });
-  //     } catch (error) {
-  //       showToast({
-  //         icon: "error",
-  //         title: error?.response?.data?.message || "Something went wrong",
-  //       });
-  //       setProducts(previousOrders);
-  //     } finally {
-  //       setBulkDelLoading(false);
-  //     }
-  //   }
-
-  //   setSelectedProducts([]);
-  // };
-
-  const { mutate: handleDelete, isPending } = useDeleteProducts();
-
-  const  deleteProduct = async (id) => {
+  const handleDelete = async (id) => {
     const result = await Swal.fire({
-      title: "Are You Sure?",
-      text: "Do you want to delete this product?",
+      title: "Delete Product?",
+      text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Delete",
     });
 
     if (!result.isConfirmed) return;
 
-    handleDelete([id], {
+    deleteProducts([id], {
       onSuccess: (data) => {
         showToast({
           icon: "success",
@@ -329,12 +227,10 @@ const ProductListView = ({
     });
   };
 
-  const { mutate: deleteProducts, isPending: bulkDelLoading } =  useDeleteProducts();
-
   const handleBulkDelete = async () => {
     const result = await Swal.fire({
-      title: "Are You Sure?",
-      text: "Delete selected products?",
+      title: "Delete Products?",
+      text: "Do you want to delete selected products?",
       icon: "warning",
       showCancelButton: true,
     });
@@ -361,7 +257,6 @@ const ProductListView = ({
   };
 
   const onSuccess = ({ position, icon, title, product }) => {
-    updateProduct(product);
     setProjectData({});
     setShowModal(false);
     setShowBulkModal(false);
@@ -375,12 +270,6 @@ const ProductListView = ({
   const queryClient = useQueryClient();
 
   const onBulkSuccess = ({ position, icon, title }) => {
-    // onBulkUpdate();
-
-    // queryClient.invalidateQueries({
-    //   queryKey: queryKeys.products(),
-    // });
-
     setShowBulkModal(false);
     setSelectedProducts([]);
     showToast({
@@ -578,7 +467,7 @@ const ProductListView = ({
 
                   {/* Delete */}
                   <button
-                    disabled={bulkDelLoading}
+                    disabled={isPending}
                     onClick={() => {
                       handleBulkDelete();
                     }}
@@ -586,7 +475,7 @@ const ProductListView = ({
                                      hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
                                  duration-200 transition-all  
                                  ${
-                                   bulkDelLoading
+                                   isPending
                                      ? "opacity-50 cursor-not-allowed"
                                      : ""
                                  }`}

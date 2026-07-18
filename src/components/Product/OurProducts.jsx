@@ -29,8 +29,6 @@ const OurProducts = ({
   title = "",
   description = "",
   loading = false,
-  updateProduct = () => {},
-  delProduct = () => {},
   skeletonProducts = 4,
   onAdd = () => {},
 }) => {
@@ -181,7 +179,6 @@ const OurProducts = ({
           title: response?.data?.message || "Product Removed Successfully",
         });
         dispatch({ type: "WISHLIST_RELOAD" });
-        // delProduct(product_id);
       } catch (error) {
         showToast({
           icon: "error",
@@ -272,7 +269,6 @@ const OurProducts = ({
   // };
 
   const onSuccess = ({ position, icon, title, product }) => {
-    updateProduct(product);
     setProjectData({});
     setShowModal(false);
     showToast({

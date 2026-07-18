@@ -4,6 +4,8 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { GlobalContext } from "../../context/Context";
 import api from "../helper/api";
+import { useCreateProduct } from "../../hooks/mutations/useCreateProducts";
+import { useUpdateProduct } from "../../hooks/mutations/useUpdateProducts";
 
 const DiscountField = ({ originalPrice = 0, formik, loading }) => {
   const discount = Number(formik.values.productDiscount) || 0;
@@ -149,7 +151,7 @@ const AddProductForm = ({
   const baseUrl = state?.baseUrl;
   const categoryList = state?.categoryList;
 
-  const [loading, setloading] = useState(false);
+  // const [loading, setloading] = useState(false);
 
   const [apiError, setApiError] = useState("");
   const [oldImages, setOldImages] = useState([]); // URLs from DB
@@ -205,6 +207,13 @@ const AddProductForm = ({
     // productColor: yup.string().required("This field is required"),
   });
 
+  const createMutation = useCreateProduct();
+
+const updateMutation = useUpdateProduct();
+
+  const loading =
+    createMutation.isPending ||
+    updateMutation.isPending;
   const addProjectFormik = useFormik({
     initialValues: {
       productName: "",
@@ -219,10 +228,13 @@ const AddProductForm = ({
     },
     validationSchema: ProductValidation,
 
-    onSubmit: async (values) => {
-      if (!descriptionReached) return;
+    
 
-      setloading(true);
+    onSubmit: async (values) => {
+
+       if (!descriptionReached) return;
+
+      
 
       // let productSizes = productSizes ? values.productSizes.split(",") : "";
       // let productColor = productColor ? values.productColor.split(",") : "";
@@ -266,41 +278,142 @@ const AddProductForm = ({
       });
 
       if (!oldImages.length && !newImages.length) {
-        setloading(false);
         alert("At least one image is required");
         return;
       }
 
-      try {
-        let response = productData.product_id
-          ? await api.put(`/products/${productData?.product_id}`, formData)
-          : await api.post(`/products`, formData, {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
+
+      // const formData = buildFormData(values);
+
+      if (productData?.product_id) {
+        updateMutation.mutate(
+          {
+            id: productData.product_id,
+            formData,
+          },
+          {
+            onSuccess: (data) => {
+              addProjectFormik.resetForm();
+
+              OnSuccess({
+                icon: "success",
+                title: data.message,
+                product: data.product,
+              });
+            },
+
+            onError: (error) => {
+              OnError({
+                icon: "warning",
+                title: error?.response.data?.message || "Something went wrong",
+              });
+            },
+          },
+        );
+      } else {
+        createMutation.mutate(formData, {
+          onSuccess: (data) => {
+            addProjectFormik.resetForm();
+
+            OnSuccess({
+              icon: "success",
+              title: data.message,
+              product: data.product,
             });
+          },
 
-        setloading(false);
-
-        addProjectFormik.resetForm();
-
-        OnSuccess({
-          icon: "success",
-          title: response?.data?.message || "Add Product Successfully",
-          product: response?.data?.product || {},
+          onError: (error) => {
+            OnError({
+              icon: "warning",
+              title: error?.response.data?.message || "Something went wrong",
+            });
+          },
         });
-      } catch (error) {
-        setloading(false);
-        OnError({
-          icon: "warning",
-          title: error?.response.data?.message || "Something went wrong",
-        });
-
-        setApiError(error?.response.data.message || "Something went wrong");
-      } finally {
-        setloading(false);
       }
     },
+
+    // onSubmit: async (values) => {
+      // if (!descriptionReached) return;
+
+      // setloading(true);
+
+      // // let productSizes = productSizes ? values.productSizes.split(",") : "";
+      // // let productColor = productColor ? values.productColor.split(",") : "";
+
+      // const productSizes = values.productSizes?.trim()
+      //   ? values.productSizes
+      //       .split(",")
+      //       .map((size) => size.trim())
+      //       .filter(Boolean)
+      //   : [];
+
+      // const productColors = values.productColor?.trim()
+      //   ? values.productColor
+      //       .split(",")
+      //       .map((color) => color.trim())
+      //       .filter(Boolean)
+      //   : [];
+      // console.log("Loading True here ");
+
+      // const formData = new FormData();
+      // formData.append("name", values.productName);
+      // formData.append("description", values.productDescription);
+      // formData.append("price", values.productPrice);
+      // formData.append("cost_price", values.productCostPrice);
+      // formData.append("quantity", values.productQuantity);
+      // formData.append("discount", values.productDiscount);
+      // formData.append("category_id", values.productCategory);
+      // formData.append("sizes", JSON.stringify(productSizes));
+      // formData.append("colors", JSON.stringify(productColors));
+      // Array.from(newImages).forEach((files) => {
+      //   formData.append("images", files);
+      // });
+      // if (mainImage) {
+      //   formData.append("mainImageType", mainImage.type);
+      //   formData.append("mainImageIndex", Number(mainImage.index));
+      // }
+
+      // // ✅ send removed images
+      // removedImages.forEach((img) => {
+      //   formData.append("removedImages[]", img);
+      // });
+
+      // if (!oldImages.length && !newImages.length) {
+      //   setloading(false);
+      //   alert("At least one image is required");
+      //   return;
+      // }
+
+    //   try {
+    //     let response = productData.product_id
+    //       ? await api.put(`/products/${productData?.product_id}`, formData)
+    //       : await api.post(`/products`, formData, {
+    //           headers: {
+    //             "Content-Type": "multipart/form-data",
+    //           },
+    //         });
+
+    //     setloading(false);
+
+    //     addProjectFormik.resetForm();
+
+    //     OnSuccess({
+    //       icon: "success",
+    //       title: response?.data?.message || "Add Product Successfully",
+    //       product: response?.data?.product || {},
+    //     });
+    //   } catch (error) {
+    //     setloading(false);
+    // OnError({
+    //   icon: "warning",
+    //   title: error?.response.data?.message || "Something went wrong",
+    // });
+
+    //     setApiError(error?.response.data.message || "Something went wrong");
+    //   } finally {
+    //     setloading(false);
+    //   }
+    // },
   });
 
   const minRequired = 20;
