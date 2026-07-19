@@ -9,27 +9,7 @@ export const useUpdateProduct = () => {
   return useMutation({
     mutationFn: updateProduct,
 
-    onMutate: ({ product }) =>
-      cacheUtils.optimisticUpdate({
-        queryClient,
-
-        queryKey: queryKeys.products(),
-
-        updatedItem: product,
-
-        dataKey: "products",
-
-        matchField: "product_id",
-      }),
-
-    onError: (_, __, context) => {
-      cacheUtils.rollback(
-        queryClient,
-        context.previousQueries
-      );
-    },
-
-    onSettled: () => {
+    onSuccess: (data) => {
       cacheUtils.invalidate(
         queryClient,
         queryKeys.products()

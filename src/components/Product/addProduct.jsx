@@ -207,8 +207,7 @@ const AddProductForm = ({
     // productColor: yup.string().required("This field is required"),
   });
 
-  const createMutation = useCreateProduct();
-
+const createMutation = useCreateProduct();
 const updateMutation = useUpdateProduct();
 
   const loading =

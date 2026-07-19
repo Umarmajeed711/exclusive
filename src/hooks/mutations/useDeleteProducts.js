@@ -39,7 +39,14 @@ export const useDeleteProducts = () => {
     },
 
     onSettled:()=>
-        cacheUtils.invalidate(queryClient,queryKeys.products())
+        // cacheUtils.invalidate(queryClient,queryKeys.products())
+    cacheUtils.invalidate(
+  queryClient,
+  queryKeys.products(),
+  {
+    refetchType: "active",
+  }
+)
 });
 
   // return useMutation({

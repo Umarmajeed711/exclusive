@@ -44,9 +44,9 @@ const ProductDetail = () => {
       getAverageRating(result?.data.products);
     } catch (error) {
       showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+        icon: "error",
+        title: error?.response?.data?.message || "something went wrong",
+      });
     } finally {
       setProductLoading(false);
     }
@@ -67,10 +67,10 @@ const ProductDetail = () => {
       // const filteredProduct = get_related_products.data.products.filter((product) => product.product_id != Product.product_id)
       setRelatedProduct(get_related_products.data.products);
     } catch (error) {
-       showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+      showToast({
+        icon: "error",
+        title: error?.response?.data?.message || "something went wrong",
+      });
     }
   };
 
@@ -169,10 +169,10 @@ const ProductDetail = () => {
       setAverageRating(avgRating);
       setRatings(response?.data?.reviews);
     } catch (error) {
-       showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+      showToast({
+        icon: "error",
+        title: error?.response?.data?.message || "something went wrong",
+      });
     } finally {
       setRatingLoading(false);
     }
@@ -206,15 +206,15 @@ const ProductDetail = () => {
       getAverageRating(Product);
     } catch (error) {
       showToast({
-        icon:"error",
-        title:error?.response?.data?.message || "something went wrong"
-      })
+        icon: "error",
+        title: error?.response?.data?.message || "something went wrong",
+      });
     }
   };
 
   // function for add to cart
- const addtoCart = async (product) => {
-   if (product?.quantity <= 0) return;
+  const addtoCart = async (product) => {
+    if (product?.quantity <= 0) return;
 
     setcartLoading(true);
 
@@ -224,30 +224,28 @@ const ProductDetail = () => {
         const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
         const existingProduct = cart.find(
-  (item) =>
-    item.product_id === product.product_id &&
-    item.sizes === selectedSize &&
-    item.colors === selectedColor
-);
+          (item) =>
+            item.product_id === product.product_id &&
+            item.sizes === selectedSize &&
+            item.colors === selectedColor,
+        );
 
-      
         if (existingProduct) {
-            if (existingProduct.quantity + counter > product.quantity) {
-    return showToast({
-      icon: "error",
-      title: `Only ${product.quantity} item(s) available in stock`,
-    });
-  }
+          if (existingProduct.quantity + counter > product.quantity) {
+            return showToast({
+              icon: "error",
+              title: `Only ${product.quantity} item(s) available in stock`,
+            });
+          }
 
-  existingProduct.quantity += counter;
-
+          existingProduct.quantity += counter;
         } else {
-            if (counter > product.quantity) {
-    return showToast({
-      icon: "error",
-      title: `Only ${product.quantity} item(s) available in stock`,
-    });
-  }
+          if (counter > product.quantity) {
+            return showToast({
+              icon: "error",
+              title: `Only ${product.quantity} item(s) available in stock`,
+            });
+          }
 
           cart.push({
             cart_id: crypto.randomUUID(),
@@ -257,8 +255,9 @@ const ProductDetail = () => {
             price: product.price,
             discount: product.discount,
             image_url: product?.image_urls[0],
-            sizes: selectedSize,
-            colors: selectedColor,
+            sizes: selectedSize.length > 0 ? selectedSize : product?.sizes[0],
+            colors:
+              selectedColor.length > 0 ? selectedColor : product?.colors[0],
             quantity: counter,
           });
         }
@@ -280,8 +279,9 @@ const ProductDetail = () => {
         productPrice: product.price,
         productDiscount: product.discount,
         productImage: product?.image_urls[0],
-        productSize: selectedSize,
-        productColor: selectedColor,
+        productSize: selectedSize.length > 0 ? selectedSize : product?.sizes[0],
+        productColor:
+          selectedColor.length > 0 ? selectedColor : product?.colors[0],
         quantity: counter,
         user_id: state.user.user_id,
       });
@@ -301,7 +301,7 @@ const ProductDetail = () => {
       setcartLoading(false);
       setCounter(1);
       setSelectedColor(Product?.colors[0]);
-      setSelectedSize(Product?.sizes[0])
+      setSelectedSize(Product?.sizes[0]);
     }
   };
   // rate a product--------------------
@@ -339,14 +339,13 @@ const ProductDetail = () => {
       {/* Product Detail */}
       {productLoading ? (
         <ProductDetailSkeleton />
-      ):
-      Product  ==  "" ?
-      <div className="flex justify-center items-center h-[50vh]">
+      ) : Product == "" ? (
+        <div className="flex justify-center items-center h-[50vh]">
           <div className="text-md sm:text-xl font-medium drop-shadow">
             Product not found!
           </div>
         </div>
-       : (
+      ) : (
         <div className=" container   my-5 ">
           {/* mx-auto  px-4 lg:px-20 */}
           {/* Product details */}
@@ -537,7 +536,7 @@ const ProductDetail = () => {
               ) : null}
 
               {/* Size Selection */}
-              
+
               {Product?.sizes?.length > 0 ? (
                 <div>
                   <p className="font-normal mb-2 text-xl">Sizes</p>
@@ -558,11 +557,10 @@ const ProductDetail = () => {
                   </div>
                   <hr />
                 </div>
-                
               ) : null}
 
               {/* Quantity and Add to Cart */}
-              
+
               <div className="flex space-x-4">
                 {/* counter */}
                 <div className="grid grid-cols-3 place-content-center place-items-center border rounded bg-White">
@@ -586,11 +584,11 @@ const ProductDetail = () => {
                 </div>
                 <button
                   className="flex-grow transition-all duration-300 disabled:cursor-not-allowed bg-theme-primary border border-transparent text-white py-2 rounded-md px-6 hover:shadow-xl  text-base sm:text-xl  "
-                   onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addtoCart(Product);
-                      }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addtoCart(Product);
+                  }}
                   disabled={cartloading || Product?.quantity <= 0}
                   type="submit"
                 >

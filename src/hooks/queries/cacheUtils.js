@@ -1,11 +1,12 @@
 // lib/react-query/cacheUtils.js
 
 export const cacheUtils = {
-  invalidate(queryClient, queryKey) {
-    return queryClient.invalidateQueries({
-      queryKey,
-    });
-  },
+  invalidate(queryClient, queryKey, options = {}) {
+  return queryClient.invalidateQueries({
+    queryKey,
+    ...options,
+  });
+},
 
   rollback(queryClient, previousQueries) {
     previousQueries?.forEach(([queryKey, data]) => {

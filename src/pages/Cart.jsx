@@ -347,9 +347,14 @@ const Cart = () => {
                           <h3 className="font-semibold text-lg">{cart.name}</h3>
 
                           <div className="flex gap-3 text-sm text-gray-500 mt-1">
-                            <span>Size: {cart.sizes}</span>
+                             {cart?.sizes &&
+                            <span>Size: {cart.sizes}</span>}
+
+                              {cart?.colors && (
 
                             <span>Color: {cart.colors}</span>
+                              )}
+
                           </div>
                         </div>
                       </div>
@@ -456,13 +461,17 @@ const Cart = () => {
                       <div className="flex-1">
                         <h3 className="font-semibold">{cart.name}</h3>
 
-                        <p className="text-sm text-gray-500">
-                          Size: {cart.sizes}
-                        </p>
+                        {cart?.sizes && (
+                          <p className="text-sm text-gray-500">
+                            Size: {cart.sizes}
+                          </p>
+                        )}
 
-                        <p className="text-sm text-gray-500">
-                          Color: {cart.colors}
-                        </p>
+                        {cart?.colors && (
+                          <p className="text-sm text-gray-500">
+                            Color: {cart.colors}
+                          </p>
+                        )}
 
                         <p className="font-bold text-theme-primary mt-2">
                           ${Math.round(cart.price - newPrice)}
