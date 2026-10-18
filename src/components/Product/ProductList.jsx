@@ -439,7 +439,7 @@ const ProductListView = ({
                     title="update Bulk Product"
                     onClick={() => setShowBulkModal(true)}
                     className="flex gap-1 items-center px-4 py-1.5 text-sm font-medium  
-              rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-[1.02] transition"
+                    rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:scale-[1.02] transition"
                   >
                     <FiEdit2 size={14} /> Bulk Update
                   </button>

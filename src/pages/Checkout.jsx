@@ -70,7 +70,6 @@ const Checkout = () => {
     validationSchema: billingValidation,
 
     onSubmit: async (values) => {
-
       if (productCart?.length >= 1) {
         setloading(true);
         // checkout start
@@ -83,13 +82,12 @@ const Checkout = () => {
             shipping_email: state?.user?.email,
             shipping_phone: values.number,
             shipping_address: address,
-            city:values?.city,
+            city: values?.city,
             payment_status: "unpaid",
             payment_method: paymentMethod,
             delivery_status: "pending",
             cartItems: productCart,
           });
-
 
           // If Online Payment, redirect to Stripe Checkout
           if (paymentMethod === "online" && response?.data?.id) {
@@ -103,11 +101,10 @@ const Checkout = () => {
           }
         } catch (error) {
           showToast({
-            icon:"error",
-            title:error?.response?.data?.message || ""
-          })
-        }
-        finally{
+            icon: "error",
+            title: error?.response?.data?.message || "",
+          });
+        } finally {
           setloading(false);
         }
       }
@@ -181,9 +178,7 @@ const Checkout = () => {
     inputField:
       // "bg-slate-100 p-2 sm:p-3 w-full outline-none focus:bg-slate-200 focus:animate-pulse focus:shadow-xl",
       "border-b-2 p-2  bg-gray-200 outline-none w-full rounded-xl px-3 py-2 focus:border-theme-primary transition disabled:cursor-not-allowed disabled:opacity-50",
-
   };
-
 
   return (
     <div className="px-5 md:px-8 lg:px-14  w-full">
@@ -338,9 +333,11 @@ const Checkout = () => {
 
             {/* products Detail */}
             <div className="col-span-2 sm:col-span-1 place-content-center">
-              <div className=" px-4 py-2 my-4 md:py-4  bg-slate-100   rounded-2xl
+              <div
+                className=" px-4 py-2 my-4 md:py-4  bg-slate-100   rounded-2xl
     border border-gray-100
-    shadow-[0_10px_40px_rgba(0,0,0,0.2)]  ">
+    shadow-[0_10px_40px_rgba(0,0,0,0.2)]  "
+              >
                 {/* product details */}
                 <div className="">
                   <div className="p-3">
@@ -447,6 +444,7 @@ const Checkout = () => {
                             setOnlinePay(true);
                           }}
                           checked={paymentMethod === "online"}
+                          id="onlinePay"
                         />
                         <span id="onlinePay">Direct Bank Transfer</span>
                       </label>
@@ -465,6 +463,7 @@ const Checkout = () => {
                             setOnlinePay(false);
                           }}
                           checked={paymentMethod === "cod"}
+                          id="cashPay"
                         />
                         <span id="cashPay">Cash On Delivery</span>
                       </label>

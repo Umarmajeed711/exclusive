@@ -21,7 +21,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const Category = () => {
   // const [loading, setLoading] = useState(false);
-  const {dispatch} = useContext(GlobalContext);
+  const { dispatch } = useContext(GlobalContext);
 
   const [showFilter, setShowFilter] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -79,15 +79,15 @@ const Category = () => {
   //   getCategories();
   // }, []);
 
-     const queryClient = useQueryClient();
-   
-     const { data, isLoading, isFetching, error } = useCategories({
-       filters,
-       page,
-       limit
-     });
+  const queryClient = useQueryClient();
 
-    const categories = data?.data ?? [];
+  const { data, isLoading, isFetching, error } = useCategories({
+    filters,
+    page,
+    limit,
+  });
+
+  const categories = data?.data ?? [];
 
   // const currentddPage = data?.currentddPage;
 
@@ -95,23 +95,23 @@ const Category = () => {
 
   const totalCategories = data?.totalCategories;
 
-    const onSuccess = ({ position, icon, message, category }) => {
-      // getCategories();
-      handleCategoryUpdate(category);
-      setSelectedCategory("")
-      setShowCategoryModal(false)
-      showToast({
-        icon: icon,
-        title: message || "",
-      });
-    };
-  
-    const OnError = ({ position, icon, message }) => {
-      showToast({
-        icon: icon,
-        title: message || "",
-      });
-    };
+  const onSuccess = ({ position, icon, message, category }) => {
+    // getCategories();
+    handleCategoryUpdate(category);
+    setSelectedCategory("");
+    setShowCategoryModal(false);
+    showToast({
+      icon: icon,
+      title: message || "",
+    });
+  };
+
+  const OnError = ({ position, icon, message }) => {
+    showToast({
+      icon: icon,
+      title: message || "",
+    });
+  };
 
   /* =========================
      FILTERS
@@ -245,7 +245,7 @@ const Category = () => {
 
     try {
       await api.delete(`/categories/delete`, {
-        data: { ids:categoryId },
+        data: { ids: categoryId },
       });
 
       showToast({
@@ -265,8 +265,6 @@ const Category = () => {
       });
     }
   };
-
-
 
   /* =========================
      BULK DELETE CATEGORY
@@ -402,35 +400,30 @@ const Category = () => {
 
       <TableLayout>
         <div>
-           {/* Category List */}
-      <CategoryList
-        categories={categories}
-        loading={isLoading}
-        filters={filters}
-        onEdit={(category) => {
-          setSelectedCategory(category);
-          setShowCategoryModal(true);
-        }}
-        onDelete={handleCategoryDelete}
-        onBulkDelete={handleBulkDeleteCategories}
-      />
+          {/* Category List */}
+          <CategoryList
+            categories={categories}
+            loading={isLoading}
+            filters={filters}
+            onEdit={(category) => {
+              setSelectedCategory(category);
+              setShowCategoryModal(true);
+            }}
+            onDelete={handleCategoryDelete}
+            onBulkDelete={handleBulkDeleteCategories}
+          />
 
-      {/* Pagination */}
-      <Pagination
-        currentPage={page}
-        totalPages={Math.ceil(totalCategories / (limit || 10))}
-        totalProducts={totalCategories}
-        pageSize={limit || 10}
-        isLoading={isLoading}
-        onPageChange={handlePageChange}
-      />
-      </div>
-
-
+          {/* Pagination */}
+          <Pagination
+            currentPage={page}
+            totalPages={Math.ceil(totalCategories / (limit || 10))}
+            totalProducts={totalCategories}
+            pageSize={limit || 10}
+            isLoading={isLoading}
+            onPageChange={handlePageChange}
+          />
+        </div>
       </TableLayout>
-
-     
-
 
       {/* Filters */}
       {showFilter && (

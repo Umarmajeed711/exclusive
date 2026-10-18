@@ -3,8 +3,11 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import api from "../helper/api";
 import { GlobalContext } from "../../context/Context";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../../lib/queryKeys";  
 
 const BulkUpdateProductForm = ({
+  
   selectedProducts = [],
   onClose = () => {},
   OnSuccess = () => {},
@@ -21,6 +24,8 @@ const BulkUpdateProductForm = ({
     productDiscount: yup.number().min(0).max(99).nullable(),
     productQuantity: yup.number().nullable(),
   });
+
+  const queryClient = useQueryClient();
 
   const formik = useFormik({
     initialValues: {
@@ -76,7 +81,7 @@ const BulkUpdateProductForm = ({
           };
         }
 
-         if (values.updateCostPrice) {
+        if (values.updateCostPrice) {
           updates.costPrice = {
             operation: values.costPriceOperation,
             value: Number(values.productCostPrice),
@@ -151,6 +156,11 @@ const BulkUpdateProductForm = ({
           title: response?.data?.message || "Products Updated Successfully",
         });
 
+        // Refresh products using TanStack Query
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.products(),
+        });
+
         formik.resetForm();
       } catch (error) {
         OnError({
@@ -184,7 +194,7 @@ const BulkUpdateProductForm = ({
       <div
         // className="border  w-full overflow-hidden h-full  bg-gray-200"
         // style={{ boxShadow: "0 0 10px #03A9F4" }}
-         className=" w-full
+        className=" w-full
   h-full
   overflow-hidden
   bg-gray-100
@@ -198,14 +208,13 @@ const BulkUpdateProductForm = ({
             className="flex flex-col gap-4  overflow-hidden h-full w-full"
           >
             <div className="py-3 border-b  px-4">
-            <p className="jetBranis text-xl sm:text-2xl font-mono font-semibold ">
-              Bulk Update Products
-            </p>
+              <p className="jetBranis text-xl sm:text-2xl font-mono font-semibold ">
+                Bulk Update Products
+              </p>
 
-            <p className="text-sm text-theme-primary mt-1">
-              Updating {selectedProducts?.length} selected products
-            </p>
-
+              <p className="text-sm text-theme-primary mt-1">
+                Updating {selectedProducts?.length} selected products
+              </p>
             </div>
 
             <div className="flex flex-col gap-5 w-full overflow-y-auto h-full custom-scrollbar py-3 px-4">
@@ -293,7 +302,10 @@ const BulkUpdateProductForm = ({
 
               {/* COST PRICE UPDATE */}
               <div className="bg-white rounded-lg p-4 space-y-4">
-                <Checkbox name="updateCostPrice" label="Update Product Cost Price" />
+                <Checkbox
+                  name="updateCostPrice"
+                  label="Update Product Cost Price"
+                />
 
                 {formik.values.updateCostPrice && (
                   <div className="space-y-3">
@@ -495,39 +507,37 @@ const BulkUpdateProductForm = ({
                   </select>
                 )}
               </div> */}
-
-              
             </div>
 
             {/* SUBMIT */}
 
-             <div className=" flex gap-3 w-full p-3 border-t">
+            <div className=" flex gap-3 w-full p-3 border-t">
               <button
                 onClick={() => {
-                formik.resetForm();
-              }}
+                  formik.resetForm();
+                }}
                 type="button"
                 className="rounded-md border  py-2 text-sm bg-white transition-all duration-200 hover:bg-gray-100  hover:shadow-md w-full"
               >
                 Clear
               </button>
-              
+
               <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded-md  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
-                >
-                  {loading ? (
-                    <div className="flex items-center px-1 py-2 gap-2">
-                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
-                    </div>
-                  ) : (
-                    "Update Products"
-                  )}
-                </button>
-             </div>
+                type="submit"
+                disabled={loading}
+                className="bg-theme-primary w-full transition-all duration-200 flex justify-center rounded-md  py-2  text-white hover:shadow-theme-secondary hover:shadow-md"
+              >
+                {loading ? (
+                  <div className="flex items-center px-1 py-2 gap-2">
+                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-2 h-2 bg-white rounded-full animate-bounce"></span>
+                  </div>
+                ) : (
+                  "Update Products"
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>

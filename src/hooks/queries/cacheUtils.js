@@ -1,12 +1,11 @@
 // lib/react-query/cacheUtils.js
 
 export const cacheUtils = {
-  invalidate(queryClient, queryKey, options = {}) {
-  return queryClient.invalidateQueries({
-    queryKey,
-    ...options,
-  });
-},
+  invalidate(queryClient, queryKey) {
+    return queryClient.invalidateQueries({
+      queryKey,
+    });
+  },
 
   rollback(queryClient, previousQueries) {
     previousQueries?.forEach(([queryKey, data]) => {
@@ -14,13 +13,7 @@ export const cacheUtils = {
     });
   },
 
-  async optimisticDelete({
-    queryClient,
-    queryKey,
-    ids,
-    dataKey,
-    matchField,
-  }) {
+  async optimisticDelete({ queryClient, queryKey, ids, dataKey, matchField }) {
     await queryClient.cancelQueries({
       queryKey,
     });
@@ -40,10 +33,10 @@ export const cacheUtils = {
           ...oldData,
 
           [dataKey]: oldData[dataKey].filter(
-            (item) => !ids.includes(item[matchField])
+            (item) => !ids.includes(item[matchField]),
           ),
         };
-      }
+      },
     );
 
     return { previousQueries };
@@ -75,12 +68,10 @@ export const cacheUtils = {
           ...oldData,
 
           [dataKey]: oldData[dataKey].map((item) =>
-            item[matchField] === updatedItem[matchField]
-              ? updatedItem
-              : item
+            item[matchField] === updatedItem[matchField] ? updatedItem : item,
           ),
         };
-      }
+      },
     );
 
     return { previousQueries };
@@ -148,12 +139,10 @@ export const cacheUtils = {
           ...oldData,
 
           [dataKey]: oldData[dataKey].map((item) =>
-            ids.includes(item[matchField])
-              ? updater(item)
-              : item
+            ids.includes(item[matchField]) ? updater(item) : item,
           ),
         };
-      }
+      },
     );
 
     return { previousQueries };

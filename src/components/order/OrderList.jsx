@@ -16,6 +16,9 @@ import { X } from "lucide-react";
 import { exportToCSV } from "../export/exportToCSV";
 import ExportDropdown from "../export/exportDrop";
 import { TableSkeleton } from "../helper/table";
+import { useDeleteOrders } from "../../hooks/mutations/useDeleteOrder";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "../../lib/queryKeys";
 
 /* ==============================
    DEFAULT COLUMNS
@@ -38,7 +41,7 @@ const STORAGE_KEY = "order_table_columns";
    MAIN COMPONENT
 ================================ */
 const OrderList = ({
-  products = [],
+  orders = [],
   filters = [],
   updateOrderStatus = () => {},
   loadingId = null,
@@ -59,16 +62,16 @@ const OrderList = ({
 
   useEffect(() => {
     if (selectedOrder) {
-      const select = products?.filter(
+      const select = orders?.filter(
         (p) => p?.order_id == selectedOrder?.order_id,
       );
       setSelectedOrder(select[0]);
     }
-  }, [products]);
+  }, [orders]);
 
   useEffect(() => {
-    setOrders(products);
-  }, [products]);
+    setOrders(orders);
+  }, [orders]);
 
   const menuRef = useOutsideClick(() => {
     setOpen(false); // close when clicked outside
@@ -226,7 +229,7 @@ const OrderList = ({
               title="Delete"
               disabled={loadingId == order?.order_id}
               className="p-2 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition disabled:opacity-50"
-              onClick={() => deleteOrder(order?.order_id)}
+              onClick={() => deleteOrder([order?.order_id])}
             >
               <RiDeleteBin6Fill size={16} />
             </button>
@@ -255,6 +258,8 @@ const OrderList = ({
   };
   const [bulkUpdLoading, setBulkUpdLoading] = useState(false);
   const [bulkDelLoading, setBulkDelLoading] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const handleBulkUpdate = async (id, field, value) => {
     if (selectedOrders.length === 1) {
@@ -293,6 +298,10 @@ const OrderList = ({
             icon: "success",
             title: "Update Successfully",
           });
+
+          await queryClient.invalidateQueries({
+            queryKey: queryKeys.orders(),
+          });
         } catch (error) {
           showToast({
             icon: "error",
@@ -309,6 +318,8 @@ const OrderList = ({
     setSelectedOrders([]);
   };
 
+  const { mutate: bulkDelete, isPendingDelete } = useDeleteOrders();
+
   const handleBulkDelete = async () => {
     const result = await Swal.fire({
       title: "Are You Sure?",
@@ -321,36 +332,55 @@ const OrderList = ({
       cancelButtonText: "Cancel",
     });
 
-    if (result?.isConfirmed) {
-      setBulkDelLoading(true);
+    if (!result.isConfirmed) return;
 
-      const previousOrders = Orders;
+    bulkDelete(
+      {
+        ids: selectedOrders,
+      },
+      {
+        onSuccess: () => {
+          showToast({
+            icon: "success",
+            title: "Delete Successfully",
+          });
+        },
 
-      setOrders((prev) =>
-        prev.filter((o) => !selectedOrders.includes(o.order_id)),
-      );
+        onError: (error) => {
+          showToast({
+            icon: "error",
+            title: error?.response?.data?.message || "Something went wrong",
+          });
+        },
+      },
+    );
 
-      try {
-        await api.delete("/orders/bulk-delete", {
-          data: { ids: selectedOrders },
-        });
+    // const previousOrders = Orders;
 
-        showToast({
-          icon: "success",
-          title: "Deleted Successfully",
-        });
-      } catch (error) {
-        showToast({
-          icon: "error",
-          title: error?.response?.data?.message || "Something went wrong",
-        });
-        setOrders(previousOrders);
-      } finally {
-        setBulkDelLoading(false);
-      }
-    }
+    // setOrders((prev) =>
+    //   prev.filter((o) => !selectedOrders.includes(o.order_id)),
+    // );
 
-    setSelectedOrders([]);
+    // try {
+    //   await api.delete("/orders/bulk-delete", {
+    //     data: { ids: selectedOrders },
+    //   });
+
+    //   showToast({
+    //     icon: "success",
+    //     title: "Deleted Successfully",
+    //   });
+    // } catch (error) {
+    //   showToast({
+    //     icon: "error",
+    //     title: error?.response?.data?.message || "Something went wrong",
+    //   });
+    //   setOrders(previousOrders);
+    // } finally {
+    //   setBulkDelLoading(false);
+    // }
+
+    // setSelectedOrders([]);
   };
 
   const navigate = useNavigate();
@@ -516,13 +546,13 @@ const OrderList = ({
 
                   {/* Delete */}
                   <button
-                    disabled={bulkDelLoading}
+                    disabled={isPendingDelete}
                     onClick={() => {
                       handleBulkDelete();
                     }}
                     className={` cursor-pointer px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-xl
                        hover:bg-red-600 shadow-sm shadow-red-400 hover:scale-105 hover:animate-spin
-                   duration-200 transition-all  ${bulkDelLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                   duration-200 transition-all  ${isPendingDelete ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     Delete
                   </button>

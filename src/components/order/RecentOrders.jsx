@@ -131,7 +131,7 @@ const RecentOrders = () => {
        <TableLayout>
       <OrderList
         title="Recent Orders"
-        products={Orders}
+        orders={Orders}
         loading={loading}
         isAdmin={isAdmin}
         loadingId={loadingId}

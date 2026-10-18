@@ -36,8 +36,6 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // export default Modal;
 
-
-
 const Modal = ({ isOpen, onClose, children, className }) => {
   const modalRef = useRef(null);
 
@@ -84,14 +82,14 @@ const Modal = ({ isOpen, onClose, children, className }) => {
             aria-modal="true"
             // className={`relative w-[90%] max-w-lg h-[700px] max-h-[80vh] overflow-hidden rounded-xl bg-theme-primary p-4 shadow-xl ${className || ""}`}
             className={`relative w-[90%] max-w-lg h-screen  overflow-hidden  border-l-[12px] border-theme-primary shadow-xl ${className || ""}`}
-           initial={{ x: "100%", opacity: 0 }}
-  animate={{ x: 0, opacity: 1 }}
-  exit={{ x: "100%", opacity: 0 }}
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
             // transition={{ type: "spring", stiffness: 460, damping: 20 }}
             transition={{
-    duration: 0.35,
-    ease: [0.22, 1, 0.36, 1],
-  }}
+              duration: 0.35,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             onClick={(e) => e.stopPropagation()} // Prevent backdrop close
           >
             {/* Close Button */}

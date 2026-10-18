@@ -15,6 +15,7 @@ import { MdClose } from "react-icons/md";
 import { showToast } from "../helper/types";
 import { DataNotFound } from "../helper/table";
 import { useDeleteProducts } from "../../hooks/mutations/useDeleteProducts";
+import { Delete, DeleteIcon, Edit, Edit2, Heart, Trash, X } from "lucide-react";
 
 const isNewArrival = (createdAt) => {
   const createdDate = new Date(createdAt);
@@ -202,34 +203,32 @@ const OurProducts = ({
   const { mutate: handleDelete, isPending } = useDeleteProducts();
 
   const deleteProduct = async (id) => {
-  const result = await Swal.fire({
-    title: "Are You Sure?",
-    text: "Do you want to delete this product?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonText: "Delete",
-  });
+    const result = await Swal.fire({
+      title: "Are You Sure?",
+      text: "Do you want to delete this product?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Delete",
+    });
 
-  if (!result.isConfirmed) return;
+    if (!result.isConfirmed) return;
 
-  handleDelete([id], {
-    onSuccess: (data) => {
-      showToast({
-        icon: "success",
-        title: data.message,
-      });
-    },
+    handleDelete([id], {
+      onSuccess: (data) => {
+        showToast({
+          icon: "success",
+          title: data.message,
+        });
+      },
 
-    onError: (error) => {
-      showToast({
-        icon: "error",
-        title:
-          error?.response?.data?.message ||
-          "Something went wrong",
-      });
-    },
-  });
-};
+      onError: (error) => {
+        showToast({
+          icon: "error",
+          title: error?.response?.data?.message || "Something went wrong",
+        });
+      },
+    });
+  };
 
   // const deleteProduct = async (id) => {
   //   // 🔥 Show confirmation alert first
@@ -272,16 +271,16 @@ const OurProducts = ({
     setProjectData({});
     setShowModal(false);
     showToast({
-          icon: icon,
-          title: title,
-        });
+      icon: icon,
+      title: title,
+    });
   };
 
   const OnError = ({ position, icon, title }) => {
     showToast({
-          icon: icon,
-          title: title,
-        });
+      icon: icon,
+      title: title,
+    });
   };
 
   const dynamicToast = ({
@@ -373,7 +372,7 @@ const OurProducts = ({
         );
 
         if (existingProduct) {
-          if ((existingProduct.quantity + 1) > product.quantity) {
+          if (existingProduct.quantity + 1 > product.quantity) {
             return showToast({
               icon: "error",
               title: `Only ${product.quantity} item(s) available in stock`,
@@ -425,7 +424,6 @@ const OurProducts = ({
         title: response?.data?.message,
       });
     } catch (e) {
-
       showToast({
         icon: "error",
         title: e?.response?.data?.message || "Something went wrong",
@@ -488,8 +486,12 @@ const OurProducts = ({
         //     No products found
         //   </div>
         // </div>
-            <DataNotFound icon="🛒" title="No Product" message="Curretly No products found"
-         className="h-[60vh]" />
+        <DataNotFound
+          icon="🛒"
+          title="No Product"
+          message="Curretly No products found"
+          className="h-[60vh]"
+        />
       ) : (
         <>
           {title ? <Title title={title} description={description} /> : null}
@@ -500,8 +502,10 @@ const OurProducts = ({
                 key={i}
                 to={`/productDetail/${product?.product_id}`}
                 className="col-span-1"
+
+                // hover:shadow-[0_0_20px_#03A9F4,0_0_20px_#4EC3F8]
               >
-                <div className="relative border-none shadow-xl  overflow-hidden  group hover:-translate-y-4 hover:rounded-xl hover:shadow-[0_0_20px_#03A9F4,0_0_20px_#4EC3F8]  transition duration-500">
+                <div className="relative border-none shadow-xl hover:shadow-[0_0_10px_#9fa3a5]  overflow-hidden  group hover:-translate-y-4 hover:rounded-xl   transition duration-500">
                   {/* Image & hover */}
                   <div className="relative w-full  h-64 aspect-square overflow-hidden   flex justify-center items-center   bg-slate-100  ">
                     <img
@@ -527,7 +531,8 @@ const OurProducts = ({
                             removeToFavorite(product?.product_id);
                           }}
                         >
-                          <MdClose className="text-lg text-gray-700 " />
+                          {/* <MdClose className="text-lg text-gray-700 " /> */}
+                          <X size={16} />
                         </button>
                       ) : (
                         <button
@@ -538,7 +543,8 @@ const OurProducts = ({
                             addToFavorite(product?.product_id);
                           }}
                         >
-                          <AiOutlineHeart className="text-lg text-gray-700 " />
+                          {/* <AiOutlineHeart className="text-lg text-gray-700 " /> */}
+                          <Heart size={16} />
                         </button>
                       )}
 
@@ -562,7 +568,8 @@ const OurProducts = ({
                               editProduct(product);
                             }}
                           >
-                            <BiEditAlt className="text-lg text-gray-700" />
+                            <Edit2 size={16} />
+                            {/* className="text-lg text-gray-700" */}
                           </button>
                           <button
                             className="bg-white p-2 rounded-full opacity-0 group-hover:opacity-90 shadow hover:bg-gray-200 !z-30 hover:scale-110 hover:!text-theme-primary"
@@ -573,7 +580,8 @@ const OurProducts = ({
                               deleteProduct(product?.product_id);
                             }}
                           >
-                            <RiDeleteBin5Line className="text-lg text-gray-700" />
+                            {/* <Delete className="text-lg text-gray-700" /> */}
+                            <Trash size={16} />
                           </button>
                         </>
                       ) : null}
@@ -624,27 +632,30 @@ const OurProducts = ({
                   {/* Product Info */}
                   <div className="p-2 flex flex-col gap-1">
                     <p className="font-semibold">{product?.name}</p>
-                    <div className="flex gap-2 items-center">
+                    <div className="flex justify-between">
                       {/* <p className="text-theme-primary font-medium">
                         ${product?.price}
                       </p> */}
                       {/* <p className="text-gray-500 text-sm">⭐️ 4.5</p> */}
-                      {product?.discount ? (
-                        <>
+                      <div className="flex gap-2 items-center">
+                        {product?.discount ? (
+                          <>
+                            <p className="text-theme-primary font-medium">
+                              $
+                              {product?.price -
+                                (product?.price * product?.discount) / 100}
+                            </p>
+                            <p className="line-through text-sm text-gray-400">
+                              ${product?.price}
+                            </p>
+                          </>
+                        ) : (
                           <p className="text-theme-primary font-medium">
-                            $
-                            {product?.price -
-                              (product?.price * product?.discount) / 100}
-                          </p>
-                          <p className="line-through text-sm text-gray-400">
                             ${product?.price}
                           </p>
-                        </>
-                      ) : (
-                        <p className="text-theme-primary font-medium">
-                          ${product?.price}
-                        </p>
-                      )}
+                        )}
+                      </div>
+
                       <p className="text-gray-500 text-sm">
                         ⭐ {product?.rating || "4.5"}
                       </p>
